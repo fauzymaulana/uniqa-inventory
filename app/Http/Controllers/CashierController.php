@@ -177,6 +177,7 @@ class CashierController extends Controller
                 'change' => $change,
                 'status' => 'completed',
                 'payment_method' => $validated['payment_method'],
+                'is_synced' => true,
             ]);
 
             // Create transaction details and reduce stock
@@ -205,6 +206,89 @@ class CashierController extends Controller
                 ->withInput();
         }
     }
+
+    /**
+     * Sync offline transactions submitted from the POS client.
+     */
+    public function syncOfflineTransactions(Request $request): JsonResponse
+    {
+        $transactions = $request->input('transactions', []);
+
+        if (!is_array($transactions) || empty($transactions)) {
+            return response()->json(['success' => false, 'message' => 'No transactions to sync'], 422);
+        }
+
+        $synced = [];
+        $failed = [];
+
+        foreach ($transactions as $txData) {
+            DB::beginTransaction();
+            try {
+                $items = $txData['items'] ?? [];
+                if (empty($items)) {
+                    $failed[] = ['offline_id' => $txData['offline_id'] ?? null, 'reason' => 'Empty cart'];
+                    DB::rollBack();
+                    continue;
+                }
+
+                $totalPrice = 0;
+                $itemsDetail = [];
+
+                foreach ($items as $item) {
+                    $product = Product::findOrFail($item['product_id']);
+                    $qty = intval($item['quantity']);
+                    if (!$product->hasStock($qty)) {
+                        throw new \Exception("Stok {$product->name} tidak cukup");
+                    }
+                    $price = isset($item['price']) ? floatval($item['price']) : $product->price;
+                    $subtotal = $price * $qty;
+                    $totalPrice += $subtotal;
+                    $itemsDetail[] = compact('product', 'qty', 'price', 'subtotal');
+                }
+
+                $discountAmount = floatval($txData['discount_amount'] ?? 0);
+                $totalAfterDiscount = max(0, $totalPrice - $discountAmount);
+                $amountReceived = floatval($txData['amount_received'] ?? $totalAfterDiscount);
+                $change = $amountReceived - $totalAfterDiscount;
+
+                $transaction = Transaction::create([
+                    'transaction_number' => Transaction::generateTransactionNumber(),
+                    'user_id' => auth()->id(),
+                    'discount_amount' => $discountAmount,
+                    'total_price' => $totalPrice,
+                    'amount_received' => $amountReceived,
+                    'change' => $change,
+                    'status' => 'completed',
+                    'payment_method' => $txData['payment_method'] ?? 'cash',
+                    'is_synced' => true,
+                ]);
+
+                foreach ($itemsDetail as $item) {
+                    TransactionDetail::create([
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $item['product']->id,
+                        'quantity' => $item['qty'],
+                        'price_at_time' => $item['price'],
+                        'subtotal' => $item['subtotal'],
+                    ]);
+                    $item['product']->reduceStock($item['qty'], 'Offline Sync - ' . $transaction->transaction_number);
+                }
+
+                DB::commit();
+                $synced[] = ['offline_id' => $txData['offline_id'] ?? null, 'transaction_number' => $transaction->transaction_number];
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $failed[] = ['offline_id' => $txData['offline_id'] ?? null, 'reason' => $e->getMessage()];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'synced' => $synced,
+            'failed' => $failed,
+        ]);
+    }
+
 
     /**
      * Show transaction receipt.

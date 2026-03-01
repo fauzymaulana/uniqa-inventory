@@ -105,6 +105,7 @@ Route::middleware('auth')->group(function () {
     // API Routes for AJAX
     Route::prefix('api')->name('api.')->group(function () {
         Route::post('get-product', [CashierController::class, 'getProduct'])->name('get-product');
+        Route::post('sync-transactions', [CashierController::class, 'syncOfflineTransactions'])->name('sync-transactions');
         // DataTables server-side endpoint for admin products
         Route::get('products/datatables', [App\Http\Controllers\Api\ProductApiController::class, 'datatables'])->name('products.datatables');
     });

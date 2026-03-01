@@ -23,6 +23,7 @@
                         <th class="text-end">Total</th>
                         <th class="text-end">Kembalian</th>
                         <th>Metode Pembayaran</th>
+                        <th class="text-center">Sync</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -43,6 +44,13 @@
                                 @endif
                             </td>
                             <td class="text-center">
+                                @if($transaction->is_synced)
+                                    <i class="fas fa-sync-alt text-success" title="Sudah tersinkronisasi"></i>
+                                @else
+                                    <i class="fas fa-sync-alt text-danger" title="Belum tersinkronisasi"></i>
+                                @endif
+                            </td>
+                            <td class="text-center">
                                 <a href="{{ route('cashier.transaction-details', $transaction) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i> Detail
                                 </a>
@@ -50,7 +58,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center text-muted">Belum ada transaksi</td>
+                            <td colspan="9" class="text-center text-muted">Belum ada transaksi</td>
                         </tr>
                     @endforelse
                 </tbody>
