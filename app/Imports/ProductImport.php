@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Imports;
+
+use App\Models\Category;
+use App\Models\Product;
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+
+class ProductImport implements ToModel, WithHeadingRow, SkipsOnError
+{
+    use SkipsErrors;
+
+    public function model(array $row)
+    {
+        // Skip empty rows
+        if (empty($row['nama_produk']) || empty($row['sku'])) {
+            return null;
+        }
+
+        // Skip if SKU already exists
+        if (Product::where('sku', trim($row['sku']))->exists()) {
+            return null;
+        }
+
+        // Find category by name
+        $category = Category::where('name', trim($row['kategori'] ?? ''))->first();
+
+        $price = isset($row['harga']) ? (float) preg_replace('/[^0-9]/', '', (string) $row['harga']) : 0;
+        $stock = isset($row['stok']) ? (int) $row['stok'] : 0;
+
+        return new Product([
+            'name' => trim($row['nama_produk']),
+            'sku' => trim($row['sku']),
+            'description' => trim($row['deskripsi'] ?? ''),
+            'price' => $price,
+            'stock' => $stock,
+            'category_id' => $category ? $category->id : null,
+        ]);
+    }
+}

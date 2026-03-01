@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\StockAdjustment;
 use Illuminate\View\View;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -16,9 +17,9 @@ class ReportController extends Controller
     public function sales(): View
     {
         $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
-        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
 
-        $transactions = Transaction::with('details.product', 'user')
+        $transactions = Transaction::with('details.product.category', 'user')
             ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
             ->where('status', 'completed')
             ->latest()
@@ -61,7 +62,7 @@ class ReportController extends Controller
     public function stockHistory(): View
     {
         $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
-        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
 
         $adjustments = StockAdjustment::with('product', 'user')
             ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
@@ -124,5 +125,24 @@ class ReportController extends Controller
     {
         $transaction->load('details.product', 'user');
         return view('admin.transaction-details', compact('transaction'));
+    }
+
+    /**
+     * Export sales report to Excel.
+     */
+    public function exportSales()
+    {
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
+
+        $transactions = Transaction::with('details.product.category', 'user')
+            ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
+            ->where('status', 'completed')
+            ->latest()
+            ->get();
+
+        $fileName = 'Laporan_Penjualan_' . $startDate->format('Y-m-d') . '_sd_' . $endDate->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new \App\Exports\SalesReportExport($transactions, $startDate, $endDate), $fileName);
     }
 }

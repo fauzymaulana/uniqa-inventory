@@ -263,7 +263,7 @@ class AdminDashboardController extends Controller
      */
     private function exportDailyReport(Carbon $startDate, Carbon $endDate)
     {
-        $transactions = Transaction::with('details.product', 'user')
+        $transactions = Transaction::with('details.product.category', 'user')
             ->where('status', 'completed')
             ->whereBetween('created_at', [$startDate, $endDate->endOfDay()])
             ->get();
@@ -279,29 +279,23 @@ class AdminDashboardController extends Controller
     private function exportMonthlyReport(Carbon $startDate, Carbon $endDate)
     {
         $data = [];
-        $currentDate = $startDate->copy();
+        $currentDate = $startDate->copy()->startOfMonth();
 
-        while ($currentDate <= $endDate) {
+        while ($currentDate->lte($endDate)) {
+            $monthStart = $currentDate->copy()->startOfMonth();
+            $monthEnd = $currentDate->copy()->endOfMonth();
+
             $sales = Transaction::where('status', 'completed')
-                ->whereBetween('created_at', [
-                    $currentDate->startOfMonth(),
-                    $currentDate->endOfMonth()
-                ])
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->sum('total_price');
 
             $transactions = Transaction::where('status', 'completed')
-                ->whereBetween('created_at', [
-                    $currentDate->startOfMonth(),
-                    $currentDate->endOfMonth()
-                ])
+                ->whereBetween('created_at', [$monthStart, $monthEnd])
                 ->count();
 
             // Get expenses for the month
-            $expenses = \App\Models\Expense::whereBetween('created_at', [
-                $currentDate->startOfMonth(),
-                $currentDate->endOfMonth()
-            ])
-            ->sum('amount');
+            $expenses = \App\Models\Expense::whereBetween('created_at', [$monthStart, $monthEnd])
+                ->sum('amount');
 
             $balance = $sales - $expenses;
 

@@ -63,6 +63,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', ProductController::class);
         Route::get('products/{product}/adjust-stock', [ProductController::class, 'adjustStock'])->name('products.adjust-stock');
         Route::post('products/{product}/update-stock', [ProductController::class, 'updateStock'])->name('products.update-stock');
+        Route::get('products-import-template', [ProductController::class, 'downloadTemplate'])->name('products.import-template');
+        Route::post('products-import', [ProductController::class, 'import'])->name('products.import');
 
         // Admin Dashboard
         Route::get('dashboard', 'App\\Http\\Controllers\\AdminDashboardController@index')->name('dashboard');
@@ -77,6 +79,7 @@ Route::middleware('auth')->group(function () {
         // Reports
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('sales', [ReportController::class, 'sales'])->name('sales');
+            Route::get('sales/export', [ReportController::class, 'exportSales'])->name('sales.export');
             Route::get('sales/daily-payment-data', 'App\\Http\\Controllers\\AdminDashboardController@getDailyPaymentMethodData')->name('sales.daily-payment-data');
             Route::get('sales/filtered-payment-data', 'App\\Http\\Controllers\\AdminDashboardController@getFilteredSalesDailyPaymentData')->name('sales.filtered-payment-data');
             Route::get('inventory', [ReportController::class, 'inventory'])->name('inventory');

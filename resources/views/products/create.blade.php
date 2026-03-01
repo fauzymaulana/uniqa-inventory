@@ -54,16 +54,8 @@
                         @error('stock') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Barcode</label>
-                        <input type="text" name="barcode" class="form-control @error('barcode') is-invalid @enderror" value="{{ old('barcode') }}">
-                        @error('barcode') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">QR Code</label>
-                        <input type="text" name="qr_code" class="form-control @error('qr_code') is-invalid @enderror" value="{{ old('qr_code') }}">
-                        @error('qr_code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="alert alert-info py-2">
+                        <i class="fas fa-info-circle"></i> <strong>Barcode & QR Code</strong> akan digenerate otomatis oleh sistem berdasarkan SKU produk.
                     </div>
 
                     <div class="mb-3">
