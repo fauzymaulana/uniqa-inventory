@@ -23,7 +23,7 @@ class InvitationController extends Controller
      */
     public function create()
     {
-        abort_if(auth()->user()->role !== 'admin', 403);
+        abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
         $categories = InvitationCategory::all();
         return view('undangan.create', compact('categories'));
     }
@@ -81,7 +81,7 @@ class InvitationController extends Controller
      */
     public function store(Request $request)
     {
-        abort_if(auth()->user()->role !== 'admin', 403);
+        abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
         $validated = $request->validate([
             'invitation_category_id' => 'required|exists:invitation_categories,id',
             'name' => 'required|string|max:255',
