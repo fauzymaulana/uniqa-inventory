@@ -118,6 +118,13 @@
                         <a href="{{ route('admin.expenses.index') }}" class="@if(request()->routeIs('admin.expenses.*')) active @endif">
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
                         </a>
+                        <div class="sidebar-title">Undangan & Konten</div>
+                        <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
+                            <i class="fas fa-envelope-open-text"></i> Undangan
+                        </a>
+                        <a href="{{ route('konten.index') }}" class="@if(request()->routeIs('konten.*')) active @endif">
+                            <i class="fas fa-images"></i> Konten
+                        </a>
                     @else
                         <div class="sidebar-title">Kasir Menu</div>
                         <a href="{{ route('cashier.dashboard') }}" class="@if(request()->routeIs('cashier.dashboard')) active @endif">
@@ -131,6 +138,13 @@
                         </a>
                         <a href="{{ route('cashier.expenses.index') }}" class="@if(request()->routeIs('cashier.expenses.*')) active @endif">
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
+                        </a>
+                        <div class="sidebar-title">Undangan & Konten</div>
+                        <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
+                            <i class="fas fa-envelope-open-text"></i> Undangan
+                        </a>
+                        <a href="{{ route('konten.index') }}" class="@if(request()->routeIs('konten.*')) active @endif">
+                            <i class="fas fa-images"></i> Konten
                         </a>
                     @endif
 
