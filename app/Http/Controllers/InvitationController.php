@@ -23,6 +23,7 @@ class InvitationController extends Controller
      */
     public function create()
     {
+        abort_if(auth()->user()->role !== 'admin', 403);
         $categories = InvitationCategory::all();
         return view('undangan.create', compact('categories'));
     }
@@ -32,11 +33,12 @@ class InvitationController extends Controller
      */
     public function store(Request $request)
     {
+        abort_if(auth()->user()->role !== 'admin', 403);
         $validated = $request->validate([
             'invitation_category_id' => 'required|exists:invitation_categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
         ]);
@@ -49,6 +51,7 @@ class InvitationController extends Controller
         }
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['price'] = $validated['price'] ?? 0;
 
         InvitationProduct::create($validated);
 
@@ -69,6 +72,7 @@ class InvitationController extends Controller
      */
     public function edit(string $id)
     {
+        abort_if(auth()->user()->role !== 'admin', 403);
         $product = InvitationProduct::findOrFail($id);
         $categories = InvitationCategory::all();
         return view('undangan.edit', compact('product', 'categories'));
@@ -79,13 +83,14 @@ class InvitationController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_if(auth()->user()->role !== 'admin', 403);
         $product = InvitationProduct::findOrFail($id);
 
         $validated = $request->validate([
             'invitation_category_id' => 'required|exists:invitation_categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'is_active' => 'boolean',
         ]);
@@ -102,6 +107,7 @@ class InvitationController extends Controller
         }
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['price'] = $validated['price'] ?? 0;
 
         $product->update($validated);
 
@@ -113,6 +119,7 @@ class InvitationController extends Controller
      */
     public function destroy(string $id)
     {
+        abort_if(auth()->user()->role !== 'admin', 403);
         $product = InvitationProduct::findOrFail($id);
 
         if ($product->thumbnail) {
