@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('transaction_number')->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->decimal('discount_amount', 15, 2)->default(0);
             $table->decimal('total_price', 15, 2);
             $table->decimal('amount_received', 15, 2);
             $table->decimal('change', 15, 2);
             $table->enum('status', ['completed', 'pending', 'cancelled'])->default('completed');
+            $table->enum('payment_method', ['transfer', 'cash'])->default('cash');
+            $table->boolean('is_synced')->default(true);
             $table->text('notes')->nullable();
             $table->timestamps();
         });
