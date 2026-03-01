@@ -1,0 +1,98 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Product extends Model
+{
+    protected $fillable = [
+        'name',
+        'sku',
+        'description',
+        'price',
+        'stock',
+        'barcode',
+        'qr_code',
+        'category_id',
+        'is_flexible_price',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
+
+    /**
+     * Get the category that owns the product.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get all transaction details for this product.
+     */
+    public function transactionDetails(): HasMany
+    {
+        return $this->hasMany(TransactionDetail::class);
+    }
+
+    /**
+     * Get all stock adjustments for this product.
+     */
+    public function stockAdjustments(): HasMany
+    {
+        return $this->hasMany(StockAdjustment::class);
+    }
+
+    /**
+     * Check if product has sufficient stock.
+     */
+    public function hasStock(int $quantity): bool
+    {
+        return $this->stock >= $quantity;
+    }
+
+    /**
+     * Reduce stock when product is sold.
+     */
+    public function reduceStock(int $quantity, string $reason = 'Sale'): void
+    {
+        $quantityBefore = $this->stock;
+        $this->stock -= $quantity;
+        $this->save();
+
+        StockAdjustment::create([
+            'product_id' => $this->id,
+            'quantity_before' => $quantityBefore,
+            'quantity_after' => $this->stock,
+            'adjustment_value' => -$quantity,
+            'type' => 'out',
+            'reason' => $reason,
+            'user_id' => auth()->id() ?? 1,
+        ]);
+    }
+
+    /**
+     * Increase stock for a product.
+     */
+    public function increaseStock(int $quantity, string $reason = 'Restock'): void
+    {
+        $quantityBefore = $this->stock;
+        $this->stock += $quantity;
+        $this->save();
+
+        StockAdjustment::create([
+            'product_id' => $this->id,
+            'quantity_before' => $quantityBefore,
+            'quantity_after' => $this->stock,
+            'adjustment_value' => $quantity,
+            'type' => 'in',
+            'reason' => $reason,
+            'user_id' => auth()->id() ?? 1,
+        ]);
+    }
+}
