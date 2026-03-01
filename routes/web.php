@@ -101,6 +101,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('expenses', ExpenseController::class);
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
+
+        // Undangan Create (admin access)
+        Route::get('undangan/create', [InvitationController::class, 'create'])->name('undangan.create');
+        Route::post('undangan', [InvitationController::class, 'store'])->name('undangan.store');
     });
 
     // Cashier Routes
@@ -119,6 +123,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('expenses', ExpenseController::class);
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
+
+        // Undangan Create (cashier access)
+        Route::get('undangan/create', [InvitationController::class, 'create'])->name('undangan.create');
+        Route::post('undangan', [InvitationController::class, 'store'])->name('undangan.store');
     });
 
     // API Routes for AJAX
