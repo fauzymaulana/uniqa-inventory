@@ -46,8 +46,10 @@ class AdminDashboardController extends Controller
             ->orderBy('stock')
             ->get();
 
-        // Best selling products
-        $topProducts = $this->getTopSellingProducts($startDate, $endDate, 5);
+        // Best selling products (always use full current month)
+        $monthStart = now()->startOfMonth();
+        $monthEnd = now()->endOfMonth();
+        $topProducts = $this->getTopSellingProducts($monthStart, $monthEnd, 5);
 
         // Category breakdown
         $categoryData = $this->getCategoryBreakdown($startDate, $endDate);
@@ -99,12 +101,12 @@ class AdminDashboardController extends Controller
     }
 
     /**
-     * Get daily payment method data for dashboard (30 days).
+     * Get daily payment method data for dashboard (current month).
      */
     public function getDailyPaymentMethodData()
     {
-        $endDate = now();
-        $startDate = now()->subDays(30);
+        $startDate = now()->startOfMonth();
+        $endDate = now()->endOfMonth();
 
         $labels = [];
         $transferData = [];

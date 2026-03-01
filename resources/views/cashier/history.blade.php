@@ -10,6 +10,26 @@
     </div>
 </div>
 
+<!-- Month Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ route('cashier.history') }}" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Bulan</label>
+                <input type="month" name="month" class="form-control" value="{{ $month }}">
+            </div>
+            <div class="col-md-8 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <a href="{{ route('cashier.history.export-excel') }}?month={{ $month }}" class="btn btn-success">
+                    <i class="fas fa-download"></i> Export Excel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
@@ -65,7 +85,7 @@
             </table>
         </div>
 
-        {{ $transactions->links() }}
+        {{ $transactions->appends(request()->query())->links() }}
     </div>
 </div>
 

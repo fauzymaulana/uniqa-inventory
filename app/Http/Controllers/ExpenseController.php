@@ -7,6 +7,8 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ExpenseController extends Controller
 {
@@ -15,17 +17,87 @@ class ExpenseController extends Controller
      */
     public function index(): View
     {
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
+
         $query = Expense::with('user', 'category');
         
         // If user is cashier, only show their own expenses
         if (auth()->user()->role === 'cashier') {
             $query->where('user_id', auth()->id());
         }
+
+        $query->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()]);
         
         $expenses = $query->latest()->paginate(20);
         $categories = Category::all();
+
+        // Summary stats
+        $totalExpenses = Expense::query()
+            ->when(auth()->user()->role === 'cashier', fn($q) => $q->where('user_id', auth()->id()))
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->sum('amount');
         
-        return view('expenses.index', compact('expenses', 'categories'));
+        return view('expenses.index', compact('expenses', 'categories', 'startDate', 'endDate', 'totalExpenses'));
+    }
+
+    /**
+     * Get daily expense data for chart (current month).
+     */
+    public function getDailyExpenseData()
+    {
+        $startDate = now()->startOfMonth();
+        $endDate = now()->endOfMonth();
+
+        // Single query grouped by date
+        $query = Expense::whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
+        if (auth()->user()->role === 'cashier') {
+            $query->where('user_id', auth()->id());
+        }
+
+        $results = $query->selectRaw("DATE(created_at) as date, SUM(amount) as total")
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $labels = [];
+        $data = [];
+
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $dateKey = $current->format('Y-m-d');
+            $labels[] = $current->format('d M');
+            $data[] = $results->get($dateKey, 0);
+
+            $current->addDay();
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * Export expenses to Excel.
+     */
+    public function exportExcel(Request $request)
+    {
+        $startDate = $request->input('start_date') ? Carbon::parse($request->input('start_date')) : now()->startOfMonth();
+        $endDate = $request->input('end_date') ? Carbon::parse($request->input('end_date')) : now()->endOfMonth();
+
+        $query = Expense::with('user', 'category');
+
+        if (auth()->user()->role === 'cashier') {
+            $query->where('user_id', auth()->id());
+        }
+
+        $expenses = $query->whereBetween('created_at', [$startDate->startOfDay(), $endDate->endOfDay()])
+            ->latest()
+            ->get();
+
+        $fileName = 'Laporan_Pengeluaran_' . $startDate->format('Y-m-d') . '_sd_' . $endDate->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new \App\Exports\ExpenseReportExport($expenses, $startDate, $endDate), $fileName);
     }
 
     /**

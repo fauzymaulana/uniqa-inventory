@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Facades\Excel;
 use DB;
 
 class CashierController extends Controller
@@ -29,6 +31,45 @@ class CashierController extends Controller
         $lowStockProducts = Product::where('stock', '<', 10)->count();
         
         return view('cashier.dashboard', compact('todaySales', 'todaysTransactions', 'lowStockProducts'));
+    }
+
+    /**
+     * Get daily payment method data for cashier dashboard (current month).
+     */
+    public function getDailyPaymentMethodData()
+    {
+        $startDate = now()->startOfMonth();
+        $endDate = now()->endOfMonth();
+
+        // Single query grouped by date and payment method
+        $results = Transaction::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->selectRaw("DATE(created_at) as date, payment_method, SUM(total_price) as total")
+            ->groupBy('date', 'payment_method')
+            ->get()
+            ->groupBy('date');
+
+        $labels = [];
+        $transferData = [];
+        $cashData = [];
+
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $dateKey = $current->format('Y-m-d');
+            $labels[] = $current->format('d M');
+
+            $dayData = $results->get($dateKey, collect());
+            $transferData[] = $dayData->where('payment_method', 'transfer')->sum('total');
+            $cashData[] = $dayData->where('payment_method', 'cash')->sum('total');
+
+            $current->addDay();
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'transfer' => $transferData,
+            'cash' => $cashData
+        ]);
     }
 
     /**
@@ -313,11 +354,35 @@ class CashierController extends Controller
      */
     public function history(): View
     {
+        $month = request('month', now()->format('Y-m'));
+        $startOfMonth = Carbon::parse($month)->startOfMonth();
+        $endOfMonth = Carbon::parse($month)->endOfMonth();
+
         $transactions = Transaction::with('user', 'details')
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
             ->latest()
             ->paginate(20);
         
-        return view('cashier.history', compact('transactions'));
+        return view('cashier.history', compact('transactions', 'month'));
+    }
+
+    /**
+     * Export transaction history to Excel.
+     */
+    public function exportHistoryExcel()
+    {
+        $month = request('month', now()->format('Y-m'));
+        $startOfMonth = Carbon::parse($month)->startOfMonth();
+        $endOfMonth = Carbon::parse($month)->endOfMonth();
+
+        $transactions = Transaction::with('details.product', 'user')
+            ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+            ->latest()
+            ->get();
+
+        $fileName = 'Riwayat_Transaksi_' . $startOfMonth->format('F_Y') . '.xlsx';
+
+        return Excel::download(new \App\Exports\TransactionHistoryExport($transactions, $startOfMonth, $endOfMonth), $fileName);
     }
 
     /**
