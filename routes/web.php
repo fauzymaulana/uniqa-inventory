@@ -86,20 +86,26 @@ Route::middleware('auth')->group(function () {
 
         // Expenses
         Route::resource('expenses', ExpenseController::class);
+        Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
+        Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
     });
 
     // Cashier Routes
     Route::middleware(CheckCashierRole::class)->prefix('cashier')->name('cashier.')->group(function () {
         Route::get('dashboard', [CashierController::class, 'dashboard'])->name('dashboard');
+        Route::get('dashboard/daily-payment-data', [CashierController::class, 'getDailyPaymentMethodData'])->name('dashboard.daily-payment-data');
         Route::get('pos', [CashierController::class, 'pos'])->name('pos');
         Route::post('store-transaction', [CashierController::class, 'storeTransaction'])->name('store-transaction');
         Route::get('receipt/{transaction}', [CashierController::class, 'receipt'])->name('receipt');
         Route::get('print-receipt/{transaction}', [CashierController::class, 'printReceipt'])->name('print-receipt');
         Route::get('history', [CashierController::class, 'history'])->name('history');
+        Route::get('history-export-excel', [CashierController::class, 'exportHistoryExcel'])->name('history.export-excel');
         Route::get('transaction-details/{transaction}', [CashierController::class, 'transactionDetails'])->name('transaction-details');
         
         // Expenses
         Route::resource('expenses', ExpenseController::class);
+        Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
+        Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
     });
 
     // API Routes for AJAX

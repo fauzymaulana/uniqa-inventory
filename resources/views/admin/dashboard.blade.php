@@ -103,7 +103,7 @@
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
-                    <i class="fas fa-chart-line"></i> Laporan Harian Metode Pembayaran (30 Hari)
+                    <i class="fas fa-chart-line"></i> Laporan Harian Metode Pembayaran ({{ now()->translatedFormat('F Y') }})
                 </h5>
             </div>
             <div class="card-body">
@@ -141,7 +141,7 @@
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
-                    <i class="fas fa-star"></i> 5 Produk Paling Laris ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }})
+                    <i class="fas fa-star"></i> 5 Produk Paling Laris ({{ now()->startOfMonth()->format('d M Y') }} - {{ now()->endOfMonth()->format('d M Y') }})
                 </h5>
             </div>
             <div class="card-body">
