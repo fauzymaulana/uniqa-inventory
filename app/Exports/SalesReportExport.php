@@ -6,9 +6,10 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class DailyReportExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize
+class SalesReportExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithTitle
 {
     protected $transactions;
     protected $startDate;
@@ -19,6 +20,11 @@ class DailyReportExport implements FromCollection, WithHeadings, WithStyles, Sho
         $this->transactions = $transactions;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
+    }
+
+    public function title(): string
+    {
+        return 'Laporan Penjualan';
     }
 
     public function collection()
@@ -83,12 +89,41 @@ class DailyReportExport implements FromCollection, WithHeadings, WithStyles, Sho
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1 => [
-                'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0070C0']],
-                'alignment' => ['horizontal' => 'center'],
-            ],
-        ];
+        $lastRow = $sheet->getHighestRow();
+
+        $sheet->getStyle('A1:K1')->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0070C0']],
+            'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
+        ]);
+        $sheet->getRowDimension(1)->setRowHeight(22);
+
+        // Currency format for numeric columns
+        $sheet->getStyle("I2:K{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle("I2:K{$lastRow}")->getAlignment()->setHorizontal('right');
+
+        // Borders
+        $sheet->getStyle("A1:K{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(
+            \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+        );
+
+        // Alternating rows
+        for ($i = 2; $i <= $lastRow; $i++) {
+            if ($i % 2 === 0) {
+                $sheet->getStyle("A{$i}:K{$i}")->getFill()->setFillType('solid')
+                    ->getStartColor()->setRGB('F2F2F2');
+            }
+        }
+
+        // Title rows
+        $sheet->insertNewRowBefore(1, 2);
+        $sheet->setCellValue('A1', 'Laporan Penjualan Detail');
+        $sheet->setCellValue('A2', 'Periode: ' . $this->startDate->format('d/m/Y') . ' - ' . $this->endDate->format('d/m/Y'));
+        $sheet->mergeCells('A1:K1');
+        $sheet->mergeCells('A2:K2');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal('center');
+
+        return [];
     }
 }

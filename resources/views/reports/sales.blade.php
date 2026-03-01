@@ -21,10 +21,13 @@
                 <label class="form-label">Tanggal Akhir</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary w-100">
+            <div class="col-md-4 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
                     <i class="fas fa-search"></i> Filter
                 </button>
+                <a href="{{ route('admin.reports.sales.export') }}?start_date={{ $startDate->format('Y-m-d') }}&end_date={{ $endDate->format('Y-m-d') }}" class="btn btn-success flex-fill">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </a>
             </div>
         </form>
     </div>

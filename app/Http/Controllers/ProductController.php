@@ -7,6 +7,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -43,8 +44,6 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'barcode' => 'nullable|string|unique:products,barcode',
-            'qr_code' => 'nullable|string|unique:products,qr_code',
             'category_id' => 'required|exists:categories,id',
         ]);
 
@@ -82,8 +81,6 @@ class ProductController extends Controller
             'sku' => 'required|string|unique:products,sku,' . $product->id,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
-            'qr_code' => 'nullable|string|unique:products,qr_code,' . $product->id,
             'category_id' => 'required|exists:categories,id',
         ]);
 
@@ -135,5 +132,28 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.show', $product)
             ->with('success', 'Stok berhasil disesuaikan.');
+    }
+
+    /**
+     * Download the Excel template for bulk product import.
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new \App\Exports\ProductTemplateExport(), 'Template_Import_Produk.xlsx');
+    }
+
+    /**
+     * Import products from an uploaded Excel file.
+     */
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        Excel::import(new \App\Imports\ProductImport(), $request->file('file'));
+
+        return redirect()->route('admin.products.index')
+            ->with('success', 'Produk berhasil diimport dari file Excel.');
     }
 }

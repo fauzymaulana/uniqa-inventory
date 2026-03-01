@@ -25,6 +25,29 @@ class Product extends Model
     ];
 
     /**
+     * Boot method to auto-generate barcode and qr_code on creation.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Product $product) {
+            $hash = hash('sha256', $product->sku . microtime(true));
+            // Use different portions of the hash to ensure barcode and qr_code differ
+            $product->barcode = str_pad(
+                (string) (hexdec(substr($hash, 0, 12)) % 1000000000000),
+                12,
+                '0',
+                STR_PAD_LEFT
+            );
+            $product->qr_code = str_pad(
+                (string) (hexdec(substr($hash, 12, 12)) % 1000000000000),
+                12,
+                '0',
+                STR_PAD_LEFT
+            );
+        });
+    }
+
+    /**
      * Get the category that owns the product.
      */
     public function category(): BelongsTo

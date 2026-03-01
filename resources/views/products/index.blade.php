@@ -51,9 +51,12 @@
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2><i class="fas fa-box"></i> Kelola Produk</h2>
-            <div>
+            <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-success" id="exportLabelBtn" style="display: none;">
                     <i class="fas fa-download"></i> Export Label
+                </button>
+                <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#importModal">
+                    <i class="fas fa-file-upload"></i> Import Excel
                 </button>
                 <a href="{{ route('admin.products.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Tambah Produk
@@ -61,6 +64,51 @@
             </div>
         </div>
         <hr>
+    </div>
+</div>
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel"><i class="fas fa-file-upload"></i> Import Produk dari Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Upload file Excel untuk menambahkan banyak produk sekaligus.</p>
+                <ol>
+                    <li>Download template Excel terlebih dahulu.</li>
+                    <li>Isi data produk sesuai template (hapus baris contoh).</li>
+                    <li>Upload file yang sudah diisi.</li>
+                </ol>
+                <div class="mb-3">
+                    <a href="{{ route('admin.products.import-template') }}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-download"></i> Download Template Excel
+                    </a>
+                </div>
+                <hr>
+                <form action="{{ route('admin.products.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label">Pilih File Excel <span class="text-danger">*</span></label>
+                        <input type="file" name="file" class="form-control @error('file') is-invalid @enderror" accept=".xlsx,.xls,.csv" required>
+                        @error('file') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        <small class="text-muted">Format: .xlsx, .xls, atau .csv (maks. 5MB)</small>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-upload"></i> Upload & Import
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
