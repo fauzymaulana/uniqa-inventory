@@ -41,25 +41,26 @@ class CashierController extends Controller
         $startDate = now()->startOfMonth();
         $endDate = now()->endOfMonth();
 
+        // Single query grouped by date and payment method
+        $results = Transaction::where('status', 'completed')
+            ->whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()])
+            ->selectRaw("DATE(created_at) as date, payment_method, SUM(total_price) as total")
+            ->groupBy('date', 'payment_method')
+            ->get()
+            ->groupBy('date');
+
         $labels = [];
         $transferData = [];
         $cashData = [];
 
         $current = $startDate->copy();
         while ($current->lte($endDate)) {
-            $transfer = Transaction::where('status', 'completed')
-                ->where('payment_method', 'transfer')
-                ->whereDate('created_at', $current)
-                ->sum('total_price');
-
-            $cash = Transaction::where('status', 'completed')
-                ->where('payment_method', 'cash')
-                ->whereDate('created_at', $current)
-                ->sum('total_price');
-
+            $dateKey = $current->format('Y-m-d');
             $labels[] = $current->format('d M');
-            $transferData[] = $transfer;
-            $cashData[] = $cash;
+
+            $dayData = $results->get($dateKey, collect());
+            $transferData[] = $dayData->where('payment_method', 'transfer')->sum('total');
+            $cashData[] = $dayData->where('payment_method', 'cash')->sum('total');
 
             $current->addDay();
         }

@@ -49,20 +49,24 @@ class ExpenseController extends Controller
         $startDate = now()->startOfMonth();
         $endDate = now()->endOfMonth();
 
-        $labels = [];
-        $data = [];
-
-        $query = Expense::query();
+        // Single query grouped by date
+        $query = Expense::whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);
         if (auth()->user()->role === 'cashier') {
             $query->where('user_id', auth()->id());
         }
 
+        $results = $query->selectRaw("DATE(created_at) as date, SUM(amount) as total")
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $labels = [];
+        $data = [];
+
         $current = $startDate->copy();
         while ($current->lte($endDate)) {
-            $amount = (clone $query)->whereDate('created_at', $current)->sum('amount');
-
+            $dateKey = $current->format('Y-m-d');
             $labels[] = $current->format('d M');
-            $data[] = $amount;
+            $data[] = $results->get($dateKey, 0);
 
             $current->addDay();
         }
