@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('products', ProductController::class);
         Route::get('products/{product}/adjust-stock', [ProductController::class, 'adjustStock'])->name('products.adjust-stock');
         Route::post('products/{product}/update-stock', [ProductController::class, 'updateStock'])->name('products.update-stock');
+        Route::get('products/{product}/download-label', [BarcodeController::class, 'generateLabel'])->name('products.download-label');
         Route::get('products-import-template', [ProductController::class, 'downloadTemplate'])->name('products.import-template');
         Route::post('products-import', [ProductController::class, 'import'])->name('products.import');
 
@@ -116,6 +117,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('api')->name('api.')->group(function () {
         Route::post('get-product', [CashierController::class, 'getProduct'])->name('get-product');
         Route::post('sync-transactions', [CashierController::class, 'syncOfflineTransactions'])->name('sync-transactions');
+        Route::post('sync-expenses', [ExpenseController::class, 'syncOfflineExpenses'])->name('sync-expenses');
         // DataTables server-side endpoint for admin products
         Route::get('products/datatables', [App\Http\Controllers\Api\ProductApiController::class, 'datatables'])->name('products.datatables');
     });

@@ -136,6 +136,7 @@ class CashierController extends Controller
             'amount_received' => $request->input('amount_received'),
             'discount_amount' => $request->input('discount_amount', 0),
             'payment_method' => $request->input('payment_method', 'cash'),
+            'notes' => $request->input('notes'),
         ];
 
         // Validate
@@ -218,6 +219,7 @@ class CashierController extends Controller
                 'change' => $change,
                 'status' => 'completed',
                 'payment_method' => $validated['payment_method'],
+                'notes' => $validated['notes'] ?? null,
                 'is_synced' => true,
             ]);
 
@@ -301,6 +303,7 @@ class CashierController extends Controller
                     'change' => $change,
                     'status' => 'completed',
                     'payment_method' => $txData['payment_method'] ?? 'cash',
+                    'notes' => $txData['notes'] ?? null,
                     'is_synced' => true,
                 ]);
 

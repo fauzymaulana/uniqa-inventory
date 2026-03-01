@@ -48,6 +48,7 @@ class TransactionHistoryExport implements FromCollection, WithHeadings, WithStyl
                 'Uang Diterima' => $transaction->amount_received,
                 'Kembalian' => $transaction->change,
                 'Metode Pembayaran' => $paymentMethod,
+                'Keterangan' => $transaction->notes ?? '-',
                 'Status' => ucfirst($transaction->status),
             ];
         });
@@ -66,6 +67,7 @@ class TransactionHistoryExport implements FromCollection, WithHeadings, WithStyl
             'Uang Diterima (Rp)',
             'Kembalian (Rp)',
             'Metode Pembayaran',
+            'Keterangan',
             'Status',
         ];
     }
@@ -75,7 +77,7 @@ class TransactionHistoryExport implements FromCollection, WithHeadings, WithStyl
         $lastRow = $this->transactions->count() + 1;
 
         // Header style
-        $sheet->getStyle('A1:K1')->applyFromArray([
+        $sheet->getStyle('A1:L1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0070C0']],
             'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
@@ -87,14 +89,14 @@ class TransactionHistoryExport implements FromCollection, WithHeadings, WithStyl
         $sheet->getStyle("G2:I{$lastRow}")->getAlignment()->setHorizontal('right');
 
         // Borders
-        $sheet->getStyle("A1:K{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(
+        $sheet->getStyle("A1:L{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(
             \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
         );
 
         // Alternating rows
         for ($i = 2; $i <= $lastRow; $i++) {
             if ($i % 2 === 0) {
-                $sheet->getStyle("A{$i}:K{$i}")->getFill()->setFillType('solid')
+                $sheet->getStyle("A{$i}:L{$i}")->getFill()->setFillType('solid')
                     ->getStartColor()->setRGB('F2F2F2');
             }
         }
@@ -103,8 +105,8 @@ class TransactionHistoryExport implements FromCollection, WithHeadings, WithStyl
         $sheet->insertNewRowBefore(1, 2);
         $sheet->setCellValue('A1', 'Riwayat Transaksi');
         $sheet->setCellValue('A2', 'Periode: ' . $this->startDate->format('d/m/Y') . ' - ' . $this->endDate->format('d/m/Y'));
-        $sheet->mergeCells('A1:K1');
-        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A1:L1');
+        $sheet->mergeCells('A2:L2');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal('center');
 

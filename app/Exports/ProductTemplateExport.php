@@ -23,7 +23,6 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
         return [
             [
                 'Produk Contoh',
-                'SKU-CONTOH-001',
                 'Makanan',
                 '15000',
                 '100',
@@ -36,7 +35,6 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
     {
         return [
             'nama_produk',
-            'sku',
             'kategori',
             'harga',
             'stok',
@@ -47,7 +45,7 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
     public function styles(Worksheet $sheet)
     {
         // Header row style
-        $sheet->getStyle('A1:F1')->applyFromArray([
+        $sheet->getStyle('A1:E1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0070C0']],
             'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
@@ -55,7 +53,7 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
         $sheet->getRowDimension(1)->setRowHeight(22);
 
         // Example row style (light yellow background)
-        $sheet->getStyle('A2:F2')->getFill()->setFillType('solid')
+        $sheet->getStyle('A2:E2')->getFill()->setFillType('solid')
             ->getStartColor()->setRGB('FFFFE0');
 
         // Add note about the example row
@@ -64,15 +62,15 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithStyles, Shou
         // Add categories note below
         $categories = Category::pluck('name')->join(', ');
         $sheet->setCellValue('A4', 'Catatan:');
-        $sheet->setCellValue('A5', '- Kolom nama_produk dan sku wajib diisi');
-        $sheet->setCellValue('A6', '- Kolom kategori harus sesuai dengan nama kategori yang tersedia: ' . $categories);
-        $sheet->setCellValue('A7', '- Barcode dan QR Code akan digenerate otomatis oleh sistem');
+        $sheet->setCellValue('A5', '- Kolom nama_produk wajib diisi');
+        $sheet->setCellValue('A6', '- SKU, Barcode dan QR Code akan digenerate otomatis oleh sistem');
+        $sheet->setCellValue('A7', '- Kolom kategori harus sesuai dengan nama kategori yang tersedia: ' . $categories);
         $sheet->setCellValue('A8', '- Hapus baris contoh (baris ke-2) sebelum mengupload');
         $sheet->getStyle('A4')->getFont()->setBold(true);
-        $sheet->mergeCells('A5:F5');
-        $sheet->mergeCells('A6:F6');
-        $sheet->mergeCells('A7:F7');
-        $sheet->mergeCells('A8:F8');
+        $sheet->mergeCells('A5:E5');
+        $sheet->mergeCells('A6:E6');
+        $sheet->mergeCells('A7:E7');
+        $sheet->mergeCells('A8:E8');
 
         return [];
     }

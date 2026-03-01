@@ -322,6 +322,10 @@
                         </select>
                     </div>
                     <div class="mt-2">
+                        <label class="form-label">Keterangan <span class="text-muted">(opsional)</span></label>
+                        <textarea id="notesInput" name="notes" class="form-control" rows="2" placeholder="Catatan transaksi..."></textarea>
+                    </div>
+                    <div class="mt-2">
                         <label class="form-label">Kembalian</label>
                         <div class="alert alert-info" id="changeAmount">Rp 0</div>
                     </div>
@@ -804,11 +808,13 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             discount_amount: discountAmount,
             amount_received: amountReceived,
             payment_method: paymentMethod,
+            notes: document.getElementById('notesInput').value,
         };
         await savePending(txData);
         cart = [];
         updateCart();
         document.getElementById('amountReceived').value = '';
+        document.getElementById('notesInput').value = '';
         await updatePendingUI();
         showToast('💾 Transaksi disimpan offline. Akan disinkronkan saat online.', 'info');
         return;

@@ -19,10 +19,8 @@
                         @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">SKU <span class="text-danger">*</span></label>
-                        <input type="text" name="sku" class="form-control @error('sku') is-invalid @enderror" value="{{ old('sku') }}" required>
-                        @error('sku') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="alert alert-info py-2">
+                        <i class="fas fa-info-circle"></i> <strong>SKU, Barcode & QR Code</strong> akan digenerate otomatis oleh sistem.
                     </div>
 
                     <div class="mb-3">
@@ -52,10 +50,6 @@
                         <label class="form-label">Stok Awal <span class="text-danger">*</span></label>
                         <input type="number" name="stock" class="form-control @error('stock') is-invalid @enderror" value="{{ old('stock', 0) }}" min="0" required>
                         @error('stock') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="alert alert-info py-2">
-                        <i class="fas fa-info-circle"></i> <strong>Barcode & QR Code</strong> akan digenerate otomatis oleh sistem berdasarkan SKU produk.
                     </div>
 
                     <div class="mb-3">
