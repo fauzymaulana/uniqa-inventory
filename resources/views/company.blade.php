@@ -3,463 +3,378 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Uniqa Creative - Jasa pembuatan undangan cetak, video, dan website berkualitas tinggi. Wujudkan momen istimewa Anda dengan karya terbaik kami.">
-    <meta name="keywords" content="undangan pernikahan, undangan digital, undangan cetak, undangan video, undangan website, jasa undangan, uniqa">
+    <meta name="description" content="Wedding by Uniqa - Platform undangan pernikahan digital, cetak &amp; souvenir. Desain eksklusif, harga bersahabat, garansi 100% uang kembali.">
+    <meta name="keywords" content="undangan pernikahan, undangan digital, undangan cetak, souvenir pernikahan, wedding invitation, uniqa, uniqa.id">
+    <meta name="author" content="Uniqa.id">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Uniqa Creative - Jasa Undangan Profesional">
-    <meta property="og:description" content="Jasa pembuatan undangan cetak, video, dan website berkualitas tinggi untuk momen istimewa Anda.">
+    <meta property="og:title" content="Wedding by Uniqa - Platform Wedding Invitation Terbaik">
+    <meta property="og:description" content="Platform undangan pernikahan digital, cetak &amp; souvenir. Desain eksklusif, harga bersahabat, garansi 100% uang kembali.">
     <meta property="og:type" content="website">
-    <title>Uniqa Creative - Jasa Undangan Profesional</title>
+    <meta property="og:url" content="{{ url('/company') }}">
+    <meta property="og:locale" content="id_ID">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wedding by Uniqa - Platform Wedding Invitation Terbaik">
+    <title>Wedding by Uniqa - Platform Wedding for YOU!</title>
     <link rel="canonical" href="{{ url('/company') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Wedding by Uniqa",
+        "url": "{{ url('/company') }}",
+        "description": "Platform undangan pernikahan digital, cetak & souvenir terbaik di Indonesia."
+    }
+    </script>
     <style>
         :root {
-            --primary: #6C63FF;
-            --secondary: #FF6584;
-            --accent: #43E97B;
-            --dark: #1a1a2e;
-            --light: #f8f9ff;
+            --beige: #f5e6d3;
+            --beige-light: #f5f0e8;
+            --gold: #c9a96e;
+            --gold-dark: #b8944f;
+            --teal: #5ba4a4;
+            --teal-light: #e8f4f4;
+            --dark: #333;
+            --coral: #e88f7a;
+            --cream: #faf6f1;
         }
-
-        * { box-sizing: border-box; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--light);
-            color: #333;
+            color: var(--dark);
             overflow-x: hidden;
         }
-
-        /* ── NAVBAR ── */
-        .navbar {
-            background: rgba(26, 26, 46, 0.95) !important;
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
-            transition: all 0.3s ease;
+        .page-loader {
+            position: fixed; inset: 0;
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999;
+            transition: opacity .5s, visibility .5s;
         }
-        .navbar.scrolled {
-            padding: 8px 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        .page-loader.hidden { opacity: 0; visibility: hidden; }
+        .loader-spinner {
+            width: 48px; height: 48px;
+            border: 4px solid var(--beige);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
         }
-        .navbar-brand {
-            font-size: 1.6rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .navbar-custom {
+            background: #fff;
+            box-shadow: 0 2px 20px rgba(0,0,0,.06);
+            padding: .8rem 0;
+            transition: all .3s;
         }
-        .nav-link { color: rgba(255,255,255,0.85) !important; font-weight: 500; transition: color 0.3s; }
-        .nav-link:hover { color: #6C63FF !important; }
-
-        /* ── HERO ── */
+        .navbar-custom.scrolled { padding: .5rem 0; box-shadow: 0 2px 20px rgba(0,0,0,.1); }
+        .navbar-brand-text {
+            font-size: 1.35rem; font-weight: 700;
+            color: var(--gold) !important;
+            letter-spacing: .5px;
+        }
+        .navbar-custom .nav-link {
+            color: var(--dark) !important;
+            font-weight: 500; font-size: .95rem;
+            margin: 0 .3rem; padding: .5rem .8rem !important;
+            border-radius: 6px;
+            transition: all .25s;
+        }
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active { color: var(--gold) !important; background: var(--beige-light); }
+        .nav-login-btn {
+            background: var(--gold) !important; color: #fff !important;
+            border-radius: 20px !important; padding: .45rem 1.1rem !important;
+        }
+        .nav-login-btn:hover { background: var(--gold-dark) !important; }
         .hero-section {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            display: flex;
-            align-items: center;
+            background: var(--beige-light);
+            padding: 6rem 0 4rem;
             position: relative;
             overflow: hidden;
         }
         .hero-section::before {
             content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(108,99,255,0.25) 0%, transparent 70%);
-            top: -100px;
-            right: -100px;
+            position: absolute; top: -60%; right: -20%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(201,169,110,.12) 0%, transparent 70%);
             border-radius: 50%;
-            animation: pulse 4s ease-in-out infinite;
         }
-        .hero-section::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255,101,132,0.2) 0%, transparent 70%);
-            bottom: -100px;
-            left: -100px;
-            border-radius: 50%;
-            animation: pulse 5s ease-in-out infinite reverse;
+        .hero-headline {
+            font-size: 2.8rem; font-weight: 800;
+            color: var(--dark); line-height: 1.2;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.15); }
+        .hero-headline span { color: var(--gold); }
+        .hero-sub {
+            font-size: 1.1rem; color: #666;
+            margin-top: 1rem; max-width: 460px;
         }
-        .hero-title {
-            font-size: clamp(2.5rem, 5vw, 4.5rem);
-            font-weight: 900;
-            color: #fff;
-            line-height: 1.2;
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
-        .hero-title span {
-            background: linear-gradient(135deg, #6C63FF, #FF6584, #43E97B);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .hero-grid-item {
+            border-radius: 12px; overflow: hidden;
+            aspect-ratio: 3/4;
+            box-shadow: 0 4px 15px rgba(0,0,0,.08);
         }
-        .hero-subtitle { font-size: 1.2rem; color: rgba(255,255,255,0.75); }
-        .hero-badge {
-            display: inline-block;
-            background: rgba(108,99,255,0.2);
-            border: 1px solid rgba(108,99,255,0.5);
-            color: #6C63FF;
-            padding: 6px 18px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-        }
-        .btn-hero-primary {
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            border: none;
-            color: #fff;
-            padding: 14px 36px;
-            border-radius: 50px;
-            font-size: 1.05rem;
-            font-weight: 700;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .btn-hero-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(108,99,255,0.4);
-            color: #fff;
-        }
-        .btn-hero-outline {
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.4);
-            color: #fff;
-            padding: 14px 36px;
-            border-radius: 50px;
-            font-size: 1.05rem;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        .btn-hero-outline:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: #fff;
-            color: #fff;
-        }
-        .hero-image-wrap {
-            position: relative;
-            z-index: 2;
-        }
-        .hero-image-wrap img {
-            border-radius: 20px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        .floating-card {
-            position: absolute;
-            background: rgba(255,255,255,0.95);
-            border-radius: 16px;
-            padding: 12px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: float 4s ease-in-out infinite;
-        }
-        .floating-card.card-1 { top: 15%; left: -30px; animation-delay: 1s; }
-        .floating-card.card-2 { bottom: 15%; right: -30px; animation-delay: 2s; }
-        .floating-card .icon { font-size: 1.5rem; margin-bottom: 4px; }
-        .floating-card p { margin: 0; font-size: 0.85rem; font-weight: 600; color: #333; }
-        .floating-card small { color: #888; font-size: 0.75rem; }
-
-        /* ── HERO SLIDER ── */
-        .hero-slider-wrap { position: relative; z-index: 2; }
-        .hero-slide-img {
-            width: 100%;
-            height: 420px;
+        .hero-grid-item img {
+            width: 100%; height: 100%;
             object-fit: cover;
-            border-radius: 20px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            transition: transform .4s;
         }
-        .hero-slide-placeholder {
-            width: 100%;
-            height: 420px;
-            background: linear-gradient(135deg, rgba(108,99,255,0.3), rgba(255,101,132,0.3));
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: rgba(255,255,255,0.6);
-            font-size: 4rem;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+        .hero-grid-item:hover img { transform: scale(1.05); }
+        .btn-gold {
+            background: var(--gold); color: #fff;
+            border: none; padding: .85rem 2.2rem;
+            border-radius: 8px; font-weight: 700;
+            font-size: 1rem; letter-spacing: .5px;
+            text-transform: uppercase;
+            transition: all .3s;
+            display: inline-block;
+            text-decoration: none;
         }
-
-        /* ── SECTION GENERIC ── */
-        .section-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            position: relative;
+        .btn-gold:hover { background: var(--gold-dark); color: #fff; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,169,110,.35); }
+        .about-section { padding: 5rem 0; background: #fff; }
+        .about-title {
+            font-size: 2.2rem; font-weight: 800;
+            color: var(--dark);
+        }
+        .about-title span { color: var(--teal); }
+        .benefit-item {
+            display: flex; align-items: flex-start; gap: .75rem;
+            margin-bottom: 1.1rem;
+        }
+        .benefit-icon {
+            flex-shrink: 0; width: 28px; height: 28px;
+            background: var(--teal); color: #fff;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: .8rem; margin-top: 2px;
+        }
+        .benefit-text { font-size: 1rem; color: #444; line-height: 1.5; }
+        .benefit-text strong { color: var(--dark); }
+        .about-images {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; border-radius: 16px; overflow: hidden;
+        }
+        .about-images img {
+            width: 100%; height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform .4s;
+        }
+        .about-images img:hover { transform: scale(1.04); }
+        .btn-teal {
+            background: var(--teal); color: #fff;
+            border: none; padding: .75rem 2rem;
+            border-radius: 8px; font-weight: 700;
+            transition: all .3s; text-decoration: none;
             display: inline-block;
         }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            border-radius: 2px;
+        .btn-teal:hover { background: #4a8f8f; color: #fff; transform: translateY(-2px); }
+        .faq-section { padding: 4rem 0; background: var(--cream); }
+        .faq-title { font-size: 1.8rem; font-weight: 700; text-align: center; margin-bottom: 2rem; }
+        .faq-pill {
+            background: var(--teal-light);
+            border: 1px solid rgba(91,164,164,.15);
+            border-radius: 50px; padding: 1rem 1.8rem;
+            margin-bottom: .8rem; font-size: .95rem;
+            color: var(--dark); cursor: pointer;
+            transition: all .3s; text-align: center;
         }
-        .section-subtitle { color: #888; font-size: 1.05rem; margin-top: 1rem; }
-
-        /* ── STATS ── */
-        .stats-section {
-            background: linear-gradient(135deg, #6C63FF 0%, #FF6584 100%);
-            padding: 60px 0;
-            color: white;
+        .faq-pill:hover { background: var(--teal); color: #fff; transform: translateY(-2px); }
+        .category-section { padding: 5rem 0; background: #fff; }
+        .category-title {
+            font-size: 2rem; font-weight: 800; text-align: center;
+            margin-bottom: .5rem;
         }
-        .stat-item { text-align: center; }
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 900;
-            display: block;
-            counter-increment: count;
+        .category-title span { color: var(--gold); }
+        .category-card {
+            position: relative; border-radius: 16px;
+            overflow: hidden; height: 320px;
+            box-shadow: 0 6px 25px rgba(0,0,0,.08);
+            transition: transform .4s;
         }
-        .stat-label { font-size: 1rem; opacity: 0.9; }
-
-        /* ── SERVICES ── */
-        .services-section { padding: 100px 0; }
-        .service-card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 35px 30px;
-            text-align: center;
-            box-shadow: 0 5px 30px rgba(0,0,0,0.06);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-            height: 100%;
-            border: 1px solid rgba(108,99,255,0.08);
+        .category-card:hover { transform: translateY(-6px); }
+        .category-card img {
+            width: 100%; height: 100%; object-fit: cover;
         }
-        .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(108,99,255,0.15);
+        .category-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 60%);
+            display: flex; flex-direction: column;
+            justify-content: flex-end; padding: 1.5rem;
         }
-        .service-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin: 0 auto 20px;
+        .category-label {
+            color: #fff; font-weight: 800;
+            font-size: 1.3rem; text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .service-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 12px; }
-
-        /* ── PRODUCTS ── */
-        .products-section { padding: 100px 0; background: #f8f9ff; }
+        .category-desc {
+            color: rgba(255,255,255,.85);
+            font-size: .85rem; margin-top: .3rem;
+        }
+        .stats-section { padding: 3.5rem 0; background: var(--beige-light); }
+        .stat-card {
+            border-radius: 16px; padding: 1.8rem 1rem;
+            text-align: center; color: #fff;
+            transition: transform .3s;
+        }
+        .stat-card:hover { transform: translateY(-4px); }
+        .stat-card.coral { background: linear-gradient(135deg, #e88f7a, #e07a63); }
+        .stat-card.gold  { background: linear-gradient(135deg, var(--gold), #d4b47e); }
+        .stat-card.teal  { background: linear-gradient(135deg, var(--teal), #4a9494); }
+        .stat-card.dark  { background: linear-gradient(135deg, #555, #444); }
+        .stat-number { font-size: 2.2rem; font-weight: 800; }
+        .stat-label { font-size: .85rem; opacity: .9; margin-top: .25rem; }
+        .products-section { padding: 5rem 0; background: var(--cream); }
+        .products-title {
+            font-size: 2rem; font-weight: 800; text-align: center;
+            margin-bottom: .3rem;
+        }
+        .filter-tabs {
+            display: flex; flex-wrap: wrap;
+            justify-content: center; gap: .5rem;
+            margin: 1.5rem 0 2rem;
+        }
+        .filter-tab {
+            padding: .5rem 1.4rem; border-radius: 50px;
+            border: 2px solid var(--gold);
+            background: transparent; color: var(--gold);
+            font-weight: 600; font-size: .9rem;
+            cursor: pointer; transition: all .25s;
+        }
+        .filter-tab:hover, .filter-tab.active {
+            background: var(--gold); color: #fff;
+        }
         .product-card {
-            background: #fff;
-            border-radius: 16px;
+            background: #fff; border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.06);
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: none;
+            box-shadow: 0 4px 18px rgba(0,0,0,.06);
+            transition: all .35s; height: 100%;
+            display: flex; flex-direction: column;
         }
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,.12); }
+        .product-thumb {
+            position: relative; overflow: hidden;
+            aspect-ratio: 4/5;
         }
-        .product-card .product-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
+        .product-thumb img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform .4s;
         }
-        .product-placeholder {
-            width: 100%;
-            height: 220px;
-            background: linear-gradient(135deg, #f0f0ff, #ffe0e8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: #ccc;
-        }
-        .product-card-body { padding: 20px; }
-        .product-name { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
-        .product-desc { color: #888; font-size: 0.9rem; margin-bottom: 12px; }
-        .product-price {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: #6C63FF;
+        .product-card:hover .product-thumb img { transform: scale(1.06); }
+        .product-thumb video {
+            width: 100%; height: 100%; object-fit: cover;
         }
         .product-badge {
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            color: white;
-            font-size: 0.75rem;
-            padding: 4px 12px;
-            border-radius: 50px;
-            font-weight: 600;
+            position: absolute; top: 10px; right: 10px;
+            background: var(--gold); color: #fff;
+            padding: .25rem .7rem; border-radius: 20px;
+            font-size: .75rem; font-weight: 600;
         }
-        .nav-pills-custom .nav-link {
-            border-radius: 50px;
-            padding: 10px 24px;
-            font-weight: 600;
-            color: #6C63FF;
-            border: 2px solid #6C63FF;
-            margin: 4px;
-            transition: all 0.3s;
+        .product-body { padding: 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
+        .product-name { font-weight: 700; font-size: 1rem; margin-bottom: .3rem; color: var(--dark); }
+        .product-desc { font-size: .82rem; color: #777; line-height: 1.45; flex: 1; }
+        .product-price {
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--gold); margin-top: .6rem;
         }
-        .nav-pills-custom .nav-link.active {
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            border-color: transparent;
-            color: #fff;
+        .product-actions { margin-top: .6rem; }
+        .btn-wa {
+            background: #25d366; color: #fff; border: none;
+            padding: .45rem 1rem; border-radius: 8px;
+            font-size: .82rem; font-weight: 600;
+            text-decoration: none; transition: all .25s;
+            display: inline-flex; align-items: center; gap: .4rem;
         }
-
-        /* ── PROMO BANNER ── */
-        .promo-section { padding: 80px 0; }
-        .promo-card {
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        .btn-wa:hover { background: #1da851; color: #fff; transform: translateY(-1px); }
+        .features-section { padding: 5rem 0; background: #fff; }
+        .features-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 2.5rem; }
+        .features-title span { color: var(--gold); }
+        .feature-card {
+            background: var(--cream); border-radius: 16px;
+            padding: 2rem 1.5rem; text-align: center;
+            transition: all .35s; height: 100%;
         }
-        .promo-card img { width: 100%; height: 300px; object-fit: cover; }
-        .promo-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(108,99,255,0.85), rgba(255,101,132,0.7));
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
-            padding: 30px;
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+        .feature-icon {
+            width: 60px; height: 60px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 1.5rem; margin: 0 auto 1rem;
         }
-
-        /* ── WHY US ── */
-        .whyus-section { padding: 100px 0; background: var(--dark); color: white; }
-        .whyus-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-            padding: 20px;
-            border-radius: 16px;
-            transition: background 0.3s;
+        .feature-icon.gold  { background: rgba(201,169,110,.15); color: var(--gold); }
+        .feature-icon.teal  { background: rgba(91,164,164,.15); color: var(--teal); }
+        .feature-icon.coral { background: rgba(232,143,122,.15); color: var(--coral); }
+        .feature-icon.dark  { background: rgba(51,51,51,.1); color: var(--dark); }
+        .feature-card h5 { font-weight: 700; font-size: 1rem; margin-bottom: .4rem; }
+        .feature-card p { font-size: .85rem; color: #666; margin: 0; }
+        .payment-section { padding: 3rem 0; background: #f7f7f7; }
+        .payment-title { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 1.5rem; color: #666; }
+        .payment-grid {
+            display: flex; flex-wrap: wrap;
+            justify-content: center; gap: 1rem;
         }
-        .whyus-item:hover { background: rgba(255,255,255,0.05); }
-        .whyus-icon {
-            width: 56px;
-            height: 56px;
-            min-width: 56px;
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
+        .payment-item {
+            background: #fff; border-radius: 10px;
+            padding: .7rem 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+            font-weight: 700; font-size: .85rem;
+            color: #555; display: flex;
+            align-items: center; gap: .5rem;
         }
-        .whyus-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-        .whyus-text { color: rgba(255,255,255,0.65); font-size: 0.95rem; margin: 0; }
-
-        /* ── CTA ── */
-        .cta-section {
-            padding: 100px 0;
-            background: linear-gradient(135deg, #6C63FF 0%, #FF6584 100%);
-            text-align: center;
-            color: white;
+        .footer {
+            background: var(--dark); color: #ccc;
+            padding: 2.5rem 0 1.5rem;
         }
-        .cta-title { font-size: 2.8rem; font-weight: 900; }
-        .btn-cta {
-            background: white;
-            color: #6C63FF;
-            padding: 15px 40px;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            transition: transform 0.3s, box-shadow 0.3s;
-            text-decoration: none;
-            display: inline-block;
+        .footer-brand { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+        .footer-social a {
+            color: #ccc; font-size: 1.3rem;
+            margin-right: 1rem; transition: color .25s;
         }
-        .btn-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            color: #6C63FF;
-        }
-
-        /* ── FOOTER ── */
-        .footer { background: #0d0d1a; color: rgba(255,255,255,0.7); padding: 60px 0 30px; }
-        .footer-brand { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 12px; }
-        .footer-desc { font-size: 0.95rem; color: rgba(255,255,255,0.55); }
-        .footer-title { font-weight: 700; color: #fff; margin-bottom: 16px; }
-        .footer a { color: rgba(255,255,255,0.6); text-decoration: none; transition: color 0.3s; display: block; margin-bottom: 8px; }
-        .footer a:hover { color: #6C63FF; }
-        .social-icon {
-            display: inline-flex;
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s, transform 0.3s;
-            margin-right: 8px;
-            color: white !important;
-        }
-        .social-icon:hover {
-            background: #6C63FF;
-            transform: translateY(-3px);
-        }
-        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 40px; padding-top: 20px; font-size: 0.88rem; }
-
-        /* ── SCROLL TOP ── */
+        .footer-social a:hover { color: var(--gold); }
+        .footer-copy { font-size: .85rem; color: #999; margin-top: 1rem; }
         .scroll-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #6C63FF, #FF6584);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.3s, transform 0.3s;
-            z-index: 999;
-            text-decoration: none;
+            position: fixed; bottom: 25px; right: 25px;
+            width: 44px; height: 44px;
+            background: var(--gold); color: #fff;
+            border: none; border-radius: 50%;
+            font-size: 1.1rem;
+            display: none; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(201,169,110,.4);
+            cursor: pointer; transition: all .3s; z-index: 1000;
         }
-        .scroll-top.visible { opacity: 1; transform: translateY(0); }
-
-        /* ── LOADING ANIMATION ── */
-        .page-loader {
-            position: fixed;
-            inset: 0;
-            background: #1a1a2e;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: opacity 0.5s, visibility 0.5s;
+        .scroll-top:hover { background: var(--gold-dark); transform: translateY(-3px); }
+        .scroll-top.show { display: flex; }
+        .banner-section { padding: 3rem 0; background: var(--beige-light); }
+        .banner-card {
+            border-radius: 14px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,.06);
         }
-        .page-loader.hidden { opacity: 0; visibility: hidden; }
-        .loader-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(108,99,255,0.2);
-            border-top-color: #6C63FF;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .banner-card img { width: 100%; height: 220px; object-fit: cover; }
+        @media (max-width: 991px) {
+            .hero-headline { font-size: 2.2rem; }
+            .hero-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 767px) {
+            .hero-section { padding: 5rem 0 3rem; }
+            .hero-headline { font-size: 1.8rem; }
+            .hero-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .hero-grid-item { aspect-ratio: 1/1; }
+            .about-title { font-size: 1.6rem; }
+            .stat-number { font-size: 1.6rem; }
+            .category-card { height: 240px; }
+            .category-label { font-size: 1.1rem; }
+        }
+        @media (max-width: 575px) {
+            .hero-headline { font-size: 1.5rem; }
+            .hero-grid { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -469,29 +384,23 @@
     <div class="loader-spinner"></div>
 </div>
 
-<!-- Scroll to Top -->
-<a href="#" class="scroll-top" id="scrollTop"><i class="fas fa-arrow-up"></i></a>
-
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg fixed-top" id="navbar">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
     <div class="container">
-        <a class="navbar-brand" href="{{ url('/company') }}">
-            <i class="fas fa-star"></i> Uniqa Creative
+        <a class="navbar-brand navbar-brand-text" href="#hero">
+            <i class="fas fa-ring me-2"></i>Wedding by Uniqa
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" style="color:white;">
-            <i class="fas fa-bars"></i>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto gap-1">
-                <li class="nav-item"><a class="nav-link" href="#hero">Beranda</a></li>
-                <li class="nav-item"><a class="nav-link" href="#layanan">Layanan</a></li>
-                <li class="nav-item"><a class="nav-link" href="#produk">Produk</a></li>
-                <li class="nav-item"><a class="nav-link" href="#mengapa-kami">Mengapa Kami</a></li>
-                <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
-                <li class="nav-item ms-2">
-                    <a class="btn btn-sm" href="{{ route('login') }}"
-                       style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:8px 20px;font-weight:600;">
-                        Login
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#katalog">Katalog</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About Us</a></li>
+                <li class="nav-item ms-lg-2">
+                    <a class="nav-link nav-login-btn" href="{{ route('login') }}">
+                        <i class="fas fa-sign-in-alt me-1"></i> Login
                     </a>
                 </li>
             </ul>
@@ -499,275 +408,47 @@
     </div>
 </nav>
 
-<!-- HERO SECTION -->
-<section class="hero-section" id="hero" style="padding-top:80px;">
-    <div class="container position-relative" style="z-index:2;">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-6">
-                <div data-aos="fade-right" data-aos-duration="800">
-                    <div class="hero-badge"><i class="fas fa-sparkles me-2"></i>Layanan Undangan Profesional</div>
-                    <h1 class="hero-title">
-                        Wujudkan Momen <span>Istimewa</span> Bersama Kami
-                    </h1>
-                    <p class="hero-subtitle mt-3 mb-4">
-                        Kami menghadirkan undangan cetak, video, dan website yang indah dan berkesan untuk setiap momen spesial Anda.
-                    </p>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <a href="#produk" class="btn-hero-primary">
-                            <i class="fas fa-eye me-2"></i>Lihat Produk
-                        </a>
-                        <a href="#kontak" class="btn-hero-outline">
-                            <i class="fas fa-phone me-2"></i>Hubungi Kami
-                        </a>
-                    </div>
-                    <div class="d-flex gap-4 mt-4">
-                        <div>
-                            <div style="font-size:1.6rem;font-weight:800;color:#fff;">500+</div>
-                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Klien Puas</div>
-                        </div>
-                        <div style="width:1px;background:rgba(255,255,255,0.2);"></div>
-                        <div>
-                            <div style="font-size:1.6rem;font-weight:800;color:#fff;">3+</div>
-                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Tahun Pengalaman</div>
-                        </div>
-                        <div style="width:1px;background:rgba(255,255,255,0.2);"></div>
-                        <div>
-                            <div style="font-size:1.6rem;font-weight:800;color:#fff;">99%</div>
-                            <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Kepuasan Klien</div>
-                        </div>
-                    </div>
-                </div>
+<!-- Hero Section -->
+<section class="hero-section" id="hero">
+    <div class="container">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5" data-aos="fade-right" data-aos-duration="800">
+                <h1 class="hero-headline">Platform <span>Wedding</span> for YOU!</h1>
+                <p class="hero-sub">Wujudkan undangan pernikahan impian kamu dengan desain eksklusif, elegan, dan berkesan &mdash; semuanya dalam satu platform.</p>
+                <a href="#katalog" class="btn-gold mt-3">LIHAT CONTOH KATALOG <i class="fas fa-angles-right ms-1"></i></a>
             </div>
-            <div class="col-lg-6">
-                <div class="hero-slider-wrap" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
-                    @if($heroContents->count() > 0)
-                        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
-                            <div class="carousel-inner">
-                                @foreach($heroContents as $i => $content)
-                                    <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
-                                        @if($content->image)
-                                            <img src="{{ asset('storage/konten/' . $content->image) }}" alt="{{ $content->title }}" class="hero-slide-img">
-                                        @else
-                                            <div class="hero-slide-placeholder">
-                                                <i class="fas fa-image"></i>
-                                                <p style="font-size:1rem;margin-top:10px;">{{ $content->title }}</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                @endforeach
+            <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
+                @if($heroContents->count())
+                    <div class="hero-grid">
+                        @foreach($heroContents->take(6) as $hero)
+                            <div class="hero-grid-item">
+                                <img src="{{ asset('storage/konten/' . $hero->image) }}" alt="{{ $hero->title }}" loading="lazy">
                             </div>
-                            @if($heroContents->count() > 1)
-                                <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon"></span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon"></span>
-                                </button>
-                            @endif
-                        </div>
-                    @else
-                        <div class="hero-slide-placeholder">
-                            <i class="fas fa-envelope-open-text"></i>
-                            <p style="font-size:1rem;margin-top:10px;">Undangan Istimewa</p>
-                        </div>
-                        <div class="floating-card card-1">
-                            <div class="icon">🎉</div>
-                            <p>Cetak Premium</p>
-                            <small>Kualitas Terbaik</small>
-                        </div>
-                        <div class="floating-card card-2">
-                            <div class="icon">🎬</div>
-                            <p>Video Cinematic</p>
-                            <small>Full HD</small>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- STATS SECTION -->
-<section class="stats-section">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="0">
-                <div class="stat-item">
-                    <span class="stat-number" data-target="500">0</span>
-                    <span class="stat-label">Klien Puas</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-item">
-                    <span class="stat-number" data-target="1200">0</span>
-                    <span class="stat-label">Pesanan Selesai</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-item">
-                    <span class="stat-number" data-target="3">0</span>
-                    <span class="stat-label">Tahun Pengalaman</span>
-                </div>
-            </div>
-            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-item">
-                    <span class="stat-number" data-target="99">0</span>
-                    <span class="stat-label">% Kepuasan Klien</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- SERVICES SECTION -->
-<section class="services-section" id="layanan">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Layanan Kami</h2>
-            <p class="section-subtitle">Berbagai pilihan undangan eksklusif untuk momen tak terlupakan</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
-                <div class="service-card">
-                    <div class="service-icon"><i class="fas fa-print"></i></div>
-                    <div class="service-title">Undangan Cetak</div>
-                    <p class="text-muted">Undangan cetak premium dengan berbagai desain eksklusif dan material berkualitas tinggi untuk kesan yang mendalam.</p>
-                    <a href="#produk" class="btn btn-sm mt-2" style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:8px 20px;">
-                        Lihat Produk
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
-                <div class="service-card">
-                    <div class="service-icon"><i class="fas fa-video"></i></div>
-                    <div class="service-title">Undangan Video</div>
-                    <p class="text-muted">Video undangan cinematic yang memukau dengan musik, animasi, dan efek visual profesional untuk dibagikan di sosial media.</p>
-                    <a href="#produk" class="btn btn-sm mt-2" style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:8px 20px;">
-                        Lihat Produk
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-                <div class="service-card">
-                    <div class="service-icon"><i class="fas fa-globe"></i></div>
-                    <div class="service-title">Undangan Website</div>
-                    <p class="text-muted">Undangan digital berbasis website yang elegan, interaktif, dan dapat diakses dari berbagai perangkat kapan saja.</p>
-                    <a href="#produk" class="btn btn-sm mt-2" style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:8px 20px;">
-                        Lihat Produk
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- PRODUCTS SECTION -->
-<section class="products-section" id="produk">
-    <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Produk Unggulan</h2>
-            <p class="section-subtitle">Temukan produk undangan terbaik sesuai kebutuhan Anda</p>
-        </div>
-
-        @if($invitationCategories->count() > 0)
-            <!-- Category Filter Tabs -->
-            <ul class="nav nav-pills-custom justify-content-center mb-5 flex-wrap" id="productTabs" role="tablist" data-aos="fade-up">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" data-filter="all">Semua</button>
-                </li>
-                @foreach($invitationCategories as $cat)
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-filter="{{ $cat->slug }}">
-                            @if($cat->slug === 'cetak') <i class="fas fa-print me-1"></i>
-                            @elseif($cat->slug === 'video') <i class="fas fa-video me-1"></i>
-                            @elseif($cat->slug === 'website') <i class="fas fa-globe me-1"></i>
-                            @else <i class="fas fa-tag me-1"></i>
-                            @endif
-                            {{ $cat->name }}
-                        </button>
-                    </li>
-                @endforeach
-            </ul>
-
-            <!-- Products Grid -->
-            <div class="row g-4" id="productsGrid">
-                @foreach($invitationCategories as $cat)
-                    @foreach($cat->products as $product)
-                        <div class="col-sm-6 col-lg-4 product-item" data-category="{{ $cat->slug }}" data-aos="fade-up">
-                            <div class="product-card">
-                                @if($product->thumbnail)
-                                    <img src="{{ asset('storage/undangan/' . $product->thumbnail) }}" alt="{{ $product->name }}" class="product-img">
-                                @else
-                                    <div class="product-placeholder">
-                                        @if($cat->slug === 'cetak') 🖨️
-                                        @elseif($cat->slug === 'video') 🎬
-                                        @elseif($cat->slug === 'website') 🌐
-                                        @else 📄
-                                        @endif
-                                    </div>
-                                @endif
-                                <div class="product-card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="product-badge">{{ $cat->name }}</span>
-                                    </div>
-                                    <div class="product-name">{{ $product->name }}</div>
-                                    @if($product->description)
-                                        <div class="product-desc">{{ Str::limit($product->description, 80) }}</div>
-                                    @endif
-                                    @if($product->price > 0)
-                                        <div class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
-                                    @else
-                                        <div class="product-price">Hubungi Kami</div>
-                                    @endif
-                                    <a href="https://wa.me/62{{ ltrim(config('app.whatsapp', '81234567890'), '0') }}?text=Halo%20Uniqa%20Creative%2C%20saya%20tertarik%20dengan%20produk%20{{ urlencode($product->name) }}"
-                                       target="_blank" class="btn btn-sm w-100 mt-3"
-                                       style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;">
-                                        <i class="fab fa-whatsapp me-1"></i> Pesan Sekarang
-                                    </a>
-                                </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="hero-grid">
+                        @for($i = 1; $i <= 6; $i++)
+                            <div class="hero-grid-item" style="background:var(--beige);display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-image fa-2x" style="color:var(--gold);opacity:.4"></i>
                             </div>
-                        </div>
-                    @endforeach
-                @endforeach
+                        @endfor
+                    </div>
+                @endif
             </div>
-        @else
-            <div class="text-center py-5" data-aos="fade-up">
-                <i class="fas fa-box-open" style="font-size:4rem;color:#ddd;"></i>
-                <p class="text-muted mt-3">Produk akan segera tersedia. Hubungi kami untuk informasi lebih lanjut.</p>
-                <a href="#kontak" class="btn" style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:12px 30px;">
-                    Hubungi Kami
-                </a>
-            </div>
-        @endif
+        </div>
     </div>
 </section>
 
-<!-- PROMO BANNERS -->
-@if($promoContents->count() > 0 || $bannerContents->count() > 0)
-<section class="promo-section">
+<!-- Banners -->
+@if($bannerContents->count())
+<section class="banner-section">
     <div class="container">
-        <div class="text-center mb-5" data-aos="fade-up">
-            <h2 class="section-title">Promo & Penawaran</h2>
-            <p class="section-subtitle">Dapatkan penawaran terbaik untuk momen istimewa Anda</p>
-        </div>
-        <div class="row g-4">
-            @foreach($promoContents->merge($bannerContents) as $promo)
-                <div class="col-md-6" data-aos="fade-up">
-                    <div class="promo-card">
-                        @if($promo->image)
-                            <img src="{{ asset('storage/konten/' . $promo->image) }}" alt="{{ $promo->title }}">
-                        @else
-                            <div style="height:300px;background:linear-gradient(135deg,#6C63FF,#FF6584);"></div>
-                        @endif
-                        <div class="promo-overlay">
-                            <h3 style="font-weight:800;font-size:1.6rem;">{{ $promo->title }}</h3>
-                            @if($promo->description)
-                                <p>{{ $promo->description }}</p>
-                            @endif
-                            <a href="#kontak" class="btn-cta mt-2" style="font-size:0.95rem;padding:10px 28px;">
-                                Dapatkan Penawaran
-                            </a>
-                        </div>
+        <div class="row g-3">
+            @foreach($bannerContents->take(3) as $banner)
+                <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 100 }}">
+                    <div class="banner-card">
+                        <img src="{{ asset('storage/konten/' . $banner->image) }}" alt="{{ $banner->title }}" loading="lazy">
                     </div>
                 </div>
             @endforeach
@@ -776,230 +457,360 @@
 </section>
 @endif
 
-<!-- WHY US SECTION -->
-<section class="whyus-section" id="mengapa-kami">
+<!-- About Section -->
+<section class="about-section" id="about">
     <div class="container">
         <div class="row align-items-center g-5">
-            <div class="col-lg-6" data-aos="fade-right">
-                <h2 class="section-title text-white">Mengapa Memilih Kami?</h2>
-                <p class="mt-3 mb-5" style="color:rgba(255,255,255,0.65);">Kami berkomitmen memberikan layanan terbaik dengan kualitas premium dan harga yang terjangkau.</p>
-                <div class="d-flex flex-column gap-3">
-                    <div class="whyus-item">
-                        <div class="whyus-icon"><i class="fas fa-medal" style="color:white;"></i></div>
-                        <div>
-                            <div class="whyus-title">Kualitas Premium</div>
-                            <p class="whyus-text">Material pilihan dan desain berkualitas tinggi untuk hasil yang memuaskan.</p>
-                        </div>
-                    </div>
-                    <div class="whyus-item">
-                        <div class="whyus-icon"><i class="fas fa-clock" style="color:white;"></i></div>
-                        <div>
-                            <div class="whyus-title">Pengerjaan Cepat</div>
-                            <p class="whyus-text">Proses produksi yang efisien tanpa mengorbankan kualitas hasil akhir.</p>
-                        </div>
-                    </div>
-                    <div class="whyus-item">
-                        <div class="whyus-icon"><i class="fas fa-palette" style="color:white;"></i></div>
-                        <div>
-                            <div class="whyus-title">Desain Eksklusif</div>
-                            <p class="whyus-text">Tim desainer berpengalaman siap mewujudkan konsep impian Anda.</p>
-                        </div>
-                    </div>
-                    <div class="whyus-item">
-                        <div class="whyus-icon"><i class="fas fa-headset" style="color:white;"></i></div>
-                        <div>
-                            <div class="whyus-title">Dukungan 24/7</div>
-                            <p class="whyus-text">Tim kami siap membantu Anda kapan saja melalui berbagai saluran komunikasi.</p>
-                        </div>
-                    </div>
+            <div class="col-lg-6" data-aos="fade-right" data-aos-duration="700">
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-check"></i></div>
+                    <div class="benefit-text"><strong>Garansi UANG KEMBALI 100%</strong> &mdash; Kepuasan Anda adalah prioritas utama kami.</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-check"></i></div>
+                    <div class="benefit-text"><strong>Desain Eksklusif &amp; Harga Bersahabat</strong> &mdash; Tampilan premium tanpa harus mahal.</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-check"></i></div>
+                    <div class="benefit-text"><strong>Full Service (Respon Cepat)</strong> &mdash; Tim kami siap membantu kapan saja.</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-check"></i></div>
+                    <div class="benefit-text"><strong>Ramah Lingkungan</strong> &mdash; Undangan digital mengurangi penggunaan kertas.</div>
+                </div>
+                <div class="benefit-item">
+                    <div class="benefit-icon"><i class="fas fa-check"></i></div>
+                    <div class="benefit-text"><strong>Undangan Web bisa jadi Album Nikah Seumur Hidup</strong> &mdash; Kenangan abadi dalam format digital.</div>
                 </div>
             </div>
-            <div class="col-lg-6" data-aos="fade-left">
-                <div style="background:linear-gradient(135deg,rgba(108,99,255,0.2),rgba(255,101,132,0.2));border-radius:30px;padding:50px;text-align:center;">
-                    <div style="font-size:6rem;">🏆</div>
-                    <h3 style="color:white;font-weight:800;margin-top:20px;">Terpercaya</h3>
-                    <p style="color:rgba(255,255,255,0.6);">Dipercaya oleh ratusan klien untuk momen pernikahan, ulang tahun, dan acara istimewa lainnya.</p>
-                    <div class="row g-3 mt-3">
-                        <div class="col-6">
-                            <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:20px;">
-                                <div style="font-size:2rem;font-weight:800;color:#6C63FF;">500+</div>
-                                <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Klien Puas</div>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div style="background:rgba(255,255,255,0.08);border-radius:14px;padding:20px;">
-                                <div style="font-size:2rem;font-weight:800;color:#FF6584;">1200+</div>
-                                <div style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Pesanan</div>
-                            </div>
-                        </div>
+            <div class="col-lg-6" data-aos="fade-left" data-aos-duration="700" data-aos-delay="150">
+                <h2 class="about-title mb-3">Kenapa <span>Uniqa.id</span>?</h2>
+                <p class="text-muted mb-3">Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash; dengan kualitas terbaik dan layanan personal yang memuaskan.</p>
+                @if($promoContents->count())
+                    <div class="about-images mb-3">
+                        @foreach($promoContents->take(4) as $promo)
+                            <img src="{{ asset('storage/konten/' . $promo->image) }}" alt="{{ $promo->title }}" loading="lazy">
+                        @endforeach
                     </div>
-                </div>
+                @endif
+                <a href="https://wa.me/6281234567890?text=Halo%20Uniqa%2C%20saya%20ingin%20pesan%20undangan%20pernikahan" class="btn-teal" target="_blank" rel="noopener">
+                    <i class="fab fa-whatsapp me-1"></i> Pesan Sekarang Juga!
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA SECTION -->
-<section class="cta-section">
-    <div class="container" data-aos="fade-up">
-        <h2 class="cta-title">Siap Memesan Undangan Impian Anda?</h2>
-        <p style="font-size:1.15rem;opacity:0.9;margin:15px 0 40px;">Hubungi kami sekarang dan konsultasikan kebutuhan undangan Anda bersama tim profesional kami.</p>
-        <div class="d-flex gap-3 justify-content-center flex-wrap">
-            <a href="https://wa.me/62{{ ltrim(config('app.whatsapp', '81234567890'), '0') }}?text=Halo%20Uniqa%20Creative%2C%20saya%20ingin%20konsultasi%20undangan"
-               target="_blank" class="btn-cta">
-                <i class="fab fa-whatsapp me-2"></i>WhatsApp Sekarang
-            </a>
-            <a href="mailto:{{ config('app.email', 'info@uniqacreative.id') }}" class="btn-hero-outline" style="padding:14px 36px;font-size:1.05rem;border-radius:50px;">
-                <i class="fas fa-envelope me-2"></i>Kirim Email
-            </a>
-        </div>
-    </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="footer" id="kontak">
+<!-- FAQ Section -->
+<section class="faq-section" id="faq">
     <div class="container">
+        <h2 class="faq-title" data-aos="fade-up">Pertanyaan yang Sering Ditanyakan</h2>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="faq-pill" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-question-circle me-2" style="color:var(--teal)"></i>
+                    Apakah Bisa Request Desain?
+                </div>
+                <div class="faq-pill" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-question-circle me-2" style="color:var(--teal)"></i>
+                    Apakah Undangan Hanya Khusus Islam?
+                </div>
+                <div class="faq-pill" data-aos="fade-up" data-aos-delay="300">
+                    <i class="fas fa-question-circle me-2" style="color:var(--teal)"></i>
+                    Pernikahan saya masih 5 bulan lagi, Apakah sudah bisa pesan?
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Section -->
+<section class="category-section" id="categories">
+    <div class="container">
+        <h2 class="category-title" data-aos="fade-up">TEMUKAN DESAIN TERBAIK UNTUK <span>WEDDING</span> KAMU</h2>
+        <p class="text-center text-muted mb-4" data-aos="fade-up" data-aos-delay="100">Pilih kategori yang sesuai dengan kebutuhan pernikahan impianmu</p>
         <div class="row g-4">
-            <div class="col-lg-4">
-                <div class="footer-brand"><i class="fas fa-star"></i> Uniqa Creative</div>
-                <p class="footer-desc">Jasa pembuatan undangan cetak, video, dan website berkualitas tinggi untuk momen istimewa Anda.</p>
-                <div class="mt-3">
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
-                    <a href="#" class="social-icon"><i class="fab fa-whatsapp"></i></a>
+            @if($invitationCategories->count())
+                @foreach($invitationCategories->take(3) as $cat)
+                    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 150 }}">
+                        <div class="category-card">
+                            @if($cat->products->first() && $cat->products->first()->thumbnail)
+                                <img src="{{ asset('storage/undangan/' . $cat->products->first()->thumbnail) }}" alt="{{ $cat->name }}" loading="lazy">
+                            @else
+                                <div style="width:100%;height:100%;background:var(--beige);display:flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-image fa-3x" style="color:var(--gold);opacity:.3"></i>
+                                </div>
+                            @endif
+                            <div class="category-overlay">
+                                <div class="category-label">{{ strtoupper($cat->name) }}</div>
+                                @if($cat->description)
+                                    <div class="category-desc">{{ Str::limit($cat->description, 80) }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @else
+                @php $defaultCats = ['UNDANGAN DIGITAL', 'UNDANGAN CETAK', 'SOUVENIR']; @endphp
+                @foreach($defaultCats as $dc)
+                    <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 150 }}">
+                        <div class="category-card">
+                            <div style="width:100%;height:100%;background:var(--beige);display:flex;align-items:center;justify-content:center;">
+                                <i class="fas fa-image fa-3x" style="color:var(--gold);opacity:.3"></i>
+                            </div>
+                            <div class="category-overlay">
+                                <div class="category-label">{{ $dc }}</div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section" id="stats">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="stat-card coral">
+                    <div class="stat-number"><span class="counter" data-target="50">0</span>+</div>
+                    <div class="stat-label">Tema Undangan</div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-2">
-                <div class="footer-title">Layanan</div>
-                <a href="#layanan">Undangan Cetak</a>
-                <a href="#layanan">Undangan Video</a>
-                <a href="#layanan">Undangan Website</a>
+            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card gold">
+                    <div class="stat-number"><span class="counter" data-target="32125">0</span>+</div>
+                    <div class="stat-label">Ucapan &amp; Doa</div>
+                </div>
             </div>
-            <div class="col-sm-6 col-lg-2">
-                <div class="footer-title">Tautan</div>
-                <a href="#hero">Beranda</a>
-                <a href="#produk">Produk</a>
-                <a href="#mengapa-kami">Tentang Kami</a>
+            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card teal">
+                    <div class="stat-number"><span class="counter" data-target="84837">0</span>+</div>
+                    <div class="stat-label">Tamu Undangan</div>
+                </div>
             </div>
-            <div class="col-lg-4">
-                <div class="footer-title">Kontak</div>
-                <p style="color:rgba(255,255,255,0.6);font-size:0.9rem;">
-                    <i class="fas fa-phone me-2" style="color:#6C63FF;"></i> +62 812-3456-7890<br>
-                    <i class="fas fa-envelope me-2 mt-2" style="color:#6C63FF;"></i> info@uniqacreative.id<br>
-                    <i class="fas fa-map-marker-alt me-2 mt-2" style="color:#6C63FF;"></i> Indonesia
-                </p>
-                <div class="mt-3">
-                    <a href="https://wa.me/6281234567890?text=Halo%20Uniqa%20Creative"
-                       target="_blank" class="btn btn-sm"
-                       style="background:linear-gradient(135deg,#6C63FF,#FF6584);color:white;border-radius:50px;padding:10px 24px;font-weight:600;">
-                        <i class="fab fa-whatsapp me-1"></i> Chat WhatsApp
-                    </a>
+            <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card dark">
+                    <div class="stat-number"><span class="counter" data-target="135">0</span>k+</div>
+                    <div class="stat-label">Undangan Disebar</div>
                 </div>
             </div>
         </div>
-        <div class="footer-bottom text-center">
-            <p class="mb-0">&copy; {{ date('Y') }} Uniqa Creative. All rights reserved. Dibuat dengan <i class="fas fa-heart" style="color:#FF6584;"></i></p>
+    </div>
+</section>
+
+<!-- Products / Katalog -->
+<section class="products-section" id="katalog">
+    <div class="container">
+        <h2 class="products-title" data-aos="fade-up">Katalog <span style="color:var(--gold)">Undangan</span></h2>
+        <p class="text-center text-muted mb-2" data-aos="fade-up">Temukan desain undangan yang sesuai dengan gaya pernikahanmu</p>
+
+        @if($invitationCategories->count())
+            <div class="filter-tabs" data-aos="fade-up" data-aos-delay="100">
+                <button class="filter-tab active" data-filter="all">Semua</button>
+                @foreach($invitationCategories as $cat)
+                    <button class="filter-tab" data-filter="cat-{{ $cat->id }}">{{ $cat->name }}</button>
+                @endforeach
+            </div>
+
+            <div class="row g-4" id="productGrid">
+                @foreach($invitationCategories as $cat)
+                    @foreach($cat->products as $product)
+                        <div class="col-6 col-md-4 col-lg-3 product-item cat-{{ $cat->id }}" data-aos="fade-up">
+                            <div class="product-card">
+                                <div class="product-thumb">
+                                    @if($product->video_demo)
+                                        <video muted loop playsinline preload="metadata" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0;">
+                                            <source src="{{ asset('storage/undangan/videos/' . $product->video_demo) }}" type="video/mp4">
+                                        </video>
+                                        <span class="product-badge"><i class="fas fa-play me-1"></i>Video</span>
+                                    @elseif($product->thumbnail)
+                                        <img src="{{ asset('storage/undangan/' . $product->thumbnail) }}" alt="{{ $product->name }}" loading="lazy">
+                                    @else
+                                        <div style="width:100%;height:100%;background:var(--beige);display:flex;align-items:center;justify-content:center;">
+                                            <i class="fas fa-image fa-2x" style="color:var(--gold);opacity:.3"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="product-body">
+                                    <div class="product-name">{{ $product->name }}</div>
+                                    @if($product->description)
+                                        <div class="product-desc">{{ Str::limit($product->description, 70) }}</div>
+                                    @endif
+                                    <div class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</div>
+                                    <div class="product-actions">
+                                        <a href="https://wa.me/6281234567890?text={{ urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}" class="btn-wa" target="_blank" rel="noopener">
+                                            <i class="fab fa-whatsapp"></i> Pesan
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endforeach
+            </div>
+        @else
+            <p class="text-center text-muted mt-4">Belum ada produk tersedia saat ini.</p>
+        @endif
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <h2 class="features-title" data-aos="fade-up">Keunggulan Desain <span>Weddingku.Vip</span></h2>
+        <div class="row g-4">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
+                <div class="feature-card">
+                    <div class="feature-icon gold"><i class="fas fa-gem"></i></div>
+                    <h5>Desain Premium</h5>
+                    <p>Tampilan elegan dan modern yang dirancang oleh desainer profesional.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon teal"><i class="fas fa-palette"></i></div>
+                    <h5>Bisa Custom Desain</h5>
+                    <p>Sesuaikan desain sesuai tema dan keinginan pernikahan kamu.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon coral"><i class="fas fa-globe"></i></div>
+                    <h5>Bisa Custom Domain</h5>
+                    <p>Gunakan nama domain sendiri untuk undangan digitalmu.</p>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon dark"><i class="fas fa-trophy"></i></div>
+                    <h5>Best Seller Di Kelasnya</h5>
+                    <p>Dipercaya ribuan pasangan di seluruh Indonesia.</p>
+                </div>
+            </div>
         </div>
+    </div>
+</section>
+
+<!-- Payment Section -->
+<section class="payment-section">
+    <div class="container">
+        <h3 class="payment-title" data-aos="fade-up">Metode Pembayaran yang Didukung</h3>
+        <div class="payment-grid" data-aos="fade-up" data-aos-delay="100">
+            <div class="payment-item"><i class="fas fa-university me-1" style="color:#003d79"></i> Bank BRI</div>
+            <div class="payment-item"><i class="fas fa-university me-1" style="color:#003399"></i> Bank BCA</div>
+            <div class="payment-item"><i class="fas fa-university me-1" style="color:#003066"></i> Bank Mandiri</div>
+            <div class="payment-item"><i class="fas fa-university me-1" style="color:#00a65a"></i> Bank BSI</div>
+            <div class="payment-item"><i class="fas fa-wallet me-1" style="color:#00aed6"></i> GoPay</div>
+            <div class="payment-item"><i class="fas fa-wallet me-1" style="color:#ee4d2d"></i> ShopeePay</div>
+            <div class="payment-item"><i class="fas fa-wallet me-1" style="color:#4c3494"></i> OVO</div>
+            <div class="payment-item"><i class="fas fa-wallet me-1" style="color:#108ee9"></i> DANA</div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container text-center">
+        <div class="footer-brand mb-2"><i class="fas fa-ring me-2"></i>Uniqa.id</div>
+        <div class="footer-social mb-2">
+            <a href="https://instagram.com/uniqa.id" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        </div>
+        <div class="footer-copy">Copyright &copy; 2021&ndash;{{ date('Y') }}, Uniqa.id &mdash; All Rights Reserved.</div>
     </div>
 </footer>
 
+<!-- Scroll to Top -->
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
-    // Init AOS animations
-    AOS.init({ duration: 700, once: true, offset: 80 });
-
-    // Page loader
-    window.addEventListener('load', function() {
-        document.getElementById('pageLoader').classList.add('hidden');
-    });
-
-    // Navbar scroll effect
-    window.addEventListener('scroll', function() {
-        const navbar = document.getElementById('navbar');
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
+    document.addEventListener('DOMContentLoaded', function () {
+        var loader = document.getElementById('pageLoader');
+        if (loader) {
+            setTimeout(function () { loader.classList.add('hidden'); }, 400);
         }
-        // Scroll to top button
-        const scrollTop = document.getElementById('scrollTop');
-        if (window.scrollY > 300) {
-            scrollTop.classList.add('visible');
-        } else {
-            scrollTop.classList.remove('visible');
-        }
-    });
 
-    // Scroll to top click
-    document.getElementById('scrollTop').addEventListener('click', function(e) {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+        AOS.init({ once: true, duration: 600, offset: 80 });
 
-    // Counter animation
-    function animateCounter(el) {
-        const target = parseInt(el.getAttribute('data-target'));
-        const duration = 2000;
-        const step = target / (duration / 16);
-        let current = 0;
-        const timer = setInterval(function() {
-            current += step;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            el.textContent = Math.floor(current) + (el.closest('.stat-item').querySelector('.stat-label').textContent.includes('%') ? '' : '+');
-        }, 16);
-    }
-
-    // Intersection Observer for counters
-    const statNumbers = document.querySelectorAll('.stat-number');
-    const observer = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-            if (entry.isIntersecting && !entry.target.dataset.animated) {
-                entry.target.dataset.animated = 'true';
-                animateCounter(entry.target);
-            }
+        var nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', function () {
+            nav.classList.toggle('scrolled', window.scrollY > 50);
         });
-    }, { threshold: 0.5 });
-    statNumbers.forEach(function(el) { observer.observe(el); });
 
-    // Product filter tabs
-    const filterBtns = document.querySelectorAll('[data-filter]');
-    const productItems = document.querySelectorAll('.product-item');
+        var stBtn = document.getElementById('scrollTop');
+        window.addEventListener('scroll', function () {
+            stBtn.classList.toggle('show', window.scrollY > 400);
+        });
+        stBtn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
 
-    filterBtns.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            filterBtns.forEach(function(b) { b.classList.remove('active'); });
-            btn.classList.add('active');
-            const filter = btn.getAttribute('data-filter');
-
-            productItems.forEach(function(item) {
-                if (filter === 'all' || item.getAttribute('data-category') === filter) {
-                    item.style.display = '';
-                    item.setAttribute('data-aos', 'fade-up');
-                } else {
-                    item.style.display = 'none';
+        document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+            a.addEventListener('click', function (e) {
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    var offset = nav.offsetHeight + 10;
+                    var y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                    var collapse = document.querySelector('.navbar-collapse.show');
+                    if (collapse) {
+                        var bsCollapse = bootstrap.Collapse.getInstance(collapse);
+                        if (bsCollapse) bsCollapse.hide();
+                    }
                 }
             });
         });
-    });
 
-    // Smooth scrolling for nav links
-    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-        anchor.addEventListener('click', function(e) {
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Close mobile navbar
-                const navbarCollapse = document.querySelector('.navbar-collapse');
-                if (navbarCollapse.classList.contains('show')) {
-                    navbarCollapse.classList.remove('show');
+        var counters = document.querySelectorAll('.counter');
+        var started = {};
+        function animateCounters() {
+            counters.forEach(function (el, idx) {
+                if (started[idx]) return;
+                var rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    started[idx] = true;
+                    var target = parseInt(el.dataset.target, 10);
+                    var duration = 1800;
+                    var startTime = null;
+                    function step(ts) {
+                        if (!startTime) startTime = ts;
+                        var progress = Math.min((ts - startTime) / duration, 1);
+                        var eased = 1 - Math.pow(1 - progress, 3);
+                        el.textContent = Math.floor(eased * target).toLocaleString('id-ID');
+                        if (progress < 1) requestAnimationFrame(step);
+                        else el.textContent = target.toLocaleString('id-ID');
+                    }
+                    requestAnimationFrame(step);
                 }
-            }
+            });
+        }
+        window.addEventListener('scroll', animateCounters);
+        animateCounters();
+
+        var tabs = document.querySelectorAll('.filter-tab');
+        var items = document.querySelectorAll('.product-item');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                tabs.forEach(function (t) { t.classList.remove('active'); });
+                this.classList.add('active');
+                var filter = this.dataset.filter;
+                items.forEach(function (item) {
+                    if (filter === 'all' || item.classList.contains(filter)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
         });
     });
 </script>
