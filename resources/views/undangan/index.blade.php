@@ -12,17 +12,20 @@
 
 @if(auth()->user()->role === 'admin')
 <div class="row mb-3">
-    <div class="col-12">
+    <div class="col-12 d-flex gap-2">
         <a href="{{ route('undangan.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Produk
         </a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+            <i class="fas fa-folder-plus"></i> Tambah Kategori
+        </button>
     </div>
 </div>
 @endif
 
 @foreach($categories as $category)
 <div class="card mb-4">
-    <div class="card-header bg-primary text-white">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
             @if($category->slug === 'cetak') <i class="fas fa-print"></i>
             @elseif($category->slug === 'video') <i class="fas fa-video"></i>
@@ -34,6 +37,20 @@
                 <small class="ms-2 fw-normal opacity-75">{{ $category->description }}</small>
             @endif
         </h5>
+        @if(auth()->user()->role === 'admin')
+        <div class="d-flex gap-1">
+            <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ $category->id }}">
+                <i class="fas fa-edit"></i>
+            </button>
+            <form action="{{ route('undangan.kategori.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori {{ $category->name }}? Semua produk di kategori ini akan ikut terhapus.')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+        @endif
     </div>
     <div class="card-body">
         @if($category->products->count() > 0)
@@ -66,6 +83,9 @@
                                         <span class="text-muted">Hubungi Kami</span>
                                     @endif
                                 </div>
+                                @if($product->video_demo)
+                                    <span class="badge bg-info mt-1"><i class="fas fa-video"></i> Video Demo</span>
+                                @endif
                                 @if(!$product->is_active)
                                     <span class="badge bg-secondary mt-1">Tidak Aktif</span>
                                 @endif
@@ -101,11 +121,74 @@
         @endif
     </div>
 </div>
+
+@if(auth()->user()->role === 'admin')
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal{{ $category->id }}" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('undangan.kategori.update', $category->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Kategori</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Kategori</label>
+                        <input type="text" name="name" class="form-control" value="{{ $category->name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Deskripsi</label>
+                        <textarea name="description" class="form-control" rows="3">{{ $category->description }}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 @endforeach
 
 @if($categories->isEmpty())
     <div class="alert alert-info">
         <i class="fas fa-info-circle"></i> Kategori undangan belum tersedia.
     </div>
+@endif
+
+@if(auth()->user()->role === 'admin')
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('undangan.kategori.store') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Kategori Undangan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Kategori <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" required placeholder="Contoh: Undangan Cetak">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Deskripsi</label>
+                        <textarea name="description" class="form-control" rows="3" placeholder="Deskripsi kategori..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Kategori</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endif
 @endsection

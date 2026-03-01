@@ -17,6 +17,14 @@ class CompanyController extends Controller
             $query->where('is_active', true);
         }])->get();
 
+        // Increment views count for all displayed content
+        $allContentIds = $heroContents->pluck('id')
+            ->merge($bannerContents->pluck('id'))
+            ->merge($promoContents->pluck('id'));
+        if ($allContentIds->isNotEmpty()) {
+            Content::whereIn('id', $allContentIds)->increment('views_count');
+        }
+
         return view('company', compact('heroContents', 'bannerContents', 'promoContents', 'invitationCategories'));
     }
 }

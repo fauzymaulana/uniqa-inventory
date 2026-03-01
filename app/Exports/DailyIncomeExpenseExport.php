@@ -30,9 +30,10 @@ class DailyIncomeExpenseExport implements FromCollection, WithHeadings, WithStyl
     {
         return [
             'Tanggal',
+            'Jumlah Transaksi',
             'Pendapatan (Rp)',
             'Pengeluaran (Rp)',
-            'Saldo (Rp)',
+            'Balance (Rp)',
         ];
     }
 

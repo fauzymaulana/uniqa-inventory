@@ -23,6 +23,9 @@
                 <span class="badge bg-success">Aktif</span>
             @endif
         </div>
+        <div class="mt-2">
+            <small class="text-muted"><i class="fas fa-eye"></i> {{ number_format($content->views_count ?? 0, 0, ',', '.') }} views</small>
+        </div>
     </div>
     <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
         <a href="{{ route('konten.edit', $content->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
