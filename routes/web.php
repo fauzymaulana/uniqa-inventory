@@ -136,6 +136,9 @@ Route::middleware('auth')->group(function () {
 
     // Undangan & Konten (accessible by admin and cashier)
     Route::resource('undangan', InvitationController::class);
+    Route::post('undangan-kategori', [InvitationController::class, 'storeCategory'])->name('undangan.kategori.store');
+    Route::put('undangan-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('undangan.kategori.update');
+    Route::delete('undangan-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('undangan.kategori.destroy');
     Route::resource('konten', ContentController::class);
 });
 

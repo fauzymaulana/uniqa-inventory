@@ -82,6 +82,27 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Video Demo (MP4)</label>
+                        @if($product->video_demo)
+                            <div class="mb-2">
+                                <video controls style="max-height:150px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);max-width:100%;">
+                                    <source src="{{ asset('storage/undangan/videos/' . $product->video_demo) }}" type="video/mp4">
+                                </video>
+                                <p class="text-muted small mt-1">Video saat ini. Upload baru untuk mengganti.</p>
+                            </div>
+                        @endif
+                        <input type="file" name="video_demo" class="form-control @error('video_demo') is-invalid @enderror"
+                               accept="video/mp4" id="videoInput">
+                        <div class="form-text">Format: MP4. Maks 20MB.</div>
+                        @error('video_demo')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div id="videoPreview" class="mt-2" style="display:none;">
+                            <video id="previewVideo" controls style="max-height:200px;border-radius:8px;max-width:100%;"></video>
+                        </div>
+                    </div>
+
                     <div class="mb-4">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" id="isActive" {{ $product->is_active ? 'checked' : '' }}>
@@ -115,6 +136,14 @@ document.getElementById('thumbnailInput').addEventListener('change', function(e)
             document.getElementById('thumbnailPreview').style.display = 'block';
         };
         reader.readAsDataURL(file);
+    }
+});
+document.getElementById('videoInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const url = URL.createObjectURL(file);
+        document.getElementById('previewVideo').src = url;
+        document.getElementById('videoPreview').style.display = 'block';
     }
 });
 </script>

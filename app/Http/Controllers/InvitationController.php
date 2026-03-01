@@ -29,6 +29,54 @@ class InvitationController extends Controller
     }
 
     /**
+     * Store a newly created invitation category.
+     */
+    public function storeCategory(Request $request)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        $validated['slug'] = Str::slug($validated['name']);
+
+        InvitationCategory::create($validated);
+
+        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil ditambahkan');
+    }
+
+    /**
+     * Update an invitation category.
+     */
+    public function updateCategory(Request $request, string $id)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+        $category = InvitationCategory::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+        $validated['slug'] = Str::slug($validated['name']);
+
+        $category->update($validated);
+
+        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil diperbarui');
+    }
+
+    /**
+     * Remove an invitation category.
+     */
+    public function destroyCategory(string $id)
+    {
+        abort_if(auth()->user()->role !== 'admin', 403);
+        $category = InvitationCategory::findOrFail($id);
+        $category->delete();
+
+        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil dihapus');
+    }
+
+    /**
      * Store a newly created invitation product.
      */
     public function store(Request $request)
@@ -40,6 +88,7 @@ class InvitationController extends Controller
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'video_demo' => 'nullable|mimes:mp4|max:20480',
             'is_active' => 'boolean',
         ]);
 
@@ -48,6 +97,13 @@ class InvitationController extends Controller
             $filename = time() . '_' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/undangan', $filename);
             $validated['thumbnail'] = $filename;
+        }
+
+        if ($request->hasFile('video_demo')) {
+            $file = $request->file('video_demo');
+            $filename = time() . '_' . Str::slug($request->name) . '_video.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/undangan/videos', $filename);
+            $validated['video_demo'] = $filename;
         }
 
         $validated['is_active'] = $request->has('is_active');
@@ -92,6 +148,7 @@ class InvitationController extends Controller
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'video_demo' => 'nullable|mimes:mp4|max:20480',
             'is_active' => 'boolean',
         ]);
 
@@ -104,6 +161,17 @@ class InvitationController extends Controller
             $filename = time() . '_' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
             $file->storeAs('public/undangan', $filename);
             $validated['thumbnail'] = $filename;
+        }
+
+        if ($request->hasFile('video_demo')) {
+            // Delete old video if exists
+            if ($product->video_demo) {
+                \Storage::delete('public/undangan/videos/' . $product->video_demo);
+            }
+            $file = $request->file('video_demo');
+            $filename = time() . '_' . Str::slug($request->name) . '_video.' . $file->getClientOriginalExtension();
+            $file->storeAs('public/undangan/videos', $filename);
+            $validated['video_demo'] = $filename;
         }
 
         $validated['is_active'] = $request->has('is_active');
@@ -124,6 +192,10 @@ class InvitationController extends Controller
 
         if ($product->thumbnail) {
             \Storage::delete('public/undangan/' . $product->thumbnail);
+        }
+
+        if ($product->video_demo) {
+            \Storage::delete('public/undangan/videos/' . $product->video_demo);
         }
 
         $product->delete();

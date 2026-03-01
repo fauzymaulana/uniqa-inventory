@@ -289,13 +289,18 @@ class AdminDashboardController extends Controller
                 ->whereDate('created_at', $current)
                 ->sum('total_price');
 
+            $transactionCount = Transaction::where('status', 'completed')
+                ->whereDate('created_at', $current)
+                ->count();
+
             $expense = \App\Models\Expense::whereDate('created_at', $current)->sum('amount');
 
             $data[] = [
                 'Tanggal' => $current->format('d-m-Y'),
+                'Jumlah Transaksi' => $transactionCount,
                 'Pendapatan (Rp)' => (float) $income,
                 'Pengeluaran (Rp)' => (float) $expense,
-                'Saldo (Rp)' => (float) ($income - $expense),
+                'Balance (Rp)' => (float) ($income - $expense),
             ];
 
             $current->addDay();
