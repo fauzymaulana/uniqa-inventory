@@ -21,8 +21,8 @@
     <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Organization",
+        "@@context": "https://schema.org",
+        "@@type": "Organization",
         "name": "Wedding by Uniqa",
         "url": "{{ url('/company') }}",
         "description": "Platform undangan pernikahan digital, cetak & souvenir terbaik di Indonesia."
@@ -815,4 +815,5 @@
     });
 </script>
 </body>
+</html>
 </html>
