@@ -135,6 +135,25 @@
     </div>
 </div>
 
+<!-- Daily Income vs Expense Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar"></i> Laporan Harian Pendapatan vs Pengeluaran ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }})
+                </h5>
+                <a href="{{ route('admin.dashboard.export-daily-income-expense') }}?start_date={{ $startDate->format('Y-m-d') }}&end_date={{ $endDate->format('Y-m-d') }}" class="btn btn-sm btn-light">
+                    <i class="fas fa-download"></i> Export Excel
+                </a>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyIncomeExpenseChart" style="max-height:350px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Top Products Section -->
 <div class="row mb-4">
     <div class="col-12">
@@ -399,5 +418,77 @@
             });
         })
         .catch(error => console.error('Error loading monthly data:', error));
+
+    // Daily Income vs Expense Chart
+    fetch('{{ route("admin.dashboard.daily-income-expense") }}?start_date={{ $startDate->format("Y-m-d") }}&end_date={{ $endDate->format("Y-m-d") }}&t=' + Date.now(), {
+        cache: 'no-store'
+    })
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('dailyIncomeExpenseChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Pendapatan (Rp)',
+                            data: data.income,
+                            backgroundColor: 'rgba(40, 167, 69, 0.75)',
+                            borderColor: '#28a745',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Pengeluaran (Rp)',
+                            data: data.expense,
+                            backgroundColor: 'rgba(220, 53, 69, 0.75)',
+                            borderColor: '#dc3545',
+                            borderWidth: 1,
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Saldo (Rp)',
+                            data: data.balance,
+                            type: 'line',
+                            borderColor: '#0070C0',
+                            backgroundColor: 'rgba(0, 112, 192, 0.1)',
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#0070C0',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error loading daily income/expense data:', error));
 </script>
 @endsection

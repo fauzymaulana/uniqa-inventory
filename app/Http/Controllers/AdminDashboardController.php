@@ -238,6 +238,75 @@ class AdminDashboardController extends Controller
     }
 
     /**
+     * Get daily income vs expenses data for chart.
+     */
+    public function getDailyIncomeExpenseData()
+    {
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+
+        $labels = [];
+        $incomeData = [];
+        $expenseData = [];
+        $balanceData = [];
+
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $income = Transaction::where('status', 'completed')
+                ->whereDate('created_at', $current)
+                ->sum('total_price');
+
+            $expense = \App\Models\Expense::whereDate('created_at', $current)->sum('amount');
+
+            $labels[] = $current->format('d M');
+            $incomeData[] = (float) $income;
+            $expenseData[] = (float) $expense;
+            $balanceData[] = (float) ($income - $expense);
+
+            $current->addDay();
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'income' => $incomeData,
+            'expense' => $expenseData,
+            'balance' => $balanceData,
+        ]);
+    }
+
+    /**
+     * Export daily income vs expense report to Excel.
+     */
+    public function exportDailyIncomeExpense()
+    {
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+
+        $data = [];
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $income = Transaction::where('status', 'completed')
+                ->whereDate('created_at', $current)
+                ->sum('total_price');
+
+            $expense = \App\Models\Expense::whereDate('created_at', $current)->sum('amount');
+
+            $data[] = [
+                'Tanggal' => $current->format('d-m-Y'),
+                'Pendapatan (Rp)' => (float) $income,
+                'Pengeluaran (Rp)' => (float) $expense,
+                'Saldo (Rp)' => (float) ($income - $expense),
+            ];
+
+            $current->addDay();
+        }
+
+        $fileName = 'Laporan_Harian_Pendapatan_Pengeluaran_' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new \App\Exports\DailyIncomeExpenseExport($data, $startDate, $endDate), $fileName);
+    }
+
+    /**
      * Export report data to Excel.
      */
     public function export($type)

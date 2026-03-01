@@ -10,6 +10,9 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Middleware\CheckAdminRole;
 use App\Http\Middleware\CheckCashierRole;
 use App\Http\Controllers\BarcodeController;
+use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\ContentController;
+
 
 // Authentication Routes
 Route::get('/login', function () {
@@ -53,6 +56,9 @@ Route::get('/product/{product}/barcode', [BarcodeController::class, 'barcode'])-
 Route::get('/label/{product}', [BarcodeController::class, 'generateLabel'])->name('product.label');
 Route::post('/labels/export', [BarcodeController::class, 'exportLabels'])->name('labels.export');
 
+// Company Profile Website (public)
+Route::get('/company', [App\Http\Controllers\CompanyController::class, 'index'])->name('company.index');
+
 Route::middleware('auth')->group(function () {
     // Admin Routes
     Route::middleware(CheckAdminRole::class)->prefix('admin')->name('admin.')->group(function () {
@@ -69,6 +75,8 @@ Route::middleware('auth')->group(function () {
 
         // Admin Dashboard
         Route::get('dashboard', 'App\\Http\\Controllers\\AdminDashboardController@index')->name('dashboard');
+        Route::get('dashboard/daily-income-expense', 'App\\Http\\Controllers\\AdminDashboardController@getDailyIncomeExpenseData')->name('dashboard.daily-income-expense');
+        Route::get('dashboard/export-daily-income-expense', 'App\\Http\\Controllers\\AdminDashboardController@exportDailyIncomeExpense')->name('dashboard.export-daily-income-expense');
         Route::get('dashboard/daily-data', 'App\\Http\\Controllers\\AdminDashboardController@getDailyData')->name('dashboard.daily-data');
         Route::get('dashboard/daily-payment-data', 'App\\Http\\Controllers\\AdminDashboardController@getDailyPaymentMethodData')->name('dashboard.daily-payment-data');
         Route::get('dashboard/monthly-data', 'App\\Http\\Controllers\\AdminDashboardController@getMonthlyData')->name('dashboard.monthly-data');
@@ -125,5 +133,9 @@ Route::middleware('auth')->group(function () {
     // Profile (available for all authenticated users)
     Route::get('profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    // Undangan & Konten (accessible by admin and cashier)
+    Route::resource('undangan', InvitationController::class);
+    Route::resource('konten', ContentController::class);
 });
 
