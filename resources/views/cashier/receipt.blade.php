@@ -59,6 +59,9 @@
                 <div class="text-muted text-center small">
                     <p>Kasir: {{ $transaction->user->name }}</p>
                     <p>Waktu: {{ $transaction->created_at->format('d/m/Y H:i:s') }}</p>
+                    @if($transaction->notes)
+                    <p>Keterangan: {{ $transaction->notes }}</p>
+                    @endif
                 </div>
 
                 <div class="d-grid gap-2">

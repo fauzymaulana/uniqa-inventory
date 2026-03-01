@@ -25,11 +25,19 @@ class Product extends Model
     ];
 
     /**
-     * Boot method to auto-generate barcode and qr_code on creation.
+     * Boot method to auto-generate SKU, barcode and qr_code on creation.
      */
     protected static function booted(): void
     {
         static::creating(function (Product $product) {
+            // Auto-generate SKU if not provided
+            if (empty($product->sku)) {
+                $prefix = 'SKU';
+                $timestamp = now()->format('ymdHis');
+                $random = strtoupper(substr(md5(uniqid()), 0, 4));
+                $product->sku = $prefix . '-' . $timestamp . '-' . $random;
+            }
+
             $hash = hash('sha256', $product->sku . microtime(true));
             // Use different portions of the hash to ensure barcode and qr_code differ
             $product->barcode = str_pad(

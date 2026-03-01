@@ -40,6 +40,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                     'Tanggal' => $transaction->created_at->format('d-m-Y H:i'),
                     'Kasir' => $transaction->user->name ?? 'N/A',
                     'Metode Pembayaran' => $paymentMethod,
+                    'Keterangan' => $transaction->notes ?? '-',
                     'SKU Produk' => '-',
                     'Nama Produk' => '-',
                     'Kategori' => '-',
@@ -55,6 +56,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
                         'Tanggal' => $transaction->created_at->format('d-m-Y H:i'),
                         'Kasir' => $transaction->user->name ?? 'N/A',
                         'Metode Pembayaran' => $paymentMethod,
+                        'Keterangan' => $transaction->notes ?? '-',
                         'SKU Produk' => $detail->product?->sku ?? '-',
                         'Nama Produk' => $detail->product?->name ?? '-',
                         'Kategori' => $detail->product?->category?->name ?? '-',
@@ -77,6 +79,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
             'Tanggal & Waktu',
             'Nama Kasir',
             'Metode Pembayaran',
+            'Keterangan',
             'SKU Produk',
             'Nama Produk',
             'Kategori',
@@ -91,7 +94,7 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
     {
         $lastRow = $sheet->getHighestRow();
 
-        $sheet->getStyle('A1:K1')->applyFromArray([
+        $sheet->getStyle('A1:L1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => 'solid', 'startColor' => ['rgb' => '0070C0']],
             'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
@@ -99,18 +102,18 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
         $sheet->getRowDimension(1)->setRowHeight(22);
 
         // Currency format for numeric columns
-        $sheet->getStyle("I2:K{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
-        $sheet->getStyle("I2:K{$lastRow}")->getAlignment()->setHorizontal('right');
+        $sheet->getStyle("J2:L{$lastRow}")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle("J2:L{$lastRow}")->getAlignment()->setHorizontal('right');
 
         // Borders
-        $sheet->getStyle("A1:K{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(
+        $sheet->getStyle("A1:L{$lastRow}")->getBorders()->getAllBorders()->setBorderStyle(
             \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
         );
 
         // Alternating rows
         for ($i = 2; $i <= $lastRow; $i++) {
             if ($i % 2 === 0) {
-                $sheet->getStyle("A{$i}:K{$i}")->getFill()->setFillType('solid')
+                $sheet->getStyle("A{$i}:L{$i}")->getFill()->setFillType('solid')
                     ->getStartColor()->setRGB('F2F2F2');
             }
         }
@@ -119,8 +122,8 @@ class SalesReportExport implements FromCollection, WithHeadings, WithStyles, Sho
         $sheet->insertNewRowBefore(1, 2);
         $sheet->setCellValue('A1', 'Laporan Penjualan Detail');
         $sheet->setCellValue('A2', 'Periode: ' . $this->startDate->format('d/m/Y') . ' - ' . $this->endDate->format('d/m/Y'));
-        $sheet->mergeCells('A1:K1');
-        $sheet->mergeCells('A2:K2');
+        $sheet->mergeCells('A1:L1');
+        $sheet->mergeCells('A2:L2');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1:A2')->getAlignment()->setHorizontal('center');
 

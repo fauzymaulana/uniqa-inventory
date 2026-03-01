@@ -138,6 +138,44 @@
 let allProducts = {!! json_encode($products) !!};
 let currentPage = 1;
 const itemsPerPage = 15;
+let sortColumn = null;
+let sortDirection = 'asc';
+
+function sortProducts(products) {
+    if (!sortColumn) return products;
+    return [...products].sort((a, b) => {
+        let valA, valB;
+        switch (sortColumn) {
+            case 'id':    valA = a.id; valB = b.id; break;
+            case 'name':  valA = (a.name || '').toLowerCase(); valB = (b.name || '').toLowerCase(); break;
+            case 'sku':   valA = (a.sku || '').toLowerCase(); valB = (b.sku || '').toLowerCase(); break;
+            case 'category': valA = (a.category?.name || '').toLowerCase(); valB = (b.category?.name || '').toLowerCase(); break;
+            case 'price': valA = parseFloat(a.price) || 0; valB = parseFloat(b.price) || 0; break;
+            case 'stock': valA = parseInt(a.stock) || 0; valB = parseInt(b.stock) || 0; break;
+            case 'barcode': valA = (a.barcode || '').toLowerCase(); valB = (b.barcode || '').toLowerCase(); break;
+            default: return 0;
+        }
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+    });
+}
+
+function setSortColumn(col) {
+    if (sortColumn === col) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortColumn = col;
+        sortDirection = 'asc';
+    }
+    const searchQuery = document.getElementById('liveSearchInput').value;
+    filterAndDisplayProducts(searchQuery);
+}
+
+function getSortIcon(col) {
+    if (sortColumn !== col) return '<i class="fas fa-sort text-muted"></i>';
+    return sortDirection === 'asc' ? '<i class="fas fa-sort-up text-primary"></i>' : '<i class="fas fa-sort-down text-primary"></i>';
+}
 
 function bindTableEvents() {
     const selectAll = document.getElementById('selectAllCheckbox');
@@ -199,10 +237,8 @@ function updateExportButton() {
     }
 }
 
-function filterAndDisplayProducts(searchQuery = '') {
+function getFilteredSortedProducts(searchQuery = '') {
     let filteredProducts = allProducts;
-
-    // Filter berdasarkan search query
     if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         filteredProducts = allProducts.filter(product => {
@@ -210,12 +246,13 @@ function filterAndDisplayProducts(searchQuery = '') {
             return text.includes(query);
         });
     }
+    return sortProducts(filteredProducts);
+}
 
-    // Reset ke halaman 1 saat search
+function filterAndDisplayProducts(searchQuery = '') {
+    // Reset ke halaman 1 saat search/sort
     currentPage = 1;
-
-    // Generate pagination dan tampilkan
-    displayPaginatedProducts(filteredProducts);
+    displayPaginatedProducts(getFilteredSortedProducts(searchQuery));
 }
 
 function displayPaginatedProducts(filteredProducts) {
@@ -239,13 +276,13 @@ function displayPaginatedProducts(filteredProducts) {
                 <thead class="table-light">
                     <tr>
                         <th style="width:40px"><input type="checkbox" id="selectAllCheckbox"></th>
-                        <th>ID</th>
-                        <th>Nama Produk</th>
-                        <th>SKU</th>
-                        <th>Kategori</th>
-                        <th>Harga</th>
-                        <th class="text-center">Stok</th>
-                        <th class="text-center">Barcode</th>
+                        <th class="sort-header" onclick="setSortColumn('id')" style="cursor:pointer;white-space:nowrap;">ID ${getSortIcon('id')}</th>
+                        <th class="sort-header" onclick="setSortColumn('name')" style="cursor:pointer;white-space:nowrap;">Nama Produk ${getSortIcon('name')}</th>
+                        <th class="sort-header" onclick="setSortColumn('sku')" style="cursor:pointer;white-space:nowrap;">SKU ${getSortIcon('sku')}</th>
+                        <th class="sort-header" onclick="setSortColumn('category')" style="cursor:pointer;white-space:nowrap;">Kategori ${getSortIcon('category')}</th>
+                        <th class="sort-header" onclick="setSortColumn('price')" style="cursor:pointer;white-space:nowrap;">Harga ${getSortIcon('price')}</th>
+                        <th class="sort-header text-center" onclick="setSortColumn('stock')" style="cursor:pointer;white-space:nowrap;">Stok ${getSortIcon('stock')}</th>
+                        <th class="sort-header text-center" onclick="setSortColumn('barcode')" style="cursor:pointer;white-space:nowrap;">Barcode ${getSortIcon('barcode')}</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -271,7 +308,7 @@ function displayPaginatedProducts(filteredProducts) {
                         <a href="/admin/products/${product.id}/edit" class="btn btn-sm btn-warning" title="Edit">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="/admin/products/download-label/${product.id}" class="btn btn-sm btn-success" title="Download Label" target="_blank">
+                        <a href="/admin/products/${product.id}/download-label" class="btn btn-sm btn-success" title="Download Label" target="_blank">
                             <i class="fas fa-download"></i>
                         </a>
                         <a href="/admin/products/${product.id}/adjust-stock" class="btn btn-sm btn-secondary" title="Sesuaikan Stok">
@@ -341,7 +378,7 @@ function displayPaginatedProducts(filteredProducts) {
 function goToPage(page) {
     currentPage = page;
     const searchQuery = document.getElementById('liveSearchInput').value;
-    filterAndDisplayProducts(searchQuery);
+    displayPaginatedProducts(getFilteredSortedProducts(searchQuery));
     
     // Scroll ke atas
     document.getElementById('productsTableContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -359,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initial display
-    displayPaginatedProducts(allProducts);
+    displayPaginatedProducts(getFilteredSortedProducts());
     bindTableEvents();
 });
 </script>

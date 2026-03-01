@@ -172,7 +172,7 @@
 // Simple client-side search
 document.getElementById('searchInput').addEventListener('input', function(e) {
     const query = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('table tbody tr');
+    const rows = document.querySelectorAll('table tbody tr:not(.pending-offline-row)');
     
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();
@@ -180,6 +180,129 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
     });
 });
 </script>
+
+@if(auth()->user()->role === 'cashier')
+<script>
+const EXPENSE_DB_NAME = 'uniqa_expense_offline';
+const EXPENSE_STORE = 'pending_expenses';
+
+function openExpenseDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open(EXPENSE_DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(EXPENSE_STORE)) {
+                db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            }
+        };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e);
+    });
+}
+
+async function getAllPendingExpenses() {
+    try {
+        const db = await openExpenseDB();
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(EXPENSE_STORE, 'readonly');
+            const req = tx.objectStore(EXPENSE_STORE).getAll();
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = (e) => reject(e);
+        });
+    } catch { return []; }
+}
+
+async function deletePendingExpense(db, offlineId) {
+    return new Promise((resolve) => {
+        const tx = db.transaction(EXPENSE_STORE, 'readwrite');
+        tx.objectStore(EXPENSE_STORE).delete(offlineId);
+        tx.oncomplete = resolve;
+    });
+}
+
+async function syncPendingExpenses() {
+    if (!navigator.onLine) return;
+    const db = await openExpenseDB();
+    const pending = await getAllPendingExpenses();
+    if (!pending.length) return;
+
+    try {
+        const resp = await fetch('{{ route("api.sync-expenses") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            },
+            body: JSON.stringify({ expenses: pending }),
+        });
+        const result = await resp.json();
+        if (result.success && result.synced.length > 0) {
+            for (const s of result.synced) {
+                await deletePendingExpense(db, s.offline_id);
+            }
+            // Reload page to show synced data
+            window.location.reload();
+        }
+    } catch {}
+}
+
+function formatCurrency(amount) {
+    return 'Rp ' + new Intl.NumberFormat('id-ID').format(amount || 0);
+}
+
+function getTypeLabel(type) {
+    return { operasional: 'Operasional', asset: 'Asset', stok_barang: 'Stok Barang' }[type] || type;
+}
+function getTypeBadge(type) {
+    const map = { operasional: 'bg-info', asset: 'bg-warning', stok_barang: 'bg-secondary' };
+    return `<span class="badge ${map[type] || 'bg-secondary'}">${getTypeLabel(type)}</span>`;
+}
+function getStatusBadge(status) {
+    return status === 'selesai'
+        ? '<span class="badge bg-success">Selesai</span>'
+        : '<span class="badge bg-warning text-dark">Belum Tuntas</span>';
+}
+
+async function injectPendingExpenses() {
+    const pending = await getAllPendingExpenses();
+    if (!pending.length) return;
+
+    const tbody = document.querySelector('table tbody');
+    if (!tbody) return;
+
+    // Remove "empty" row if present
+    const emptyRow = tbody.querySelector('td[colspan]');
+    if (emptyRow) emptyRow.closest('tr').remove();
+
+    pending.forEach((exp, idx) => {
+        const savedAt = exp.saved_at ? new Date(exp.saved_at).toLocaleString('id-ID') : '-';
+        const tr = document.createElement('tr');
+        tr.className = 'table-warning pending-offline-row';
+        tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${savedAt}</td>
+            <td><strong>${exp.activity || '-'}</strong></td>
+            <td>${getTypeBadge(exp.type)}</td>
+            <td><span class="text-muted">-</span></td>
+            <td class="text-end"><strong>${formatCurrency(exp.amount)}</strong></td>
+            <td>${getStatusBadge(exp.status)}</td>
+            <td>-</td>
+            <td class="text-center">
+                <i class="fas fa-sync-alt text-warning" title="Menunggu sinkronisasi ke server"></i>
+                <span class="badge bg-warning text-dark ms-1">Pending</span>
+            </td>
+        `;
+        tbody.insertBefore(tr, tbody.firstChild);
+    });
+}
+
+window.addEventListener('online', syncPendingExpenses);
+document.addEventListener('DOMContentLoaded', async () => {
+    await injectPendingExpenses();
+    await syncPendingExpenses();
+});
+</script>
+@endif
 
 @if(auth()->user()->role === 'admin')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

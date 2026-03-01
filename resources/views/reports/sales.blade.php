@@ -79,6 +79,7 @@
                         <th>Jumlah Item</th>
                         <th class="text-end">Total</th>
                         <th>Metode Pembayaran</th>
+                        <th>Keterangan</th>
                         <th class="text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -97,6 +98,7 @@
                                     <span class="badge bg-primary">Tunai</span>
                                 @endif
                             </td>
+                            <td>{{ $transaction->notes ?: '-' }}</td>
                             <td class="text-center">
                                 <a href="{{ route('admin.reports.transaction-details', $transaction) }}" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i> Detail
@@ -105,7 +107,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Tidak ada data penjualan</td>
+                            <td colspan="8" class="text-center text-muted">Tidak ada data penjualan</td>
                         </tr>
                     @endforelse
                 </tbody>

@@ -175,6 +175,44 @@ class ExpenseController extends Controller
     }
 
     /**
+     * Sync offline expenses submitted from the client.
+     */
+    public function syncOfflineExpenses(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+    {
+        $expenses = $request->input('expenses', []);
+
+        if (!is_array($expenses) || empty($expenses)) {
+            return response()->json(['success' => false, 'message' => 'No expenses to sync'], 422);
+        }
+
+        $synced = [];
+        $failed = [];
+
+        foreach ($expenses as $expenseData) {
+            try {
+                $expense = Expense::create([
+                    'activity' => $expenseData['activity'] ?? '',
+                    'type' => $expenseData['type'] ?? 'operasional',
+                    'category_id' => $expenseData['category_id'] ?: null,
+                    'status' => $expenseData['status'] ?? 'selesai',
+                    'amount' => floatval($expenseData['amount'] ?? 0),
+                    'description' => $expenseData['description'] ?? null,
+                    'user_id' => auth()->id(),
+                ]);
+                $synced[] = ['offline_id' => $expenseData['offline_id'] ?? null, 'id' => $expense->id];
+            } catch (\Exception $e) {
+                $failed[] = ['offline_id' => $expenseData['offline_id'] ?? null, 'reason' => $e->getMessage()];
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'synced' => $synced,
+            'failed' => $failed,
+        ]);
+    }
+
+    /**
      * Delete expense.
      */
     public function destroy(Expense $expense): RedirectResponse
