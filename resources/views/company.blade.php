@@ -622,7 +622,7 @@
                             <div class="product-card">
                                 <div class="product-thumb">
                                     @if($product->video_demo)
-                                        <video muted loop playsinline preload="metadata" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0;">
+                                        <video muted loop playsinline preload="metadata" aria-label="Demo video {{ $product->name }}" tabindex="0" onfocus="this.play()" onblur="this.pause();this.currentTime=0;" onmouseenter="this.play()" onmouseleave="this.pause();this.currentTime=0;">
                                             <source src="{{ asset('storage/undangan/videos/' . $product->video_demo) }}" type="video/mp4">
                                         </video>
                                         <span class="product-badge"><i class="fas fa-play me-1"></i>Video</span>
@@ -785,9 +785,9 @@
                         if (!startTime) startTime = ts;
                         var progress = Math.min((ts - startTime) / duration, 1);
                         var eased = 1 - Math.pow(1 - progress, 3);
-                        el.textContent = Math.floor(eased * target).toLocaleString('id-ID');
+                        el.textContent = Math.floor(eased * target).toLocaleString();
                         if (progress < 1) requestAnimationFrame(step);
-                        else el.textContent = target.toLocaleString('id-ID');
+                        else el.textContent = target.toLocaleString();
                     }
                     requestAnimationFrame(step);
                 }
