@@ -89,7 +89,6 @@ class InvitationController extends Controller
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_demo' => 'nullable|mimes:mp4|max:20480',
-            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -149,7 +148,6 @@ class InvitationController extends Controller
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_demo' => 'nullable|mimes:mp4|max:20480',
-            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('thumbnail')) {

@@ -36,7 +36,6 @@ class ContentController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'type' => 'required|in:hero,banner,promo',
             'order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -51,7 +50,10 @@ class ContentController extends Controller
 
         Content::create($validated);
 
-        return redirect()->route('konten.index')->with('success', 'Konten berhasil ditambahkan');
+        if (auth()->user()->role === 'admin') {
+            return redirect()->route('admin.content.index')->with('success', 'Konten berhasil ditambahkan');
+        }
+        return redirect()->route('cashier.content.create')->with('success', 'Konten berhasil ditambahkan');
     }
 
     /**
@@ -59,7 +61,7 @@ class ContentController extends Controller
      */
     public function show(string $id)
     {
-        return redirect()->route('konten.edit', $id);
+        return redirect()->route('admin.content.edit', $id);
     }
 
     /**
@@ -84,7 +86,6 @@ class ContentController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:4096',
             'type' => 'required|in:hero,banner,promo',
             'order' => 'nullable|integer|min:0',
-            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('image')) {
@@ -102,7 +103,7 @@ class ContentController extends Controller
 
         $content->update($validated);
 
-        return redirect()->route('konten.index')->with('success', 'Konten berhasil diperbarui');
+        return redirect()->route('admin.content.index')->with('success', 'Konten berhasil diperbarui');
     }
 
     /**
@@ -118,6 +119,6 @@ class ContentController extends Controller
 
         $content->delete();
 
-        return redirect()->route('konten.index')->with('success', 'Konten berhasil dihapus');
+        return redirect()->route('admin.content.index')->with('success', 'Konten berhasil dihapus');
     }
 }

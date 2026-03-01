@@ -17,7 +17,7 @@ class AdminDashboardController extends Controller
     public function index(): View
     {
         $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
-        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
 
         // Daily statistics
         $todaySales = Transaction::where('status', 'completed')
@@ -243,7 +243,7 @@ class AdminDashboardController extends Controller
     public function getDailyIncomeExpenseData()
     {
         $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
-        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
 
         $labels = [];
         $incomeData = [];

@@ -17,7 +17,7 @@
                 <h5 class="mb-0"><i class="fas fa-envelope-open-text"></i> Form Produk Undangan</h5>
             </div>
             <div class="card-body">
-                <form action="{{ auth()->user()->role === 'admin' ? route('admin.undangan.store') : route('cashier.undangan.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ auth()->user()->role === 'admin' ? route('admin.invitation.store') : route('cashier.invitation.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
