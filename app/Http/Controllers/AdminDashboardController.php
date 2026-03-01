@@ -101,6 +101,44 @@ class AdminDashboardController extends Controller
     }
 
     /**
+     * Get daily payment method data for sales report (filter-aware).
+     */
+    public function getFilteredSalesDailyPaymentData()
+    {
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
+
+        $labels = [];
+        $transferData = [];
+        $cashData = [];
+
+        $current = $startDate->copy();
+        while ($current->lte($endDate)) {
+            $transfer = Transaction::where('status', 'completed')
+                ->where('payment_method', 'transfer')
+                ->whereDate('created_at', $current)
+                ->sum('total_price');
+
+            $cash = Transaction::where('status', 'completed')
+                ->where('payment_method', 'cash')
+                ->whereDate('created_at', $current)
+                ->sum('total_price');
+
+            $labels[] = $current->format('d M');
+            $transferData[] = $transfer;
+            $cashData[] = $cash;
+
+            $current->addDay();
+        }
+
+        return response()->json([
+            'labels' => $labels,
+            'transfer' => $transferData,
+            'cash' => $cashData
+        ]);
+    }
+
+    /**
      * Get daily payment method data for dashboard (current month).
      */
     public function getDailyPaymentMethodData()
@@ -163,7 +201,6 @@ class AdminDashboardController extends Controller
                 $current->copy()->startOfMonth(),
                 $current->copy()->endOfMonth(),
             ])
-            ->where('status', 'approved')
             ->sum('amount');
 
             $labels[] = $current->format('M Y');
@@ -264,7 +301,6 @@ class AdminDashboardController extends Controller
                 $currentDate->startOfMonth(),
                 $currentDate->endOfMonth()
             ])
-            ->where('status', 'approved')
             ->sum('amount');
 
             $balance = $sales - $expenses;

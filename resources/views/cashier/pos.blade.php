@@ -104,17 +104,18 @@
     }
     #cameraSection video {
         width: 100%;
-        max-height: 220px;
+        max-height: 320px;
         object-fit: cover;
         display: block;
+        transform: scaleX(1); /* front camera will be flipped via JS */
     }
     #cameraOverlay {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 160px;
-        height: 100px;
+        width: 200px;
+        height: 130px;
         border: 3px solid #28a745;
         border-radius: 6px;
         pointer-events: none;
@@ -236,7 +237,10 @@
             <button class="btn btn-sm btn-danger" onclick="stopCamera()">
                 <i class="fas fa-stop"></i> Stop Camera
             </button>
-            <span class="text-muted ms-2" style="font-size:0.82rem;">Arahkan kamera ke barcode produk</span>
+            <button class="btn btn-sm btn-secondary ms-2" onclick="flipCamera()" id="flipCameraBtn">
+                <i class="fas fa-sync-alt"></i> Flip Camera
+            </button>
+            <span class="text-muted ms-2" style="font-size:0.82rem;">Arahkan kamera ke barcode atau QR Code</span>
         </div>
 
         <!-- Scanner Section -->
@@ -370,6 +374,7 @@ let currentMode = 'manual';
 let cameraScanner = null;
 let scannerBuffer = '';
 let scannerTimer = null;
+let currentFacingMode = 'environment'; // default: rear camera
 
 const OFFLINE_DB_NAME = 'uniqa_pos_offline';
 const OFFLINE_DB_VERSION = 1;
@@ -535,17 +540,59 @@ function switchMode(mode) {
 function startCamera() {
     if (typeof Html5Qrcode === 'undefined') { showToast('Kamera tidak didukung di browser ini.', 'danger'); return; }
     cameraScanner = new Html5Qrcode('cameraSection');
-    const config = { fps: 10, qrbox: { width: 160, height: 100 }, aspectRatio: 1.7 };
+    const config = {
+        fps: 15,
+        qrbox: { width: 200, height: 130 },
+        aspectRatio: 1.7,
+        formatsToSupport: [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.CODE_93,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.ITF,
+            Html5QrcodeSupportedFormats.DATA_MATRIX,
+            Html5QrcodeSupportedFormats.AZTEC,
+            Html5QrcodeSupportedFormats.PDF_417,
+        ]
+    };
+    const videoConstraints = {
+        facingMode: currentFacingMode,
+        width: { ideal: 3840, min: 1280 },
+        height: { ideal: 2160, min: 720 },
+    };
     cameraScanner.start(
-        { facingMode: 'environment' },
+        videoConstraints,
         config,
         (decodedText) => {
             processScannedCode(decodedText);
         },
         () => {} // silent errors during scanning frames
-    ).catch((err) => {
+    ).then(() => {
+        // Apply mirror transform for front camera after camera starts
+        const videoEl = document.querySelector('#cameraSection video');
+        if (videoEl) {
+            videoEl.style.transform = currentFacingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)';
+        }
+    }).catch((err) => {
         showToast('Tidak dapat mengakses kamera: ' + err, 'danger');
     });
+}
+
+function flipCamera() {
+    currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+    if (cameraScanner) {
+        cameraScanner.stop().then(() => {
+            cameraScanner = null;
+            startCamera();
+        }).catch(() => {
+            cameraScanner = null;
+            startCamera();
+        });
+    }
 }
 
 function stopCamera() {

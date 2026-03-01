@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('reports')->name('reports.')->group(function () {
             Route::get('sales', [ReportController::class, 'sales'])->name('sales');
             Route::get('sales/daily-payment-data', 'App\\Http\\Controllers\\AdminDashboardController@getDailyPaymentMethodData')->name('sales.daily-payment-data');
+            Route::get('sales/filtered-payment-data', 'App\\Http\\Controllers\\AdminDashboardController@getFilteredSalesDailyPaymentData')->name('sales.filtered-payment-data');
             Route::get('inventory', [ReportController::class, 'inventory'])->name('inventory');
             Route::get('stock-history', [ReportController::class, 'stockHistory'])->name('stock-history');
             Route::get('daily', [ReportController::class, 'daily'])->name('daily');

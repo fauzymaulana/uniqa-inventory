@@ -22,9 +22,6 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-filter"></i> Filter
                 </button>
-                <a href="{{ route('cashier.history.export-excel') }}?month={{ $month }}" class="btn btn-success">
-                    <i class="fas fa-download"></i> Export Excel
-                </a>
             </div>
         </form>
     </div>

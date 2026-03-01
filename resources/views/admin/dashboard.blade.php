@@ -126,7 +126,7 @@
             <div class="card-body">
                 <canvas id="monthlyChart"></canvas>
                 <div class="mt-3 text-center">
-                    <a href="{{ route('admin.dashboard.export', 'monthly') }}?start_date={{ $startDate->format('Y-m-d') }}&end_date={{ $endDate->format('Y-m-d') }}" class="btn btn-sm btn-success">
+                    <a href="{{ route('admin.dashboard.export', 'monthly') }}?start_date={{ now()->startOfYear()->format('Y-m-d') }}&end_date={{ now()->endOfYear()->format('Y-m-d') }}" class="btn btn-sm btn-success">
                         <i class="fas fa-download"></i> Export Excel
                     </a>
                 </div>

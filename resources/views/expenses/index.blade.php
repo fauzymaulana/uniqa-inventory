@@ -38,9 +38,11 @@
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="fas fa-filter"></i> Filter
                 </button>
-                <a href="{{ auth()->user()->role === 'admin' ? route('admin.expenses.export-excel') : route('cashier.expenses.export-excel') }}?start_date={{ $startDate->format('Y-m-d') }}&end_date={{ $endDate->format('Y-m-d') }}" class="btn btn-success flex-fill">
+                @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.expenses.export-excel') }}?start_date={{ $startDate->format('Y-m-d') }}&end_date={{ $endDate->format('Y-m-d') }}" class="btn btn-success flex-fill">
                     <i class="fas fa-download"></i> Export Excel
                 </a>
+                @endif
             </div>
         </form>
     </div>
@@ -60,16 +62,18 @@
 </div>
 
 <!-- Chart -->
+@if(auth()->user()->role === 'admin')
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0">
-            <i class="fas fa-chart-line"></i> Grafik Pengeluaran Harian ({{ now()->translatedFormat('F Y') }})
+            <i class="fas fa-chart-line"></i> Grafik Pengeluaran Harian ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }})
         </h5>
     </div>
     <div class="card-body">
         <canvas id="expenseChart"></canvas>
     </div>
 </div>
+@endif
 
 <div class="card">
     <div class="card-header bg-light">
@@ -164,7 +168,6 @@
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 // Simple client-side search
 document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -176,9 +179,13 @@ document.getElementById('searchInput').addEventListener('input', function(e) {
         row.style.display = text.includes(query) ? '' : 'none';
     });
 });
+</script>
 
-// Expense Chart
-fetch('{{ auth()->user()->role === "admin" ? route("admin.expenses.daily-data") : route("cashier.expenses.daily-data") }}')
+@if(auth()->user()->role === 'admin')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Expense Chart - admin only
+fetch('{{ route("admin.expenses.daily-data") }}?start_date={{ $startDate->format("Y-m-d") }}&end_date={{ $endDate->format("Y-m-d") }}')
     .then(response => response.json())
     .then(data => {
         const ctx = document.getElementById('expenseChart').getContext('2d');
@@ -223,4 +230,5 @@ fetch('{{ auth()->user()->role === "admin" ? route("admin.expenses.daily-data") 
         });
     });
 </script>
+@endif
 @endsection

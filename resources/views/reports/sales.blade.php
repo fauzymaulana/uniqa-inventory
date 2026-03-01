@@ -53,7 +53,7 @@
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
         <h5 class="mb-0">
-            <i class="fas fa-chart-line"></i> Laporan Harian ({{ now()->translatedFormat('F Y') }}) - Metode Pembayaran
+            <i class="fas fa-chart-line"></i> Grafik Harian ({{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }}) - Metode Pembayaran
         </h5>
     </div>
     <div class="card-body">
@@ -118,8 +118,8 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Daily Payment Method Chart (Cash=Blue, Transfer=Red)
-    fetch('{{ route("admin.reports.sales.daily-payment-data") }}')
+    // Daily Payment Method Chart - filter-aware
+    fetch('{{ route("admin.reports.sales.filtered-payment-data") }}?start_date={{ $startDate->format("Y-m-d") }}&end_date={{ $endDate->format("Y-m-d") }}')
         .then(response => response.json())
         .then(data => {
             const ctx = document.getElementById('paymentMethodChart').getContext('2d');

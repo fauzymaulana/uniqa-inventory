@@ -42,12 +42,12 @@ class ExpenseController extends Controller
     }
 
     /**
-     * Get daily expense data for chart (current month).
+     * Get daily expense data for chart (filtered by date range).
      */
     public function getDailyExpenseData()
     {
-        $startDate = now()->startOfMonth();
-        $endDate = now()->endOfMonth();
+        $startDate = request('start_date') ? Carbon::parse(request('start_date')) : now()->startOfMonth();
+        $endDate = request('end_date') ? Carbon::parse(request('end_date')) : now()->endOfMonth();
 
         // Single query grouped by date
         $query = Expense::whereBetween('created_at', [$startDate->copy()->startOfDay(), $endDate->copy()->endOfDay()]);

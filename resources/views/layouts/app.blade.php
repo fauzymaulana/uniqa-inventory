@@ -191,6 +191,80 @@
                 navigator.serviceWorker.register('/sw.js').catch(function () {});
             });
         }
+
+        // ── Sortable Table Headers ───────────────────────────────
+        (function () {
+            function getCellValue(row, colIndex) {
+                const cell = row.cells[colIndex];
+                if (!cell) return '';
+                return cell.innerText.trim();
+            }
+
+            function comparator(a, b, colIndex, asc) {
+                const va = getCellValue(asc ? a : b, colIndex);
+                const vb = getCellValue(asc ? b : a, colIndex);
+                // Try numeric comparison (strip non-numeric except dots and commas)
+                const na = parseFloat(va.replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                const nb = parseFloat(vb.replace(/[^0-9,.-]/g, '').replace(',', '.'));
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return va.localeCompare(vb, 'id');
+            }
+
+            function initSortableTable(table) {
+                const headers = table.querySelectorAll('thead th');
+                headers.forEach(function (th, colIndex) {
+                    th.style.cursor = 'pointer';
+                    th.style.userSelect = 'none';
+                    th.setAttribute('data-sort-dir', '');
+                    // Add sort indicator span
+                    if (!th.querySelector('.sort-icon')) {
+                        const icon = document.createElement('span');
+                        icon.className = 'sort-icon ms-1 text-muted';
+                        icon.innerHTML = '&#8597;';
+                        icon.style.fontSize = '0.75rem';
+                        th.appendChild(icon);
+                    }
+                    th.addEventListener('click', function () {
+                        const currentDir = th.getAttribute('data-sort-dir');
+                        const asc = currentDir !== 'asc';
+                        // Reset all headers
+                        headers.forEach(function (h) {
+                            h.setAttribute('data-sort-dir', '');
+                            const ic = h.querySelector('.sort-icon');
+                            if (ic) { ic.innerHTML = '&#8597;'; ic.className = 'sort-icon ms-1 text-muted'; }
+                        });
+                        th.setAttribute('data-sort-dir', asc ? 'asc' : 'desc');
+                        const ic = th.querySelector('.sort-icon');
+                        if (ic) {
+                            ic.innerHTML = asc ? '&#8593;' : '&#8595;';
+                            ic.className = 'sort-icon ms-1 text-primary';
+                        }
+                        // Sort visible rows
+                        const tbody = table.querySelector('tbody');
+                        if (!tbody) return;
+                        const rows = Array.from(tbody.querySelectorAll('tr')).filter(function (r) {
+                            return r.style.display !== 'none';
+                        });
+                        rows.sort(function (a, b) { return comparator(a, b, colIndex, asc); });
+                        rows.forEach(function (r) { tbody.appendChild(r); });
+                    });
+                });
+            }
+
+            function initAllTables() {
+                document.querySelectorAll('table.table').forEach(function (table) {
+                    if (!table.dataset.sortInit) {
+                        table.dataset.sortInit = '1';
+                        initSortableTable(table);
+                    }
+                });
+            }
+
+            // Init on page load
+            document.addEventListener('DOMContentLoaded', initAllTables);
+            // Also init if tables are added later (e.g., via AJAX)
+            window.initAllSortableTables = initAllTables;
+        })();
     </script>
     @yield('scripts')
 </body>
