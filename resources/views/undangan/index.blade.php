@@ -13,7 +13,7 @@
 @if(in_array(auth()->user()->role, ['admin', 'cashier']))
 <div class="row mb-3">
     <div class="col-12 d-flex gap-2">
-        <a href="{{ auth()->user()->role === 'admin' ? route('admin.undangan.create') : route('cashier.undangan.create') }}" class="btn btn-primary">
+        <a href="{{ auth()->user()->role === 'admin' ? route('admin.invitation.create') : route('cashier.invitation.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Produk
         </a>
         <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
@@ -113,7 +113,7 @@
                 <i class="fas fa-box-open fa-2x mb-2"></i>
                 <p class="mb-0">Belum ada produk di kategori ini.</p>
                 @if(in_array(auth()->user()->role, ['admin', 'cashier']))
-                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.undangan.create') : route('cashier.undangan.create') }}" class="btn btn-sm btn-primary mt-2">
+                    <a href="{{ auth()->user()->role === 'admin' ? route('admin.invitation.create') : route('cashier.invitation.create') }}" class="btn btn-sm btn-primary mt-2">
                         <i class="fas fa-plus"></i> Tambah Produk
                     </a>
                 @endif

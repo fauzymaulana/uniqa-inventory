@@ -122,7 +122,7 @@
                         <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
-                        <a href="{{ route('konten.index') }}" class="@if(request()->routeIs('konten.*')) active @endif">
+                        <a href="{{ route('admin.content.index') }}" class="@if(request()->routeIs('admin.content.*')) active @endif">
                             <i class="fas fa-images"></i> Konten
                         </a>
                     @else
@@ -143,7 +143,7 @@
                         <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
-                        <a href="{{ route('konten.index') }}" class="@if(request()->routeIs('konten.*')) active @endif">
+                        <a href="{{ route('cashier.content.create') }}" class="@if(request()->routeIs('cashier.content.*')) active @endif">
                             <i class="fas fa-images"></i> Konten
                         </a>
                     @endif

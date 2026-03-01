@@ -17,7 +17,7 @@
                 <h5 class="mb-0"><i class="fas fa-images"></i> Form Upload Konten</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('konten.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ auth()->user()->role === 'admin' ? route('admin.content.store') : route('cashier.content.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">
@@ -84,7 +84,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-upload"></i> Upload Konten
                         </button>
-                        <a href="{{ route('konten.index') }}" class="btn btn-secondary">
+                        <a href="{{ auth()->user()->role === 'admin' ? route('admin.content.index') : route('cashier.dashboard') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                     </div>

@@ -13,7 +13,7 @@
 
 <div class="row mb-3">
     <div class="col-12">
-        <a href="{{ route('konten.create') }}" class="btn btn-primary">
+        <a href="{{ route('admin.content.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Upload Konten Baru
         </a>
     </div>
@@ -78,7 +78,7 @@
     @endif
 @else
     <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i> Belum ada konten. <a href="{{ route('konten.create') }}">Upload konten sekarang</a>.
+        <i class="fas fa-info-circle"></i> Belum ada konten. <a href="{{ route('admin.content.create') }}">Upload konten sekarang</a>.
     </div>
 @endif
 @endsection

@@ -28,10 +28,10 @@
         </div>
     </div>
     <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
-        <a href="{{ route('konten.edit', $content->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
+        <a href="{{ route('admin.content.edit', $content->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
             <i class="fas fa-edit"></i> Edit
         </a>
-        <form action="{{ route('konten.destroy', $content->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus konten ini?')">
+        <form action="{{ route('admin.content.destroy', $content->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus konten ini?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-sm btn-outline-danger w-100">

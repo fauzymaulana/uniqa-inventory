@@ -102,9 +102,12 @@ Route::middleware('auth')->group(function () {
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
 
-        // Undangan Create (admin access)
-        Route::get('undangan/create', [InvitationController::class, 'create'])->name('undangan.create');
-        Route::post('undangan', [InvitationController::class, 'store'])->name('undangan.store');
+        // Invitation Create (admin access)
+        Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
+        Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
+
+        // Content Management (admin access)
+        Route::resource('content', ContentController::class);
     });
 
     // Cashier Routes
@@ -124,9 +127,13 @@ Route::middleware('auth')->group(function () {
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
 
-        // Undangan Create (cashier access)
-        Route::get('undangan/create', [InvitationController::class, 'create'])->name('undangan.create');
-        Route::post('undangan', [InvitationController::class, 'store'])->name('undangan.store');
+        // Invitation Create (cashier access)
+        Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
+        Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
+
+        // Content Create (cashier access)
+        Route::get('content/create', [ContentController::class, 'create'])->name('content.create');
+        Route::post('content', [ContentController::class, 'store'])->name('content.store');
     });
 
     // API Routes for AJAX
@@ -142,11 +149,10 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
-    // Undangan & Konten (accessible by admin and cashier)
+    // Undangan (accessible by admin and cashier)
     Route::resource('undangan', InvitationController::class);
     Route::post('undangan-kategori', [InvitationController::class, 'storeCategory'])->name('undangan.kategori.store');
     Route::put('undangan-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('undangan.kategori.update');
     Route::delete('undangan-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('undangan.kategori.destroy');
-    Route::resource('konten', ContentController::class);
 });
 
