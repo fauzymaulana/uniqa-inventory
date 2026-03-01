@@ -81,7 +81,7 @@ class ReportController extends Controller
     {
         $date = request('date') ? Carbon::parse(request('date')) : now();
 
-        $transactions = Transaction::with('details.product', 'user')
+        $transactions = Transaction::with('details.product.category', 'user')
             ->whereDate('created_at', $date)
             ->where('status', 'completed')
             ->latest()
@@ -92,7 +92,7 @@ class ReportController extends Controller
             return $transaction->details->sum('quantity');
         });
 
-        $topProducts = Product::with('transactionDetails')
+        $topProducts = Product::with('transactionDetails', 'category')
             ->get()
             ->map(function ($product) use ($date) {
                 $quantity = $product->transactionDetails()

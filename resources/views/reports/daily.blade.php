@@ -27,7 +27,7 @@
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-dollar-sign"></i> Total Penjualan</h5>
@@ -35,11 +35,19 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-boxes"></i> Total Item Terjual</h5>
                 <div class="number">{{ $totalItems }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h5><i class="fas fa-receipt"></i> Jumlah Transaksi</h5>
+                <div class="number">{{ $transactions->count() }}</div>
             </div>
         </div>
     </div>
@@ -57,6 +65,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Produk</th>
+                                <th>Kategori</th>
                                 <th class="text-center">Qty Terjual</th>
                                 <th class="text-end">Revenue</th>
                             </tr>
@@ -64,13 +73,23 @@
                         <tbody>
                             @forelse($topProducts as $item)
                                 <tr>
-                                    <td>{{ $item['product']->name }}</td>
+                                    <td>
+                                        <strong>{{ $item['product']->name }}</strong><br>
+                                        <small class="text-muted">{{ $item['product']->sku }}</small>
+                                    </td>
+                                    <td>
+                                        @if($item['product']->category)
+                                            <span class="badge bg-light text-dark">{{ $item['product']->category->name }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td class="text-center">{{ $item['quantity'] }}</td>
                                     <td class="text-end">Rp {{ number_format($item['revenue'], 0, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Belum ada transaksi</td>
+                                    <td colspan="4" class="text-center text-muted">Belum ada transaksi</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -85,37 +104,66 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Transaksi</h5>
+                <h5 class="mb-0"><i class="fas fa-list"></i> Detail Transaksi</h5>
             </div>
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>No. Transaksi</th>
-                                <th>Waktu</th>
-                                <th>Kasir</th>
-                                <th class="text-center">Jumlah Item</th>
-                                <th class="text-end">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($transactions as $transaction)
-                                <tr>
-                                    <td><strong>{{ $transaction->transaction_number }}</strong></td>
-                                    <td>{{ $transaction->created_at->format('H:i:s') }}</td>
-                                    <td>{{ $transaction->user->name }}</td>
-                                    <td class="text-center">{{ $transaction->details->sum('quantity') }}</td>
-                                    <td class="text-end">Rp {{ number_format($transaction->total_price, 0, ',', '.') }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted">Tidak ada transaksi</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                @forelse($transactions as $transaction)
+                    <div class="card mb-3 border">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ $transaction->transaction_number }}</strong>
+                                &nbsp;|&nbsp; {{ $transaction->created_at->format('H:i:s') }}
+                                &nbsp;|&nbsp; Kasir: {{ $transaction->user->name }}
+                            </div>
+                            <div>
+                                @if($transaction->payment_method === 'transfer')
+                                    <span class="badge bg-success">Transfer</span>
+                                @else
+                                    <span class="badge bg-primary">Tunai</span>
+                                @endif
+                                <strong class="ms-2">Rp {{ number_format($transaction->total_price, 0, ',', '.') }}</strong>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Kategori</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-end">Harga Satuan</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($transaction->details as $detail)
+                                        <tr>
+                                            <td>
+                                                <strong>{{ $detail->product->name ?? '-' }}</strong><br>
+                                                <small class="text-muted">{{ $detail->product->sku ?? '' }}</small>
+                                            </td>
+                                            <td>
+                                                @if($detail->product && $detail->product->category)
+                                                    <span class="badge bg-light text-dark">{{ $detail->product->category->name }}</span>
+                                                @else
+                                                    <span class="text-muted">-</span>
+                                                @endif
+                                            </td>
+                                            <td class="text-center">{{ $detail->quantity }}</td>
+                                            <td class="text-end">Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
+                                            <td class="text-end">Rp {{ number_format($detail->price * $detail->quantity, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-inbox fa-2x mb-2"></i><br>
+                        Tidak ada transaksi pada tanggal ini
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
