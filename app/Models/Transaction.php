@@ -18,6 +18,7 @@ class Transaction extends Model
         'status',
         'notes',
         'payment_method',
+        'is_synced',
     ];
 
     protected $casts = [
