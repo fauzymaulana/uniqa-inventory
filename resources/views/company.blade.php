@@ -193,6 +193,11 @@
             object-fit: cover;
             display: block;
         }
+        .polaroid-placeholder {
+            width: 100%; height: calc(100% - 22px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .polaroid-placeholder-icon { font-size: 2rem; color: var(--gold); opacity: .5; }
         .polaroid:nth-child(1) { width: 140px; height: 160px; top: 0; left: 0; transform: rotate(-6deg); }
         .polaroid:nth-child(2) { width: 150px; height: 170px; top: 20px; left: 45%; transform: rotate(4deg); }
         .polaroid:nth-child(3) { width: 130px; height: 150px; top: 140px; left: 15%; transform: rotate(-3deg); }
@@ -544,10 +549,10 @@
                             $polaroidColors = ['#f5e6d3', '#e8f4f4', '#faf6f1', '#f0e8f5'];
                             $polaroidIcons = ['fas fa-ring', 'fas fa-heart', 'fas fa-camera', 'fas fa-music'];
                         @endphp
-                        @for($pi = 0; $pi < 4; $pi++)
+                        @for($polaroidIndex = 0; $polaroidIndex < 4; $polaroidIndex++)
                             <div class="polaroid">
-                                <div style="width:100%;height:calc(100% - 22px);background:{{ $polaroidColors[$pi] }};display:flex;align-items:center;justify-content:center;">
-                                    <i class="{{ $polaroidIcons[$pi] }}" style="font-size:2rem;color:var(--gold);opacity:.5"></i>
+                                <div class="polaroid-placeholder" style="background:{{ $polaroidColors[$polaroidIndex] }}">
+                                    <i class="{{ $polaroidIcons[$polaroidIndex] }} polaroid-placeholder-icon"></i>
                                 </div>
                             </div>
                         @endfor
