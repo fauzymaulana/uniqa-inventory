@@ -22,5 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->renderable(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, $request) {
+            return back()->with('error', 'File yang diunggah terlalu besar. Maksimal ukuran file gambar adalah 2MB dan video adalah 20MB. Silakan kompres file Anda dan coba lagi.');
+        });
     })->create();

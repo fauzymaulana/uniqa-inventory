@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvitationProduct extends Model
 {
-    protected $fillable = ['invitation_category_id', 'name', 'description', 'price', 'thumbnail', 'video_demo', 'is_active'];
+    protected $fillable = ['invitation_category_id', 'name', 'description', 'price', 'thumbnail', 'video_demo', 'link', 'is_active'];
 
     protected $casts = [
         'price' => 'decimal:2',

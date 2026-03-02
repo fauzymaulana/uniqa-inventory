@@ -119,7 +119,7 @@
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
                         </a>
                         <div class="sidebar-title">Undangan & Konten</div>
-                        <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
+                        <a href="{{ route('invitation.index') }}" class="@if(request()->routeIs('invitation.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
                         <a href="{{ route('admin.content.index') }}" class="@if(request()->routeIs('admin.content.*')) active @endif">
@@ -140,7 +140,7 @@
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
                         </a>
                         <div class="sidebar-title">Undangan & Konten</div>
-                        <a href="{{ route('undangan.index') }}" class="@if(request()->routeIs('undangan.*')) active @endif">
+                        <a href="{{ route('invitation.index') }}" class="@if(request()->routeIs('invitation.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
                         <a href="{{ route('cashier.content.create') }}" class="@if(request()->routeIs('cashier.content.*')) active @endif">
@@ -176,6 +176,13 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif

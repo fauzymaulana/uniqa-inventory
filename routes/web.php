@@ -149,10 +149,10 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
-    // Undangan (accessible by admin and cashier)
-    Route::resource('undangan', InvitationController::class);
-    Route::post('undangan-kategori', [InvitationController::class, 'storeCategory'])->name('undangan.kategori.store');
-    Route::put('undangan-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('undangan.kategori.update');
-    Route::delete('undangan-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('undangan.kategori.destroy');
+    // Invitation (accessible by admin and cashier)
+    Route::resource('invitation', InvitationController::class);
+    Route::post('invitation-kategori', [InvitationController::class, 'storeCategory'])->name('invitation.kategori.store');
+    Route::put('invitation-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('invitation.kategori.update');
+    Route::delete('invitation-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('invitation.kategori.destroy');
 });
 

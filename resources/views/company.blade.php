@@ -168,6 +168,42 @@
             transition: transform .4s;
         }
         .about-images img:hover { transform: scale(1.04); }
+        .polaroid-gallery {
+            position: relative;
+            min-height: 320px;
+            margin: 1.5rem 0;
+        }
+        .polaroid {
+            position: absolute;
+            background: #fff;
+            padding: 8px 8px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.12);
+            border-radius: 3px;
+            transition: transform .4s, box-shadow .4s;
+            z-index: 1;
+        }
+        .polaroid:hover {
+            transform: scale(1.08) !important;
+            box-shadow: 0 8px 30px rgba(0,0,0,.2);
+            z-index: 10;
+        }
+        .polaroid img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .polaroid:nth-child(1) { width: 140px; height: 160px; top: 0; left: 0; transform: rotate(-6deg); }
+        .polaroid:nth-child(2) { width: 150px; height: 170px; top: 20px; left: 45%; transform: rotate(4deg); }
+        .polaroid:nth-child(3) { width: 130px; height: 150px; top: 140px; left: 15%; transform: rotate(-3deg); }
+        .polaroid:nth-child(4) { width: 145px; height: 165px; top: 120px; left: 60%; transform: rotate(7deg); }
+        @media (max-width: 767px) {
+            .polaroid-gallery { min-height: 240px; }
+            .polaroid:nth-child(1) { width: 100px; height: 120px; }
+            .polaroid:nth-child(2) { width: 110px; height: 130px; left: 50%; }
+            .polaroid:nth-child(3) { width: 95px; height: 115px; top: 110px; }
+            .polaroid:nth-child(4) { width: 105px; height: 125px; top: 100px; left: 55%; }
+        }
         .btn-teal {
             background: var(--teal); color: #fff;
             border: none; padding: .75rem 2rem;
@@ -293,6 +329,15 @@
             display: inline-flex; align-items: center; gap: .4rem;
         }
         .btn-wa:hover { background: #1da851; color: #fff; transform: translateY(-1px); }
+        .btn-preview {
+            background: var(--gold); color: #fff; border: none;
+            padding: .45rem 1rem; border-radius: 8px;
+            font-size: .82rem; font-weight: 600;
+            text-decoration: none; transition: all .25s;
+            display: inline-flex; align-items: center; gap: .4rem;
+            margin-left: .4rem;
+        }
+        .btn-preview:hover { background: var(--gold-dark); color: #fff; transform: translateY(-1px); }
         .features-section { padding: 5rem 0; background: #fff; }
         .features-title { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 2.5rem; }
         .features-title span { color: var(--gold); }
@@ -485,14 +530,16 @@
             </div>
             <div class="col-lg-6" data-aos="fade-left" data-aos-duration="700" data-aos-delay="150">
                 <h2 class="about-title mb-3">Kenapa <span>Uniqa.id</span>?</h2>
-                <p class="text-muted mb-3">Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash; dengan kualitas terbaik dan layanan personal yang memuaskan.</p>
                 @if($promoContents->count())
-                    <div class="about-images mb-3">
+                    <div class="polaroid-gallery mb-3">
                         @foreach($promoContents->take(4) as $promo)
-                            <img src="{{ asset('storage/konten/' . $promo->image) }}" alt="{{ $promo->title }}" loading="lazy">
+                            <div class="polaroid">
+                                <img src="{{ asset('storage/konten/' . $promo->image) }}" alt="{{ $promo->title }}" loading="lazy">
+                            </div>
                         @endforeach
                     </div>
                 @endif
+                <p class="text-muted mb-3">Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash; dengan kualitas terbaik dan layanan personal yang memuaskan.</p>
                 <a href="https://wa.me/6281234567890?text=Halo%20Uniqa%2C%20saya%20ingin%20pesan%20undangan%20pernikahan" class="btn-teal" target="_blank" rel="noopener">
                     <i class="fab fa-whatsapp me-1"></i> Pesan Sekarang Juga!
                 </a>
@@ -644,6 +691,11 @@
                                         <a href="https://wa.me/6281234567890?text={{ urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}" class="btn-wa" target="_blank" rel="noopener">
                                             <i class="fab fa-whatsapp"></i> Pesan
                                         </a>
+                                        @if($product->link)
+                                            <a href="{{ $product->link }}" class="btn-preview" target="_blank" rel="noopener">
+                                                <i class="fas fa-eye"></i> Preview
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -815,5 +867,4 @@
     });
 </script>
 </body>
-</html>
 </html>

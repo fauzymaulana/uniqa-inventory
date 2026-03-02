@@ -42,7 +42,7 @@ class InvitationController extends Controller
 
         InvitationCategory::create($validated);
 
-        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil ditambahkan');
+        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil ditambahkan');
     }
 
     /**
@@ -61,7 +61,7 @@ class InvitationController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil diperbarui');
+        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil diperbarui');
     }
 
     /**
@@ -73,7 +73,7 @@ class InvitationController extends Controller
         $category = InvitationCategory::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('undangan.index')->with('success', 'Kategori undangan berhasil dihapus');
+        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil dihapus');
     }
 
     /**
@@ -89,6 +89,7 @@ class InvitationController extends Controller
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_demo' => 'nullable|mimes:mp4|max:20480',
+            'link' => 'nullable|url|max:500',
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -110,7 +111,7 @@ class InvitationController extends Controller
 
         InvitationProduct::create($validated);
 
-        return redirect()->route('undangan.index')->with('success', 'Produk undangan berhasil ditambahkan');
+        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil ditambahkan');
     }
 
     /**
@@ -148,6 +149,7 @@ class InvitationController extends Controller
             'price' => 'nullable|numeric|min:0',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_demo' => 'nullable|mimes:mp4|max:20480',
+            'link' => 'nullable|url|max:500',
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -177,7 +179,7 @@ class InvitationController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('undangan.index')->with('success', 'Produk undangan berhasil diperbarui');
+        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil diperbarui');
     }
 
     /**
@@ -198,6 +200,6 @@ class InvitationController extends Controller
 
         $product->delete();
 
-        return redirect()->route('undangan.index')->with('success', 'Produk undangan berhasil dihapus');
+        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil dihapus');
     }
 }

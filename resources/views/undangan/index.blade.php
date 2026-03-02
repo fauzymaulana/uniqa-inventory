@@ -42,7 +42,7 @@
             <button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ $category->id }}">
                 <i class="fas fa-edit"></i>
             </button>
-            <form action="{{ route('undangan.kategori.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori {{ $category->name }}? Semua produk di kategori ini akan ikut terhapus.')">
+            <form action="{{ route('invitation.kategori.destroy', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori {{ $category->name }}? Semua produk di kategori ini akan ikut terhapus.')">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-sm btn-danger">
@@ -92,10 +92,10 @@
                             </div>
                             @if(auth()->user()->role === 'admin')
                             <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
-                                <a href="{{ route('undangan.edit', $product->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                <a href="{{ route('invitation.edit', $product->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('undangan.destroy', $product->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus produk ini?')">
+                                <form action="{{ route('invitation.destroy', $product->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus produk ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger w-100">
@@ -127,7 +127,7 @@
 <div class="modal fade" id="editCategoryModal{{ $category->id }}" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('undangan.kategori.update', $category->id) }}" method="POST">
+            <form action="{{ route('invitation.kategori.update', $category->id) }}" method="POST">
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
@@ -166,7 +166,7 @@
 <div class="modal fade" id="addCategoryModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ route('undangan.kategori.store') }}" method="POST">
+            <form action="{{ route('invitation.kategori.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Kategori Undangan</h5>
