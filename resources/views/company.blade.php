@@ -193,6 +193,11 @@
             object-fit: cover;
             display: block;
         }
+        .polaroid-placeholder {
+            width: 100%; height: calc(100% - 22px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .polaroid-placeholder-icon { font-size: 2rem; color: var(--gold); opacity: .5; }
         .polaroid:nth-child(1) { width: 140px; height: 160px; top: 0; left: 0; transform: rotate(-6deg); }
         .polaroid:nth-child(2) { width: 150px; height: 170px; top: 20px; left: 45%; transform: rotate(4deg); }
         .polaroid:nth-child(3) { width: 130px; height: 150px; top: 140px; left: 15%; transform: rotate(-3deg); }
@@ -537,6 +542,20 @@
                                 <img src="{{ asset('storage/konten/' . $promo->image) }}" alt="{{ $promo->title }}" loading="lazy">
                             </div>
                         @endforeach
+                    </div>
+                @else
+                    <div class="polaroid-gallery mb-3">
+                        @php
+                            $polaroidColors = ['#f5e6d3', '#e8f4f4', '#faf6f1', '#f0e8f5'];
+                            $polaroidIcons = ['fas fa-ring', 'fas fa-heart', 'fas fa-camera', 'fas fa-music'];
+                        @endphp
+                        @for($polaroidIndex = 0; $polaroidIndex < 4; $polaroidIndex++)
+                            <div class="polaroid">
+                                <div class="polaroid-placeholder" style="background:{{ $polaroidColors[$polaroidIndex] }}">
+                                    <i class="{{ $polaroidIcons[$polaroidIndex] }} polaroid-placeholder-icon"></i>
+                                </div>
+                            </div>
+                        @endfor
                     </div>
                 @endif
                 <p class="text-muted mb-3">Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash; dengan kualitas terbaik dan layanan personal yang memuaskan.</p>

@@ -35,6 +35,11 @@ echo ""
 echo "🏗️  Building assets..."
 npm run build
 
+# Create storage symlink
+echo ""
+echo "🔗 Creating storage symlink..."
+php artisan storage:link
+
 # Run migrations
 echo ""
 echo "🗄️  Running migrations..."

@@ -15,7 +15,7 @@ class InvitationController extends Controller
     public function index()
     {
         $categories = InvitationCategory::with('products')->get();
-        return view('undangan.index', compact('categories'));
+        return view('invitation.index', compact('categories'));
     }
 
     /**
@@ -25,7 +25,7 @@ class InvitationController extends Controller
     {
         abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
         $categories = InvitationCategory::all();
-        return view('undangan.create', compact('categories'));
+        return view('invitation.create', compact('categories'));
     }
 
     /**
@@ -120,7 +120,7 @@ class InvitationController extends Controller
     public function show(string $id)
     {
         $product = InvitationProduct::with('category')->findOrFail($id);
-        return view('undangan.show', compact('product'));
+        return view('invitation.show', compact('product'));
     }
 
     /**
@@ -131,7 +131,7 @@ class InvitationController extends Controller
         abort_if(auth()->user()->role !== 'admin', 403);
         $product = InvitationProduct::findOrFail($id);
         $categories = InvitationCategory::all();
-        return view('undangan.edit', compact('product', 'categories'));
+        return view('invitation.edit', compact('product', 'categories'));
     }
 
     /**
