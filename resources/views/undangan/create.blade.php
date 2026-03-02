@@ -67,7 +67,11 @@
                         <label class="form-label fw-bold">Thumbnail / Poster</label>
                         <input type="file" name="thumbnail" class="form-control @error('thumbnail') is-invalid @enderror"
                                accept="image/*" id="thumbnailInput">
-                        <div class="form-text">Format: JPEG, PNG, JPG, GIF, WEBP. Maks 2MB.</div>
+                        <div class="form-text">
+                            Format: JPEG, PNG, JPG, GIF, WEBP. Maks 2MB.<br>
+                            <i class="fas fa-info-circle text-info"></i>
+                            <strong>Rekomendasi dimensi poster:</strong> 800 × 1200 px (rasio 2:3, portrait) atau 1080 × 1080 px (rasio 1:1, square). Gunakan resolusi minimal 72 DPI.
+                        </div>
                         @error('thumbnail')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -80,7 +84,11 @@
                         <label class="form-label fw-bold">Video Demo (MP4)</label>
                         <input type="file" name="video_demo" class="form-control @error('video_demo') is-invalid @enderror"
                                accept="video/mp4" id="videoInput">
-                        <div class="form-text">Format: MP4. Maks 20MB. Video singkat untuk preview produk.</div>
+                        <div class="form-text">
+                            Format: MP4. Maks 20MB. Video singkat untuk preview produk.<br>
+                            <i class="fas fa-info-circle text-info"></i>
+                            <strong>Rekomendasi dimensi video:</strong> 1080 × 1920 px (portrait/vertikal, rasio 9:16) atau 1920 × 1080 px (landscape, rasio 16:9). Durasi video: maks 60 detik.
+                        </div>
                         @error('video_demo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
