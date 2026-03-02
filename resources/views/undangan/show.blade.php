@@ -48,11 +48,11 @@
                 </dl>
                 <div class="d-flex gap-2">
                     @if(auth()->user()->role === 'admin')
-                        <a href="{{ route('undangan.edit', $product->id) }}" class="btn btn-primary">
+                        <a href="{{ route('invitation.edit', $product->id) }}" class="btn btn-primary">
                             <i class="fas fa-edit"></i> Edit
                         </a>
                     @endif
-                    <a href="{{ route('undangan.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('invitation.index') }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </a>
                 </div>

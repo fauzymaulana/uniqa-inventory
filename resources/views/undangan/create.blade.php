@@ -89,6 +89,16 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Link Preview / Demo</label>
+                        <input type="url" name="link" class="form-control @error('link') is-invalid @enderror"
+                               value="{{ old('link') }}" placeholder="https://contoh-undangan.com/demo">
+                        <div class="form-text">URL untuk preview atau demo produk undangan.</div>
+                        @error('link')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     <div class="mb-4">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="is_active" id="isActive" {{ old('is_active', true) ? 'checked' : '' }}>
@@ -100,7 +110,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Simpan Produk
                         </button>
-                        <a href="{{ route('undangan.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('invitation.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                     </div>
@@ -113,9 +123,18 @@
 
 @section('scripts')
 <script>
+var MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+var MAX_VIDEO_SIZE = 20 * 1024 * 1024; // 20MB
+
 document.getElementById('thumbnailInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
+        if (file.size > MAX_IMAGE_SIZE) {
+            alert('Ukuran file gambar terlalu besar! Maksimal 2MB. Ukuran file Anda: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+            this.value = '';
+            document.getElementById('thumbnailPreview').style.display = 'none';
+            return;
+        }
         const reader = new FileReader();
         reader.onload = function(ev) {
             document.getElementById('previewImg').src = ev.target.result;
@@ -127,6 +146,12 @@ document.getElementById('thumbnailInput').addEventListener('change', function(e)
 document.getElementById('videoInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {
+        if (file.size > MAX_VIDEO_SIZE) {
+            alert('Ukuran file video terlalu besar! Maksimal 20MB. Ukuran file Anda: ' + (file.size / 1024 / 1024).toFixed(2) + 'MB');
+            this.value = '';
+            document.getElementById('videoPreview').style.display = 'none';
+            return;
+        }
         const url = URL.createObjectURL(file);
         document.getElementById('previewVideo').src = url;
         document.getElementById('videoPreview').style.display = 'block';
