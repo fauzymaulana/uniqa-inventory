@@ -42,6 +42,12 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
     if (url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/sync-transactions')) return;
 
+    // Skip storage files – served directly by the web server, not the app
+    if (url.pathname.startsWith('/storage/')) return;
+
+    // Skip auth-protected admin pages to avoid stale cache issues with dynamic content
+    if (url.pathname.startsWith('/admin/')) return;
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {
