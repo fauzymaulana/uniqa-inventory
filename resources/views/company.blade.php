@@ -538,6 +538,20 @@
                             </div>
                         @endforeach
                     </div>
+                @else
+                    <div class="polaroid-gallery mb-3">
+                        @php
+                            $polaroidColors = ['#f5e6d3', '#e8f4f4', '#faf6f1', '#f0e8f5'];
+                            $polaroidIcons = ['fas fa-ring', 'fas fa-heart', 'fas fa-camera', 'fas fa-music'];
+                        @endphp
+                        @for($pi = 0; $pi < 4; $pi++)
+                            <div class="polaroid">
+                                <div style="width:100%;height:calc(100% - 22px);background:{{ $polaroidColors[$pi] }};display:flex;align-items:center;justify-content:center;">
+                                    <i class="{{ $polaroidIcons[$pi] }}" style="font-size:2rem;color:var(--gold);opacity:.5"></i>
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
                 @endif
                 <p class="text-muted mb-3">Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash; dengan kualitas terbaik dan layanan personal yang memuaskan.</p>
                 <a href="https://wa.me/6281234567890?text=Halo%20Uniqa%2C%20saya%20ingin%20pesan%20undangan%20pernikahan" class="btn-teal" target="_blank" rel="noopener">
