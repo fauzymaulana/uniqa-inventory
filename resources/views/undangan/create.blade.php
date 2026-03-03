@@ -118,7 +118,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Simpan Produk
                         </button>
-                        <a href="{{ route('invitation.index') }}" class="btn btn-secondary">
+                        <a href="{{ auth()->user()->role === 'admin' ? route('admin.invitation.index') : route('cashier.invitation.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                     </div>

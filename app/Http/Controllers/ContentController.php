@@ -41,7 +41,7 @@ class ContentController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/konten', $filename);
+            $file->storeAs('konten', $filename, 'public');
             $validated['image'] = $filename;
         }
 
@@ -90,11 +90,11 @@ class ContentController extends Controller
 
         if ($request->hasFile('image')) {
             if ($content->image) {
-                \Storage::delete('public/konten/' . $content->image);
+                \Storage::disk('public')->delete('konten/' . $content->image);
             }
             $file = $request->file('image');
             $filename = time() . '_' . Str::slug($request->title) . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/konten', $filename);
+            $file->storeAs('konten', $filename, 'public');
             $validated['image'] = $filename;
         }
 
@@ -114,7 +114,7 @@ class ContentController extends Controller
         $content = Content::findOrFail($id);
 
         if ($content->image) {
-            \Storage::delete('public/konten/' . $content->image);
+            \Storage::disk('public')->delete('konten/' . $content->image);
         }
 
         $content->delete();

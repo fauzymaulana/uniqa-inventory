@@ -118,8 +118,11 @@
                         <a href="{{ route('admin.expenses.index') }}" class="@if(request()->routeIs('admin.expenses.*')) active @endif">
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
                         </a>
+                        <a href="{{ route('admin.debts.index') }}" class="@if(request()->routeIs('admin.debts.*')) active @endif">
+                            <i class="fas fa-hand-holding-usd"></i> Riwayat Hutang
+                        </a>
                         <div class="sidebar-title">Undangan & Konten</div>
-                        <a href="{{ route('invitation.index') }}" class="@if(request()->routeIs('invitation.*')) active @endif">
+                        <a href="{{ route('admin.invitation.index') }}" class="@if(request()->routeIs('admin.invitation.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
                         <a href="{{ route('admin.content.index') }}" class="@if(request()->routeIs('admin.content.*')) active @endif">
@@ -139,8 +142,11 @@
                         <a href="{{ route('cashier.expenses.index') }}" class="@if(request()->routeIs('cashier.expenses.*')) active @endif">
                             <i class="fas fa-money-bill-wave"></i> Pengeluaran
                         </a>
+                        <a href="{{ route('cashier.debts.index') }}" class="@if(request()->routeIs('cashier.debts.*')) active @endif">
+                            <i class="fas fa-hand-holding-usd"></i> Riwayat Hutang
+                        </a>
                         <div class="sidebar-title">Undangan & Konten</div>
-                        <a href="{{ route('invitation.index') }}" class="@if(request()->routeIs('invitation.*')) active @endif">
+                        <a href="{{ route('cashier.invitation.index') }}" class="@if(request()->routeIs('cashier.invitation.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan
                         </a>
                         <a href="{{ route('cashier.content.create') }}" class="@if(request()->routeIs('cashier.content.*')) active @endif">

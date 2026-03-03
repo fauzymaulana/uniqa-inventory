@@ -92,10 +92,10 @@
                             </div>
                             @if(auth()->user()->role === 'admin')
                             <div class="card-footer bg-transparent border-top-0 d-flex gap-2">
-                                <a href="{{ route('invitation.edit', $product->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
+                                <a href="{{ route('admin.invitation.edit', $product->id) }}" class="btn btn-sm btn-outline-primary flex-fill">
                                     <i class="fas fa-edit"></i> Edit
                                 </a>
-                                <form action="{{ route('invitation.destroy', $product->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus produk ini?')">
+                                <form action="{{ route('admin.invitation.destroy', $product->id) }}" method="POST" class="flex-fill" onsubmit="return confirm('Hapus produk ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger w-100">

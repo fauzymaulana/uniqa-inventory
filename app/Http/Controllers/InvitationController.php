@@ -42,7 +42,7 @@ class InvitationController extends Controller
 
         InvitationCategory::create($validated);
 
-        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil ditambahkan');
+        return redirect()->route('admin.invitation.index')->with('success', 'Kategori undangan berhasil ditambahkan');
     }
 
     /**
@@ -61,7 +61,7 @@ class InvitationController extends Controller
 
         $category->update($validated);
 
-        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil diperbarui');
+        return redirect()->route('admin.invitation.index')->with('success', 'Kategori undangan berhasil diperbarui');
     }
 
     /**
@@ -73,7 +73,7 @@ class InvitationController extends Controller
         $category = InvitationCategory::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('invitation.index')->with('success', 'Kategori undangan berhasil dihapus');
+        return redirect()->route('admin.invitation.index')->with('success', 'Kategori undangan berhasil dihapus');
     }
 
     /**
@@ -84,34 +84,35 @@ class InvitationController extends Controller
         abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
         $validated = $request->validate([
             'invitation_category_id' => 'required|exists:invitation_categories,id',
-            'name' => 'required|string|max:255',
+            'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'nullable|numeric|min:0',
-            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'video_demo' => 'nullable|mimes:mp4|max:20480',
-            'link' => 'nullable|url|max:500',
+            'price'       => 'nullable|numeric|min:0',
+            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'video_demo'  => 'nullable|mimes:mp4|max:20480',
+            'link'        => 'nullable|url|max:500',
         ]);
 
         if ($request->hasFile('thumbnail')) {
-            $file = $request->file('thumbnail');
+            $file     = $request->file('thumbnail');
             $filename = time() . '_' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/undangan', $filename);
+            $file->storeAs('undangan', $filename, 'public');
             $validated['thumbnail'] = $filename;
         }
 
         if ($request->hasFile('video_demo')) {
-            $file = $request->file('video_demo');
+            $file     = $request->file('video_demo');
             $filename = time() . '_' . Str::slug($request->name) . '_video.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/undangan/videos', $filename);
+            $file->storeAs('undangan/videos', $filename, 'public');
             $validated['video_demo'] = $filename;
         }
 
         $validated['is_active'] = $request->has('is_active');
-        $validated['price'] = $validated['price'] ?? 0;
+        $validated['price']     = $validated['price'] ?? 0;
 
         InvitationProduct::create($validated);
 
-        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil ditambahkan');
+        $route = auth()->user()->role === 'admin' ? 'admin.invitation.index' : 'cashier.invitation.index';
+        return redirect()->route($route)->with('success', 'Produk undangan berhasil ditambahkan');
     }
 
     /**
@@ -155,22 +156,22 @@ class InvitationController extends Controller
         if ($request->hasFile('thumbnail')) {
             // Delete old thumbnail if exists
             if ($product->thumbnail) {
-                \Storage::delete('public/undangan/' . $product->thumbnail);
+                \Storage::disk('public')->delete('undangan/' . $product->thumbnail);
             }
             $file = $request->file('thumbnail');
             $filename = time() . '_' . Str::slug($request->name) . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/undangan', $filename);
+            $file->storeAs('undangan', $filename, 'public');
             $validated['thumbnail'] = $filename;
         }
 
         if ($request->hasFile('video_demo')) {
             // Delete old video if exists
             if ($product->video_demo) {
-                \Storage::delete('public/undangan/videos/' . $product->video_demo);
+                \Storage::disk('public')->delete('undangan/videos/' . $product->video_demo);
             }
             $file = $request->file('video_demo');
             $filename = time() . '_' . Str::slug($request->name) . '_video.' . $file->getClientOriginalExtension();
-            $file->storeAs('public/undangan/videos', $filename);
+            $file->storeAs('undangan/videos', $filename, 'public');
             $validated['video_demo'] = $filename;
         }
 
@@ -179,7 +180,7 @@ class InvitationController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil diperbarui');
+        return redirect()->route('admin.invitation.index')->with('success', 'Produk undangan berhasil diperbarui');
     }
 
     /**
@@ -191,15 +192,15 @@ class InvitationController extends Controller
         $product = InvitationProduct::findOrFail($id);
 
         if ($product->thumbnail) {
-            \Storage::delete('public/undangan/' . $product->thumbnail);
+            \Storage::disk('public')->delete('undangan/' . $product->thumbnail);
         }
 
         if ($product->video_demo) {
-            \Storage::delete('public/undangan/videos/' . $product->video_demo);
+            \Storage::disk('public')->delete('undangan/videos/' . $product->video_demo);
         }
 
         $product->delete();
 
-        return redirect()->route('invitation.index')->with('success', 'Produk undangan berhasil dihapus');
+        return redirect()->route('admin.invitation.index')->with('success', 'Produk undangan berhasil dihapus');
     }
 }

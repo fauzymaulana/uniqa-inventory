@@ -65,6 +65,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all debt records created by this user.
+     */
+    public function debts(): HasMany
+    {
+        return $this->hasMany(Debt::class);
+    }
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed

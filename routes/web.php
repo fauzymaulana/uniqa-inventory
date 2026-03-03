@@ -12,6 +12,7 @@ use App\Http\Middleware\CheckCashierRole;
 use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\ContentController;
+use App\Http\Controllers\DebtController;
 
 
 // Authentication Routes
@@ -102,12 +103,25 @@ Route::middleware('auth')->group(function () {
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
 
-        // Invitation Create (admin access)
-        Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
-        Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
+        // Invitation Management (admin full access)
+        Route::resource('invitation', InvitationController::class);
+        Route::post('invitation-kategori', [InvitationController::class, 'storeCategory'])->name('invitation.kategori.store');
+        Route::put('invitation-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('invitation.kategori.update');
+        Route::delete('invitation-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('invitation.kategori.destroy');
 
         // Content Management (admin access)
         Route::resource('content', ContentController::class);
+
+        // Debt Management (admin full access)
+        Route::get('debts', [DebtController::class, 'index'])->name('debts.index');
+        Route::get('debts/create', [DebtController::class, 'create'])->name('debts.create');
+        Route::post('debts', [DebtController::class, 'store'])->name('debts.store');
+        Route::get('debts/{debtor}', [DebtController::class, 'show'])->name('debts.show');
+        Route::delete('debts/{debtor}', [DebtController::class, 'destroyDebtor'])->name('debts.destroyDebtor');
+        Route::post('debts/{debtor}/pay-all', [DebtController::class, 'payAll'])->name('debts.pay-all');
+        Route::post('debt/{debt}/pay-one', [DebtController::class, 'payOne'])->name('debts.pay-one');
+        Route::post('debt/{debt}/pay-partial', [DebtController::class, 'payPartial'])->name('debts.pay-partial');
+        Route::delete('debt/{debt}', [DebtController::class, 'destroy'])->name('debts.destroy');
     });
 
     // Cashier Routes
@@ -127,13 +141,25 @@ Route::middleware('auth')->group(function () {
         Route::get('expenses-daily-data', [ExpenseController::class, 'getDailyExpenseData'])->name('expenses.daily-data');
         Route::get('expenses-export-excel', [ExpenseController::class, 'exportExcel'])->name('expenses.export-excel');
 
-        // Invitation Create (cashier access)
+        // Invitation (cashier: view index + create only)
+        Route::get('invitation', [InvitationController::class, 'index'])->name('invitation.index');
         Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
         Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
 
         // Content Create (cashier access)
         Route::get('content/create', [ContentController::class, 'create'])->name('content.create');
         Route::post('content', [ContentController::class, 'store'])->name('content.store');
+
+        // Debt Management (cashier: same access as admin)
+        Route::get('debts', [DebtController::class, 'index'])->name('debts.index');
+        Route::get('debts/create', [DebtController::class, 'create'])->name('debts.create');
+        Route::post('debts', [DebtController::class, 'store'])->name('debts.store');
+        Route::get('debts/{debtor}', [DebtController::class, 'show'])->name('debts.show');
+        Route::delete('debts/{debtor}', [DebtController::class, 'destroyDebtor'])->name('debts.destroyDebtor');
+        Route::post('debts/{debtor}/pay-all', [DebtController::class, 'payAll'])->name('debts.pay-all');
+        Route::post('debt/{debt}/pay-one', [DebtController::class, 'payOne'])->name('debts.pay-one');
+        Route::post('debt/{debt}/pay-partial', [DebtController::class, 'payPartial'])->name('debts.pay-partial');
+        Route::delete('debt/{debt}', [DebtController::class, 'destroy'])->name('debts.destroy');
     });
 
     // API Routes for AJAX
@@ -143,16 +169,14 @@ Route::middleware('auth')->group(function () {
         Route::post('sync-expenses', [ExpenseController::class, 'syncOfflineExpenses'])->name('sync-expenses');
         // DataTables server-side endpoint for admin products
         Route::get('products/datatables', [App\Http\Controllers\Api\ProductApiController::class, 'datatables'])->name('products.datatables');
+        // Debt offline sync
+        Route::post('sync-debts', [DebtController::class, 'syncOffline'])->name('sync-debts');
+        Route::post('sync-debt-payments/{debt}', [DebtController::class, 'syncOfflinePayment'])->name('sync-debt-payments');
     });
 
     // Profile (available for all authenticated users)
     Route::get('profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
 
-    // Invitation (accessible by admin and cashier)
-    Route::resource('invitation', InvitationController::class);
-    Route::post('invitation-kategori', [InvitationController::class, 'storeCategory'])->name('invitation.kategori.store');
-    Route::put('invitation-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('invitation.kategori.update');
-    Route::delete('invitation-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('invitation.kategori.destroy');
 });
 

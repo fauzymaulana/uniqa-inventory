@@ -17,7 +17,7 @@
                 <h5 class="mb-0"><i class="fas fa-envelope-open-text"></i> Edit: {{ $product->name }}</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('invitation.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.invitation.update', $product->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -124,7 +124,7 @@
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save"></i> Simpan Perubahan
                         </button>
-                        <a href="{{ route('invitation.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.invitation.index') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                     </div>

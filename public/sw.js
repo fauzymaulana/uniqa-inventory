@@ -62,10 +62,13 @@ self.addEventListener('fetch', (event) => {
     );
 });
 
-// Background Sync: flush pending offline transactions
+// Background Sync: flush pending offline transactions & debts
 self.addEventListener('sync', (event) => {
     if (event.tag === 'sync-transactions') {
         event.waitUntil(syncPendingTransactions());
+    }
+    if (event.tag === 'sync-debts') {
+        event.waitUntil(notifyClientsToSyncDebts());
     }
 });
 
@@ -73,4 +76,9 @@ async function syncPendingTransactions() {
     // Signal all clients to attempt sync
     const clients = await self.clients.matchAll({ type: 'window' });
     clients.forEach((client) => client.postMessage({ type: 'SYNC_REQUESTED' }));
+}
+
+async function notifyClientsToSyncDebts() {
+    const clients = await self.clients.matchAll({ type: 'window' });
+    clients.forEach((client) => client.postMessage({ type: 'SYNC_DEBTS' }));
 }
