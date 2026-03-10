@@ -20,41 +20,25 @@ class BarcodeController extends Controller
             mkdir($dirPath, 0755, true);
         }
 
-        // Generate QR code file
+        // Generate QR code file — always use the plain barcode string as payload.
+        // If the product has no barcode yet, fall back to the product SKU.
+        $payload  = $product->barcode ?: $product->sku;
         $filePath = $dirPath . '/' . $product->id . '.png';
-        
-        if (!file_exists($filePath)) {
-            try {
-                // If a barcode string is defined on the product, generate QR containing
-                // only that barcode string so scanners return the expected numeric/text code.
-                $payload = $product->barcode ? $product->barcode : json_encode([
-                    'product_id' => $product->id,
-                    'sku' => $product->sku,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                ]);
 
-                QrCode::size(300)
-                    ->format('png')
-                    ->generate($payload, $filePath);
-            } catch (\Exception $e) {
-                // Fallback - generate on the fly
-                $payload = $product->barcode ? $product->barcode : json_encode([
-                    'product_id' => $product->id,
-                    'sku' => $product->sku,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                ]);
+        // Always regenerate so the file reflects the current barcode value.
+        try {
+            QrCode::size(300)
+                ->format('png')
+                ->generate($payload, $filePath);
+        } catch (\Exception $e) {
+            // Fallback — stream on the fly without caching
+            $qrCode = QrCode::size(300)
+                ->format('png')
+                ->generate($payload);
 
-                $qrCode = QrCode::size(300)
-                    ->format('png')
-                    ->generate($payload);
-
-                return response($qrCode, 200, [
-                    'Content-Type' => 'image/png',
-                    'Cache-Control' => 'public, max-age=31536000',
-                ]);
-            }
+            return response($qrCode, 200, [
+                'Content-Type' => 'image/png',
+            ]);
         }
 
         if (file_exists($filePath)) {

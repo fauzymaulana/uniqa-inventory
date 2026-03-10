@@ -18,12 +18,9 @@ class BarcodeHelper
                 mkdir(dirname($qrCodePath), 0755, true);
             }
 
-            // Prefer storing the product's barcode string in the QR code when available.
-            $payload = $product->barcode ? $product->barcode : json_encode([
-                'product_id' => $product->id,
-                'sku' => $product->sku,
-                'name' => $product->name,
-            ]);
+            // Always use the plain barcode string as QR payload.
+            // If no barcode is set yet, fall back to SKU.
+            $payload = $product->barcode ?: $product->sku;
 
             QrCode::size(200)
                 ->format('png')
