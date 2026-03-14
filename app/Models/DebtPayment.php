@@ -12,6 +12,7 @@ class DebtPayment extends Model
         'user_id',
         'amount',
         'note',
+        'offline_id',
     ];
 
     protected $casts = [

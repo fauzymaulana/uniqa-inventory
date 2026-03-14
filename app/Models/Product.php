@@ -89,41 +89,45 @@ class Product extends Model
 
     /**
      * Reduce stock when product is sold.
+     * Uses atomic DB decrement to prevent race conditions.
      */
     public function reduceStock(int $quantity, string $reason = 'Sale'): void
     {
         $quantityBefore = $this->stock;
-        $this->stock -= $quantity;
-        $this->save();
+
+        // Atomic decrement at DB level — safe under concurrency
+        $this->decrement('stock', $quantity);
 
         StockAdjustment::create([
-            'product_id' => $this->id,
-            'quantity_before' => $quantityBefore,
-            'quantity_after' => $this->stock,
+            'product_id'       => $this->id,
+            'quantity_before'  => $quantityBefore,
+            'quantity_after'   => $this->stock,
             'adjustment_value' => -$quantity,
-            'type' => 'out',
-            'reason' => $reason,
-            'user_id' => auth()->id() ?? 1,
+            'type'             => 'out',
+            'reason'           => $reason,
+            'user_id'          => auth()->id() ?? 1,
         ]);
     }
 
     /**
      * Increase stock for a product.
+     * Uses atomic DB increment to prevent race conditions.
      */
     public function increaseStock(int $quantity, string $reason = 'Restock'): void
     {
         $quantityBefore = $this->stock;
-        $this->stock += $quantity;
-        $this->save();
+
+        // Atomic increment at DB level — safe under concurrency
+        $this->increment('stock', $quantity);
 
         StockAdjustment::create([
-            'product_id' => $this->id,
-            'quantity_before' => $quantityBefore,
-            'quantity_after' => $this->stock,
+            'product_id'       => $this->id,
+            'quantity_before'  => $quantityBefore,
+            'quantity_after'   => $this->stock,
             'adjustment_value' => $quantity,
-            'type' => 'in',
-            'reason' => $reason,
-            'user_id' => auth()->id() ?? 1,
+            'type'             => 'in',
+            'reason'           => $reason,
+            'user_id'          => auth()->id() ?? 1,
         ]);
     }
 }

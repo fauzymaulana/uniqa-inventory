@@ -139,24 +139,32 @@ class DebtController extends Controller
             return back()->with('error', 'Tidak ada hutang yang perlu dilunaskan.');
         }
 
-        foreach ($unpaid as $debt) {
-            $remaining = (float) $debt->amount - (float) $debt->amount_paid;
-            if ($remaining > 0) {
-                // Catat cicilan pelunasan penuh
-                DebtPayment::create([
-                    'debt_id' => $debt->id,
-                    'user_id' => auth()->id(),
-                    'amount'  => $remaining,
-                    'note'    => 'Pelunasan penuh (bayar semua)',
+        \DB::transaction(function () use ($unpaid) {
+            foreach ($unpaid as $debt) {
+                // Lock row — skip if already paid by a concurrent request
+                $debt = Debt::lockForUpdate()->find($debt->id);
+                if (!$debt || $debt->is_paid) {
+                    continue;
+                }
+
+                $remaining = (float) $debt->amount - (float) $debt->amount_paid;
+                if ($remaining > 0) {
+                    DebtPayment::create([
+                        'debt_id' => $debt->id,
+                        'user_id' => auth()->id(),
+                        'amount'  => $remaining,
+                        'note'    => 'Pelunasan penuh (bayar semua)',
+                    ]);
+                }
+
+                $debt->update([
+                    'amount_paid' => $debt->amount,
+                    'is_paid'     => true,
+                    'paid_at'     => now(),
+                    'paid_by'     => auth()->id(),
                 ]);
             }
-            $debt->update([
-                'amount_paid' => $debt->amount,
-                'is_paid'     => true,
-                'paid_at'     => now(),
-                'paid_by'     => auth()->id(),
-            ]);
-        }
+        });
 
         $role = auth()->user()->role;
         return redirect()
@@ -173,23 +181,31 @@ class DebtController extends Controller
             return back()->with('error', 'Hutang ini sudah lunas.');
         }
 
-        $remaining = (float) $debt->amount - (float) $debt->amount_paid;
+        \DB::transaction(function () use ($debt) {
+            // Re-lock to prevent concurrent double-payment
+            $debt = Debt::lockForUpdate()->findOrFail($debt->id);
 
-        if ($remaining > 0) {
-            DebtPayment::create([
-                'debt_id' => $debt->id,
-                'user_id' => auth()->id(),
-                'amount'  => $remaining,
-                'note'    => 'Pelunasan penuh',
+            if ($debt->is_paid) {
+                return; // already settled by concurrent request
+            }
+
+            $remaining = (float) $debt->amount - (float) $debt->amount_paid;
+            if ($remaining > 0) {
+                DebtPayment::create([
+                    'debt_id' => $debt->id,
+                    'user_id' => auth()->id(),
+                    'amount'  => $remaining,
+                    'note'    => 'Pelunasan penuh',
+                ]);
+            }
+
+            $debt->update([
+                'amount_paid' => $debt->amount,
+                'is_paid'     => true,
+                'paid_at'     => now(),
+                'paid_by'     => auth()->id(),
             ]);
-        }
-
-        $debt->update([
-            'amount_paid' => $debt->amount,
-            'is_paid'     => true,
-            'paid_at'     => now(),
-            'paid_by'     => auth()->id(),
-        ]);
+        });
 
         $role = auth()->user()->role;
         return redirect()
@@ -217,6 +233,15 @@ class DebtController extends Controller
             'pay_amount.max'      => 'Jumlah pembayaran tidak boleh melebihi sisa hutang (Rp ' . number_format($remaining, 0, ',', '.') . ').',
         ]);
 
+        // Re-lock row to prevent concurrent payment race condition
+        $debt = Debt::lockForUpdate()->findOrFail($debt->id);
+
+        if ($debt->is_paid) {
+            return back()->with('error', 'Hutang ini sudah lunas.');
+        }
+
+        $remaining = (float) $debt->amount - (float) $debt->amount_paid;
+
         // Catat cicilan
         DebtPayment::create([
             'debt_id' => $debt->id,
@@ -226,7 +251,7 @@ class DebtController extends Controller
         ]);
 
         // Update amount_paid
-        $newPaid = (float) $debt->amount_paid + (float) $request->pay_amount;
+        $newPaid   = (float) $debt->amount_paid + (float) $request->pay_amount;
         $isNowPaid = $newPaid >= (float) $debt->amount;
 
         $debt->update([
@@ -275,10 +300,13 @@ class DebtController extends Controller
 
     /**
      * Sync endpoint: terima debt record dari offline queue (JSON/FormData).
+     * Idempotent: menggunakan offline_id sebagai kunci dedup.
+     * Retry dengan offline_id yang sama mengembalikan record yang sudah ada.
      */
     public function syncOffline(Request $request)
     {
         $request->validate([
+            'offline_id'     => 'nullable|string|max:255',
             'debtor_type'    => 'required|in:existing,new',
             'debtor_id'      => 'required_if:debtor_type,existing|nullable|exists:debtors,id',
             'debtor_name'    => 'required_if:debtor_type,new|nullable|string|max:255',
@@ -288,6 +316,25 @@ class DebtController extends Controller
             'due_date'       => 'required|date',
             'description'    => 'nullable|string|max:1000',
         ]);
+
+        $offlineId = $request->input('offline_id');
+
+        // --- Idempotency check: already synced? ---
+        if ($offlineId) {
+            $existing = Debt::where('offline_id', $offlineId)->first();
+            if ($existing) {
+                return response()->json([
+                    'status_code' => 200,
+                    'success'     => true,
+                    'message'     => 'Hutang sudah tersinkronisasi sebelumnya.',
+                    'data'        => [
+                        'debt_id'        => $existing->id,
+                        'debtor_id'      => $existing->debtor_id,
+                        'already_synced' => true,
+                    ],
+                ]);
+            }
+        }
 
         if ($request->debtor_type === 'new') {
             $debtor = Debtor::firstOrCreate(
@@ -305,15 +352,17 @@ class DebtController extends Controller
             'due_date'    => $request->due_date,
             'is_paid'     => false,
             'description' => $request->description,
+            'offline_id'  => $offlineId,
         ]);
 
         return response()->json([
             'status_code' => 200,
-            'success' => true,
-            'message' => 'Hutang berhasil disimpan.',
-            'data' => [
-                'debt_id' => $debt->id,
-                'debtor_id' => $debtor->id,
+            'success'     => true,
+            'message'     => 'Hutang berhasil disimpan.',
+            'data'        => [
+                'debt_id'        => $debt->id,
+                'debtor_id'      => $debtor->id,
+                'already_synced' => false,
             ],
         ]);
     }

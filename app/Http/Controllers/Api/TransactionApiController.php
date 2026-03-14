@@ -56,7 +56,8 @@ class TransactionApiController extends Controller
             $items = [];
 
             foreach ($validated['items'] as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                // Lock product row for atomic stock check + deduct
+                $product = Product::lockForUpdate()->findOrFail($item['product_id']);
 
                 if (!$product->hasStock($item['quantity'])) {
                     return response()->json([

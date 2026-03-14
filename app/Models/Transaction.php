@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Transaction extends Model
 {
@@ -19,6 +20,7 @@ class Transaction extends Model
         'notes',
         'payment_method',
         'is_synced',
+        'offline_id',
     ];
 
     protected $casts = [
@@ -45,12 +47,17 @@ class Transaction extends Model
     }
 
     /**
-     * Generate transaction number.
+     * Generate a unique transaction number, safe against race conditions.
+     * Uses a DB-level sequence count with locking to prevent duplicates.
      */
     public static function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        $count = self::whereDate('created_at', now())->count() + 1;
+        // Lock the count query to prevent duplicate numbers under concurrent requests
+        $count = DB::table('transactions')
+            ->whereDate('created_at', now())
+            ->lockForUpdate()
+            ->count() + 1;
         return 'TRX-' . $date . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
     }
 }

@@ -172,7 +172,7 @@ class CashierController extends Controller
             $items_detail = [];
 
             foreach ($validated['items'] as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                $product = Product::lockForUpdate()->findOrFail($item['product_id']);
                 $quantity = $item['quantity'];
 
                 // Check stock availability
@@ -256,6 +256,8 @@ class CashierController extends Controller
 
     /**
      * Sync offline transactions submitted from the POS client.
+     * Idempotent: each transaction is keyed by client-provided offline_id.
+     * Retrying with the same offline_id returns the existing record, no duplicate.
      */
     public function syncOfflineTransactions(Request $request): JsonResponse
     {
@@ -274,64 +276,88 @@ class CashierController extends Controller
         $failed = [];
 
         foreach ($transactions as $txData) {
+            $offlineId = $txData['offline_id'] ?? null;
+
+            // --- Idempotency check: already synced? Return existing record ---
+            if ($offlineId) {
+                $existing = Transaction::where('offline_id', $offlineId)->first();
+                if ($existing) {
+                    $synced[] = [
+                        'offline_id' => $offlineId,
+                        'transaction_number' => $existing->transaction_number,
+                        'already_synced' => true,
+                    ];
+                    continue;
+                }
+            }
+
             DB::beginTransaction();
             try {
                 $items = $txData['items'] ?? [];
                 if (empty($items)) {
-                    $failed[] = ['offline_id' => $txData['offline_id'] ?? null, 'reason' => 'Empty cart'];
+                    $failed[] = ['offline_id' => $offlineId, 'reason' => 'Empty cart'];
                     DB::rollBack();
                     continue;
                 }
 
-                $totalPrice = 0;
+                $totalPrice  = 0;
                 $itemsDetail = [];
 
                 foreach ($items as $item) {
-                    $product = Product::findOrFail($item['product_id']);
-                    $qty = intval($item['quantity']);
+                    // Lock the product row for atomic stock check + deduct
+                    $product = Product::lockForUpdate()->findOrFail($item['product_id']);
+                    $qty     = intval($item['quantity']);
+
                     if (!$product->hasStock($qty)) {
                         throw new \Exception("Stok {$product->name} tidak cukup");
                     }
-                    $price = isset($item['price']) ? floatval($item['price']) : $product->price;
+
+                    $price    = isset($item['price']) ? floatval($item['price']) : $product->price;
                     $subtotal = $price * $qty;
                     $totalPrice += $subtotal;
                     $itemsDetail[] = compact('product', 'qty', 'price', 'subtotal');
                 }
 
-                $discountAmount = floatval($txData['discount_amount'] ?? 0);
+                $discountAmount    = floatval($txData['discount_amount'] ?? 0);
                 $totalAfterDiscount = max(0, $totalPrice - $discountAmount);
-                $amountReceived = floatval($txData['amount_received'] ?? $totalAfterDiscount);
-                $change = $amountReceived - $totalAfterDiscount;
+                $amountReceived    = floatval($txData['amount_received'] ?? $totalAfterDiscount);
+                $change            = $amountReceived - $totalAfterDiscount;
 
                 $transaction = Transaction::create([
                     'transaction_number' => Transaction::generateTransactionNumber(),
-                    'user_id' => auth()->id(),
-                    'discount_amount' => $discountAmount,
-                    'total_price' => $totalPrice,
-                    'amount_received' => $amountReceived,
-                    'change' => $change,
-                    'status' => 'completed',
-                    'payment_method' => $txData['payment_method'] ?? 'cash',
-                    'notes' => $txData['notes'] ?? null,
-                    'is_synced' => true,
+                    'user_id'            => auth()->id(),
+                    'discount_amount'    => $discountAmount,
+                    'total_price'        => $totalPrice,
+                    'amount_received'    => $amountReceived,
+                    'change'             => $change,
+                    'status'             => 'completed',
+                    'payment_method'     => $txData['payment_method'] ?? 'cash',
+                    'notes'              => $txData['notes'] ?? null,
+                    'is_synced'          => true,
+                    'offline_id'         => $offlineId,
                 ]);
 
                 foreach ($itemsDetail as $item) {
                     TransactionDetail::create([
                         'transaction_id' => $transaction->id,
-                        'product_id' => $item['product']->id,
-                        'quantity' => $item['qty'],
-                        'price_at_time' => $item['price'],
-                        'subtotal' => $item['subtotal'],
+                        'product_id'     => $item['product']->id,
+                        'quantity'       => $item['qty'],
+                        'price_at_time'  => $item['price'],
+                        'subtotal'       => $item['subtotal'],
                     ]);
+
                     $item['product']->reduceStock($item['qty'], 'Offline Sync - ' . $transaction->transaction_number);
                 }
 
                 DB::commit();
-                $synced[] = ['offline_id' => $txData['offline_id'] ?? null, 'transaction_number' => $transaction->transaction_number];
+                $synced[] = [
+                    'offline_id'         => $offlineId,
+                    'transaction_number' => $transaction->transaction_number,
+                    'already_synced'     => false,
+                ];
             } catch (\Exception $e) {
                 DB::rollBack();
-                $failed[] = ['offline_id' => $txData['offline_id'] ?? null, 'reason' => $e->getMessage()];
+                $failed[] = ['offline_id' => $offlineId, 'reason' => $e->getMessage()];
             }
         }
 

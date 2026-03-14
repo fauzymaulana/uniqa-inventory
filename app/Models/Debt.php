@@ -18,6 +18,7 @@ class Debt extends Model
         'paid_at',
         'paid_by',
         'description',
+        'offline_id',
     ];
 
     protected $casts = [

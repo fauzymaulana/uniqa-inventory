@@ -176,6 +176,8 @@ class ExpenseController extends Controller
 
     /**
      * Sync offline expenses submitted from the client.
+     * Idempotent: each expense is keyed by client-provided offline_id.
+     * Retrying with the same offline_id returns the existing record, no duplicate.
      */
     public function syncOfflineExpenses(\Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
     {
@@ -194,19 +196,39 @@ class ExpenseController extends Controller
         $failed = [];
 
         foreach ($expenses as $expenseData) {
+            $offlineId = $expenseData['offline_id'] ?? null;
+
+            // --- Idempotency check: already synced? Return existing record ---
+            if ($offlineId) {
+                $existing = Expense::where('offline_id', $offlineId)->first();
+                if ($existing) {
+                    $synced[] = [
+                        'offline_id'    => $offlineId,
+                        'id'            => $existing->id,
+                        'already_synced' => true,
+                    ];
+                    continue;
+                }
+            }
+
             try {
                 $expense = Expense::create([
-                    'activity' => $expenseData['activity'] ?? '',
-                    'type' => $expenseData['type'] ?? 'operasional',
+                    'activity'    => $expenseData['activity'] ?? '',
+                    'type'        => $expenseData['type'] ?? 'operasional',
                     'category_id' => $expenseData['category_id'] ?: null,
-                    'status' => $expenseData['status'] ?? 'selesai',
-                    'amount' => floatval($expenseData['amount'] ?? 0),
+                    'status'      => $expenseData['status'] ?? 'selesai',
+                    'amount'      => floatval($expenseData['amount'] ?? 0),
                     'description' => $expenseData['description'] ?? null,
-                    'user_id' => auth()->id(),
+                    'user_id'     => auth()->id(),
+                    'offline_id'  => $offlineId,
                 ]);
-                $synced[] = ['offline_id' => $expenseData['offline_id'] ?? null, 'id' => $expense->id];
+                $synced[] = [
+                    'offline_id'     => $offlineId,
+                    'id'             => $expense->id,
+                    'already_synced' => false,
+                ];
             } catch (\Exception $e) {
-                $failed[] = ['offline_id' => $expenseData['offline_id'] ?? null, 'reason' => $e->getMessage()];
+                $failed[] = ['offline_id' => $offlineId, 'reason' => $e->getMessage()];
             }
         }
 

@@ -15,6 +15,7 @@ class Expense extends Model
         'amount',
         'description',
         'user_id',
+        'offline_id',
     ];
 
     protected $casts = [
