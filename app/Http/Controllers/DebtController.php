@@ -307,7 +307,15 @@ class DebtController extends Controller
             'description' => $request->description,
         ]);
 
-        return response()->json(['success' => true, 'debt_id' => $debt->id, 'debtor_id' => $debtor->id]);
+        return response()->json([
+            'status_code' => 200,
+            'success' => true,
+            'message' => 'Hutang berhasil disimpan.',
+            'data' => [
+                'debt_id' => $debt->id,
+                'debtor_id' => $debtor->id,
+            ],
+        ]);
     }
 
     /**
@@ -339,6 +347,13 @@ class DebtController extends Controller
             'paid_by'     => $isNowPaid ? auth()->id() : $debt->paid_by,
         ]);
 
-        return response()->json(['success' => true, 'is_paid' => $isNowPaid]);
+        return response()->json([
+            'status_code' => 200,
+            'success' => true,
+            'message' => 'Cicilan berhasil disimpan.',
+            'data' => [
+                'is_paid' => $isNowPaid,
+            ],
+        ]);
     }
 }

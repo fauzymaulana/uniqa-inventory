@@ -23,7 +23,9 @@ class TransactionApiController extends Controller
             ->paginate($perPage);
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => $transactions->items(),
             'pagination' => [
                 'current_page' => $transactions->currentPage(),
@@ -58,8 +60,10 @@ class TransactionApiController extends Controller
 
                 if (!$product->hasStock($item['quantity'])) {
                     return response()->json([
+                        'status_code' => 422,
                         'success' => false,
                         'message' => "Stok {$product->name} tidak cukup. Stok tersedia: {$product->stock}",
+                        'data' => null,
                     ], 422);
                 }
 
@@ -77,8 +81,10 @@ class TransactionApiController extends Controller
             $amountReceived = $validated['amount_received'];
             if ($amountReceived < $totalPrice) {
                 return response()->json([
+                    'status_code' => 422,
                     'success' => false,
                     'message' => 'Uang yang diberikan tidak cukup.',
+                    'data' => null,
                 ], 422);
             }
 
@@ -109,6 +115,7 @@ class TransactionApiController extends Controller
             DB::commit();
 
             return response()->json([
+                'status_code' => 201,
                 'success' => true,
                 'message' => 'Transaksi berhasil disimpan.',
                 'data' => [
@@ -124,8 +131,10 @@ class TransactionApiController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
+                'status_code' => 500,
                 'success' => false,
                 'message' => $e->getMessage(),
+                'data' => null,
             ], 500);
         }
     }
@@ -138,7 +147,9 @@ class TransactionApiController extends Controller
         $transaction->load('details.product', 'user');
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => [
                 'id' => $transaction->id,
                 'transaction_number' => $transaction->transaction_number,

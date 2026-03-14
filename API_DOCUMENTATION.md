@@ -120,6 +120,7 @@ POST /api/auth/login
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Login berhasil",
   "data": {
@@ -140,6 +141,7 @@ POST /api/auth/login
 
 ```json
 {
+  "status_code": 401,
   "success": false,
   "message": "Email atau password salah"
 }
@@ -159,6 +161,7 @@ GET /api/auth/me
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": {
     "id": 1,
@@ -184,6 +187,7 @@ POST /api/auth/refresh
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Token refreshed successfully",
   "data": {
@@ -208,6 +212,7 @@ POST /api/auth/logout
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Logout berhasil"
 }
@@ -245,6 +250,7 @@ POST /api/auth/change-password
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Password berhasil diubah"
 }
@@ -272,6 +278,7 @@ GET /api/products
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": [
     {
@@ -310,6 +317,7 @@ GET /api/products/{product_id}
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": {
     "id": 13,
@@ -373,6 +381,7 @@ POST /api/get-product
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": {
     "id": 13,
@@ -389,6 +398,7 @@ POST /api/get-product
 
 ```json
 {
+  "status_code": 404,
   "success": false,
   "message": "Produk tidak ditemukan."
 }
@@ -439,6 +449,7 @@ POST /api/transactions
 
 ```json
 {
+  "status_code": 201,
   "success": true,
   "message": "Transaksi berhasil disimpan.",
   "data": {
@@ -456,6 +467,7 @@ POST /api/transactions
 
 ```json
 {
+  "status_code": 422,
   "success": false,
   "message": "Stok Beras 15 Kg tidak cukup. Stok tersedia: 1"
 }
@@ -465,6 +477,7 @@ POST /api/transactions
 
 ```json
 {
+  "status_code": 422,
   "success": false,
   "message": "Uang yang diberikan tidak cukup."
 }
@@ -482,6 +495,7 @@ GET /api/transactions/{transaction_id}
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": {
     "id": 101,
@@ -533,6 +547,7 @@ GET /api/transactions
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": [ /* array of transaction objects */ ],
   "pagination": {
@@ -560,6 +575,7 @@ GET /api/products/{product_id}/stock
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": {
     "product_id": 13,
@@ -604,6 +620,7 @@ POST /api/stock/adjust
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Stok berhasil disesuaikan.",
   "data": {
@@ -619,6 +636,7 @@ POST /api/stock/adjust
 
 ```json
 {
+  "status_code": 422,
   "success": false,
   "message": "Stok tidak cukup untuk pengurangan."
 }
@@ -644,6 +662,7 @@ GET /api/stock-adjustments
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "data": [
     {
@@ -723,6 +742,7 @@ POST /api/sync-transactions
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "synced": [
     {
@@ -738,6 +758,7 @@ POST /api/sync-transactions
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "synced": [],
   "failed": [
@@ -782,6 +803,7 @@ POST /api/sync-expenses
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "synced": [
     { "offline_id": "local-expense-001", "id": 45 }
@@ -841,6 +863,7 @@ POST /api/sync-debts
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "debt_id": 27,
   "debtor_id": 3
@@ -875,6 +898,7 @@ POST /api/sync-debt-payments/{debt_id}
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "is_paid": false
 }
@@ -890,6 +914,7 @@ POST /api/sync-debt-payments/{debt_id}
 
 ```json
 {
+  "status_code": 200,
   "success": true,
   "message": "Pesan opsional",
   "data": { }
@@ -900,6 +925,7 @@ POST /api/sync-debt-payments/{debt_id}
 
 ```json
 {
+  "status_code": 422,
   "success": false,
   "message": "Deskripsi error",
   "errors": {

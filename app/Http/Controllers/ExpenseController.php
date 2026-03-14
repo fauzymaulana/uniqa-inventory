@@ -182,7 +182,12 @@ class ExpenseController extends Controller
         $expenses = $request->input('expenses', []);
 
         if (!is_array($expenses) || empty($expenses)) {
-            return response()->json(['success' => false, 'message' => 'No expenses to sync'], 422);
+            return response()->json([
+                'status_code' => 422,
+                'success' => false,
+                'message' => 'No expenses to sync',
+                'data' => null,
+            ], 422);
         }
 
         $synced = [];
@@ -206,9 +211,13 @@ class ExpenseController extends Controller
         }
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
-            'synced' => $synced,
-            'failed' => $failed,
+            'message' => '',
+            'data' => [
+                'synced' => $synced,
+                'failed' => $failed,
+            ],
         ]);
     }
 

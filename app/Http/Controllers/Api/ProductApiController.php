@@ -21,7 +21,9 @@ class ProductApiController extends Controller
             ->paginate($perPage);
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => $products->items(),
             'pagination' => [
                 'current_page' => $products->currentPage(),
@@ -40,7 +42,9 @@ class ProductApiController extends Controller
         $product->load('category', 'stockAdjustments');
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -132,7 +136,10 @@ class ProductApiController extends Controller
         } catch (\Exception $e) {
             logger()->error('DataTables products.datatables error: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json([
-                'error' => 'Server error: ' . $e->getMessage(),
+                'status_code' => 500,
+                'success' => false,
+                'message' => 'Server error: ' . $e->getMessage(),
+                'data' => null,
             ], 500);
         }
     }

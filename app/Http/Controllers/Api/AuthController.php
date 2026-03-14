@@ -25,7 +25,12 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return response()->json([
+                'status_code' => 422,
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
         }
 
         $user = User::create([
@@ -36,8 +41,10 @@ class AuthController extends Controller
         ]);
 
         return response()->json([
+            'status_code' => 201,
+            'success' => true,
             'message' => 'User registered successfully',
-            'user' => $user,
+            'data' => $user,
         ], 201);
     }
 
@@ -53,6 +60,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'status_code' => 422,
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
@@ -66,12 +74,15 @@ class AuthController extends Controller
 
         if (!$token) {
             return response()->json([
+                'status_code' => 401,
                 'success' => false,
                 'message' => 'Email atau password salah',
+                'data' => null,
             ], 401);
         }
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
             'message' => 'Login berhasil',
             'data' => [
@@ -93,19 +104,25 @@ class AuthController extends Controller
 
             if (!$user) {
                 return response()->json([
+                    'status_code' => 404,
                     'success' => false,
                     'message' => 'User tidak ditemukan',
+                    'data' => null,
                 ], 404);
             }
 
             return response()->json([
+                'status_code' => 200,
                 'success' => true,
+                'message' => '',
                 'data' => $user,
             ]);
         } catch (\Exception $e) {
             return response()->json([
+                'status_code' => 401,
                 'success' => false,
                 'message' => 'Token tidak valid atau telah expired',
+                'data' => null,
             ], 401);
         }
     }
@@ -120,6 +137,7 @@ class AuthController extends Controller
             $newToken = $token->refresh();
 
             return response()->json([
+                'status_code' => 200,
                 'success' => true,
                 'message' => 'Token refreshed successfully',
                 'data' => [
@@ -130,13 +148,17 @@ class AuthController extends Controller
             ]);
         } catch (\Tymon\JwtAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
+                'status_code' => 401,
                 'success' => false,
                 'message' => 'Token telah expired dan tidak bisa di-refresh',
+                'data' => null,
             ], 401);
         } catch (\Exception $e) {
             return response()->json([
+                'status_code' => 401,
                 'success' => false,
                 'message' => 'Failed to refresh token',
+                'data' => null,
             ], 401);
         }
     }
@@ -150,13 +172,17 @@ class AuthController extends Controller
             $this->jwt->parseToken()->invalidate();
 
             return response()->json([
+                'status_code' => 200,
                 'success' => true,
                 'message' => 'Logout berhasil',
+                'data' => null,
             ]);
         } catch (\Exception $e) {
             return response()->json([
+                'status_code' => 500,
                 'success' => false,
                 'message' => 'Failed to logout',
+                'data' => null,
             ], 500);
         }
     }
@@ -173,6 +199,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
+                'status_code' => 422,
                 'success' => false,
                 'message' => 'Validation failed',
                 'errors' => $validator->errors(),
@@ -184,8 +211,10 @@ class AuthController extends Controller
 
             if (!Hash::check($request->current_password, $user->password)) {
                 return response()->json([
+                    'status_code' => 401,
                     'success' => false,
                     'message' => 'Password saat ini tidak sesuai',
+                    'data' => null,
                 ], 401);
             }
 
@@ -194,13 +223,17 @@ class AuthController extends Controller
             ]);
 
             return response()->json([
+                'status_code' => 200,
                 'success' => true,
                 'message' => 'Password berhasil diubah',
+                'data' => null,
             ]);
         } catch (\Exception $e) {
             return response()->json([
+                'status_code' => 500,
                 'success' => false,
                 'message' => 'Failed to change password',
+                'data' => null,
             ], 500);
         }
     }

@@ -16,7 +16,9 @@ class StockApiController extends Controller
     public function check(Product $product): JsonResponse
     {
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => [
                 'product_id' => $product->id,
                 'name' => $product->name,
@@ -42,8 +44,10 @@ class StockApiController extends Controller
 
         if ($validated['type'] === 'out' && !$product->hasStock($validated['quantity'])) {
             return response()->json([
+                'status_code' => 422,
                 'success' => false,
                 'message' => 'Stok tidak cukup untuk pengurangan.',
+                'data' => null,
             ], 422);
         }
 
@@ -54,6 +58,7 @@ class StockApiController extends Controller
         }
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
             'message' => 'Stok berhasil disesuaikan.',
             'data' => [
@@ -82,7 +87,9 @@ class StockApiController extends Controller
             ->paginate($perPage);
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => $adjustments->items(),
             'pagination' => [
                 'current_page' => $adjustments->currentPage(),

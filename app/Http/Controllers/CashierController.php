@@ -104,13 +104,17 @@ class CashierController extends Controller
 
         if (!$product) {
             return response()->json([
+                'status_code' => 404,
                 'success' => false,
                 'message' => 'Produk tidak ditemukan.',
+                'data' => null,
             ], 404);
         }
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
+            'message' => '',
             'data' => [
                 'id' => $product->id,
                 'name' => $product->name,
@@ -258,7 +262,12 @@ class CashierController extends Controller
         $transactions = $request->input('transactions', []);
 
         if (!is_array($transactions) || empty($transactions)) {
-            return response()->json(['success' => false, 'message' => 'No transactions to sync'], 422);
+            return response()->json([
+                'status_code' => 422,
+                'success' => false,
+                'message' => 'No transactions to sync',
+                'data' => null,
+            ], 422);
         }
 
         $synced = [];
@@ -327,9 +336,13 @@ class CashierController extends Controller
         }
 
         return response()->json([
+            'status_code' => 200,
             'success' => true,
-            'synced' => $synced,
-            'failed' => $failed,
+            'message' => '',
+            'data' => [
+                'synced' => $synced,
+                'failed' => $failed,
+            ],
         ]);
     }
 
