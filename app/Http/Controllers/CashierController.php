@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\ActivityLogger;
 use DB;
 
 class CashierController extends Controller
@@ -156,6 +157,11 @@ class CashierController extends Controller
                     ->withErrors(['error' => 'Data item tidak valid'])
                     ->withInput();
             }
+            if (isset($item['price']) && (float) $item['price'] <= 0) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'Harga produk tidak boleh 0 atau negatif. Pastikan semua produk custom memiliki harga yang valid.'])
+                    ->withInput();
+            }
         }
 
         if (!is_numeric($validated['amount_received']) || $validated['amount_received'] < 0) {
@@ -243,11 +249,29 @@ class CashierController extends Controller
 
             DB::commit();
 
+            ActivityLogger::info(
+                'transaction.created',
+                "Transaksi {$transaction->transaction_number} berhasil dibuat oleh " . auth()->user()?->name,
+                $transaction,
+                [
+                    'total_price' => $transaction->total_price,
+                    'amount_received' => $transaction->amount_received,
+                    'payment_method' => $transaction->payment_method,
+                ]
+            );
+
             return redirect()->route('cashier.receipt', $transaction)
                 ->with('success', 'Transaksi berhasil disimpan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            ActivityLogger::error('Gagal menyimpan transaksi dari POS', $e, [
+                'items' => $validated['items'] ?? [],
+                'discount_amount' => $validated['discount_amount'] ?? 0,
+                'amount_received' => $validated['amount_received'] ?? null,
+            ]);
+
             return redirect()->back()
                 ->withErrors(['error' => $e->getMessage()])
                 ->withInput();
@@ -357,6 +381,10 @@ class CashierController extends Controller
                 ];
             } catch (\Exception $e) {
                 DB::rollBack();
+                ActivityLogger::error('Gagal sinkronisasi transaksi offline', $e, [
+                    'offline_id' => $offlineId,
+                    'payload' => $txData,
+                ]);
                 $failed[] = ['offline_id' => $offlineId, 'reason' => $e->getMessage()];
             }
         }

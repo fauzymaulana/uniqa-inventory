@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\ActivityLogger;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,10 +20,26 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\CheckAdminRole::class,
             'cashier' => \App\Http\Middleware\CheckCashierRole::class,
             'jwt' => \App\Http\Middleware\JwtMiddleware::class,
+            'activity' => \App\Http\Middleware\LogUserActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->renderable(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, $request) {
             return back()->withInput()->with('error', 'File yang diunggah terlalu besar. Maksimal ukuran file gambar adalah 2MB dan video adalah 20MB. Silakan kompres file Anda dan coba lagi.');
+        });
+
+        $exceptions->report(function (\Throwable $e) {
+            if (app()->runningInConsole()) {
+                return;
+            }
+
+            if ($e instanceof \Illuminate\Validation\ValidationException) {
+                return;
+            }
+
+            ActivityLogger::error('Unhandled application exception', $e, [
+                'request_path' => request()?->path(),
+                'request_method' => request()?->method(),
+            ]);
         });
     })->create();

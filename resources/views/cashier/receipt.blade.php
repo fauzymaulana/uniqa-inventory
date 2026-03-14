@@ -77,3 +77,12 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+<script>
+    // Signal the POS page to clear its cart when the user navigates back.
+    // This works even when the POS page is restored from the browser's bfcache
+    // because the pageshow event fires on every visit (including cached restores).
+    sessionStorage.setItem('pos_cart_cleared', '1');
+</script>
+@endsection

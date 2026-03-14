@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Carbon\Carbon;
+use App\Services\ActivityLogger;
 
 class DebtController extends Controller
 {
@@ -120,6 +121,11 @@ class DebtController extends Controller
             'due_date'    => $request->due_date,
             'is_paid'     => false,
             'description' => $request->description,
+        ]);
+
+        ActivityLogger::info('debt.created', "Hutang baru atas nama {$debtor->name} berhasil dicatat", $debtor, [
+            'amount' => $request->amount,
+            'due_date' => $request->due_date,
         ]);
 
         $role = auth()->user()->role;
@@ -379,30 +385,50 @@ class DebtController extends Controller
             'pay_note'   => ['nullable', 'string', 'max:500'],
         ]);
 
-        DebtPayment::create([
-            'debt_id' => $debt->id,
-            'user_id' => auth()->id(),
-            'amount'  => $request->pay_amount,
-            'note'    => $request->pay_note,
-        ]);
+        try {
+            DebtPayment::create([
+                'debt_id' => $debt->id,
+                'user_id' => auth()->id(),
+                'amount'  => $request->pay_amount,
+                'note'    => $request->pay_note,
+            ]);
 
-        $newPaid   = (float) $debt->amount_paid + (float) $request->pay_amount;
-        $isNowPaid = $newPaid >= (float) $debt->amount;
+            $newPaid   = (float) $debt->amount_paid + (float) $request->pay_amount;
+            $isNowPaid = $newPaid >= (float) $debt->amount;
 
-        $debt->update([
-            'amount_paid' => $newPaid,
-            'is_paid'     => $isNowPaid,
-            'paid_at'     => $isNowPaid ? now() : $debt->paid_at,
-            'paid_by'     => $isNowPaid ? auth()->id() : $debt->paid_by,
-        ]);
+            $debt->update([
+                'amount_paid' => $newPaid,
+                'is_paid'     => $isNowPaid,
+                'paid_at'     => $isNowPaid ? now() : $debt->paid_at,
+                'paid_by'     => $isNowPaid ? auth()->id() : $debt->paid_by,
+            ]);
 
-        return response()->json([
-            'status_code' => 200,
-            'success' => true,
-            'message' => 'Cicilan berhasil disimpan.',
-            'data' => [
+            ActivityLogger::info('debt.paid', 'Cicilan hutang offline berhasil disimpan', $debt, [
+                'debt_id' => $debt->id,
+                'pay_amount' => $request->pay_amount,
                 'is_paid' => $isNowPaid,
-            ],
-        ]);
+            ]);
+
+            return response()->json([
+                'status_code' => 200,
+                'success' => true,
+                'message' => 'Cicilan berhasil disimpan.',
+                'data' => [
+                    'is_paid' => $isNowPaid,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            ActivityLogger::error('Gagal sinkronisasi cicilan hutang offline', $e, [
+                'debt_id' => $debt->id,
+                'pay_amount' => $request->pay_amount,
+            ]);
+
+            return response()->json([
+                'status_code' => 500,
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], 500);
+        }
     }
 }

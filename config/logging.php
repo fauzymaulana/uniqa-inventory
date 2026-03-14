@@ -123,6 +123,15 @@ return [
             'handler' => NullHandler::class,
         ],
 
+        // ── Activity log: satu file per hari, disimpan 30 hari ──
+        'activity' => [
+            'driver'              => 'daily',
+            'path'                => storage_path('logs/activity.log'),
+            'level'               => 'debug',
+            'days'                => 30,
+            'replace_placeholders' => true,
+        ],
+
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],

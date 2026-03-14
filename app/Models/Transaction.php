@@ -53,10 +53,14 @@ class Transaction extends Model
     public static function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        // Lock the count query to prevent duplicate numbers under concurrent requests
+        // Use a PostgreSQL advisory lock to serialize number generation.
+        // pg_advisory_xact_lock acquires a transaction-level exclusive lock
+        // using a stable integer key (CRC32 of the date), preventing duplicate
+        // numbers under concurrent requests without conflicting with FOR UPDATE
+        // on aggregate functions (which PostgreSQL disallows).
+        DB::statement('SELECT pg_advisory_xact_lock(?)', [crc32('trx_seq_' . $date)]);
         $count = DB::table('transactions')
             ->whereDate('created_at', now())
-            ->lockForUpdate()
             ->count() + 1;
         return 'TRX-' . $date . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
     }

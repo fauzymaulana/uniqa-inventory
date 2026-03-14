@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Carbon\Carbon;
+use App\Services\ActivityLogger;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExpenseController extends Controller
@@ -228,6 +229,10 @@ class ExpenseController extends Controller
                     'already_synced' => false,
                 ];
             } catch (\Exception $e) {
+                ActivityLogger::error('Gagal sinkronisasi pengeluaran offline', $e, [
+                    'offline_id' => $offlineId,
+                    'payload' => $expenseData,
+                ]);
                 $failed[] = ['offline_id' => $offlineId, 'reason' => $e->getMessage()];
             }
         }

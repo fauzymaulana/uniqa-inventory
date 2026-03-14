@@ -24,19 +24,27 @@ Route::post('/login', function () {
     $credentials = request()->only('email', 'password');
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
+        \App\Services\ActivityLogger::info('login', 'User berhasil login ke aplikasi', $user, [
+            'email' => request('email'),
+        ]);
         // Redirect based on role
         if ($user && $user->role === 'admin') {
             return redirect()->intended(route('admin.dashboard'));
         }
         return redirect()->intended(route('cashier.dashboard'));
     }
+
+    \App\Services\ActivityLogger::warning('login.failed', 'Login gagal: email atau password salah', null, [
+        'email' => request('email'),
+    ]);
+
     return back()->with('error', 'Email atau password salah');
-})->name('login.post');
+})->middleware('activity')->name('login.post');
 
 Route::post('/logout', function () {
     Auth::logout();
     return redirect()->route('login');
-})->name('logout');
+})->middleware('activity')->name('logout');
 
 Route::get('/', function () {
     if (! Auth::check()) {
@@ -60,7 +68,7 @@ Route::post('/labels/export', [BarcodeController::class, 'exportLabels'])->name(
 // Company Profile Website (public)
 Route::get('/company', [App\Http\Controllers\CompanyController::class, 'index'])->name('company.index');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'activity'])->group(function () {
     // Admin Routes
     Route::middleware(CheckAdminRole::class)->prefix('admin')->name('admin.')->group(function () {
         // Category Management
@@ -85,6 +93,9 @@ Route::middleware('auth')->group(function () {
 
         // Cashier account management (admin only)
         Route::resource('cashiers', App\Http\Controllers\Admin\CashierController::class);
+        Route::get('activity-logs', [App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('activity-logs/{activityLog}', [App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
+        Route::post('activity-logs/purge', [App\Http\Controllers\Admin\ActivityLogController::class, 'purge'])->name('activity-logs.purge');
 
         // Reports
         Route::prefix('reports')->name('reports.')->group(function () {

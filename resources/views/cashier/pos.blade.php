@@ -330,6 +330,11 @@
                         <div class="alert alert-info" id="changeAmount">Rp 0</div>
                     </div>
 
+                    <div id="zeroPriceWarning" class="alert alert-warning py-2 mt-3 mb-0" style="display:none;font-size:0.88rem;">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        <strong>Transaksi tidak dapat diproses.</strong><br>
+                        Terdapat produk dengan harga <strong>Rp 0</strong> di keranjang. Hapus item tersebut atau masukkan harga yang valid.
+                    </div>
                     <button type="submit" class="btn btn-success w-100 mt-3" id="payBtn">
                         <i class="fas fa-check"></i> Bayar
                     </button>
@@ -680,11 +685,15 @@ function selectProduct(productId, productName, productPrice, productStock, isFle
         return;
     }
     if (isFlexiblePrice) {
-        const inputPrice = prompt(`Masukkan harga untuk ${productName}:`, productPrice);
+        const inputPrice = prompt(`Masukkan harga untuk ${productName}:`, productPrice > 0 ? productPrice : '');
         if (inputPrice === null) return;
         const parsedPrice = parseFloat(inputPrice);
         if (isNaN(parsedPrice) || parsedPrice < 0) {
             showToast('Harga tidak valid', 'danger');
+            return;
+        }
+        if (parsedPrice === 0) {
+            showToast('⚠️ Harga produk custom tidak boleh 0. Masukkan harga yang valid.', 'warning');
             return;
         }
         productPrice = parsedPrice;
@@ -753,6 +762,15 @@ function updateCart() {
         product_id: item.product_id, quantity: item.quantity, price: item.price
     })));
 
+    // Disable pay button if any item has price = 0
+    const hasZeroPrice = cart.some(item => item.price === 0);
+    const payBtn = document.getElementById('payBtn');
+    const warning = document.getElementById('zeroPriceWarning');
+    payBtn.disabled = hasZeroPrice;
+    payBtn.classList.toggle('btn-success', !hasZeroPrice);
+    payBtn.classList.toggle('btn-secondary', hasZeroPrice);
+    warning.style.display = hasZeroPrice ? '' : 'none';
+
     updateChange(totalPrice);
 }
 
@@ -790,6 +808,8 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     e.preventDefault();
 
     if (cart.length === 0) { showToast('Keranjang masih kosong!', 'warning'); return; }
+    const zeroItem = cart.find(item => item.price === 0);
+    if (zeroItem) { showToast(`⚠️ "${zeroItem.name}" memiliki harga Rp 0. Hapus atau perbaiki harga terlebih dahulu.`, 'warning'); return; }
     const paymentMethod = document.getElementById('paymentMethod').value;
     if (!paymentMethod) { showToast('Silakan pilih metode pembayaran', 'warning'); return; }
 
@@ -844,5 +864,19 @@ if ('serviceWorker' in navigator) {
 // ── Init ─────────────────────────────────────────────────
 updateNetworkStatus();
 updatePendingUI();
+
+// Clear cart when returning from a successful transaction (handles bfcache too).
+// The receipt page sets this flag; we clear it here so it only fires once.
+window.addEventListener('pageshow', function () {
+    if (sessionStorage.getItem('pos_cart_cleared') === '1') {
+        sessionStorage.removeItem('pos_cart_cleared');
+        cart = [];
+        document.getElementById('amountReceived').value = '';
+        document.getElementById('discountAmount').value = '0';
+        document.getElementById('notesInput').value = '';
+        document.getElementById('paymentMethod').value = '';
+        updateCart();
+    }
+});
 </script>
 @endsection

@@ -121,6 +121,9 @@
                         <a href="{{ route('admin.debts.index') }}" class="@if(request()->routeIs('admin.debts.*')) active @endif">
                             <i class="fas fa-hand-holding-usd"></i> Riwayat Hutang
                         </a>
+                        <a href="{{ route('admin.activity-logs.index') }}" class="@if(request()->routeIs('admin.activity-logs.*')) active @endif">
+                            <i class="fas fa-clipboard-list"></i> Activity Log
+                        </a>
                         <div class="sidebar-title">Undangan & Konten</div>
                         <a href="{{ route('admin.invitation.index') }}" class="@if(request()->routeIs('admin.invitation.*')) active @endif">
                             <i class="fas fa-envelope-open-text"></i> Undangan

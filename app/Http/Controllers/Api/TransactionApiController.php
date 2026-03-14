@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Product;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use DB;
@@ -60,6 +61,7 @@ class TransactionApiController extends Controller
                 $product = Product::lockForUpdate()->findOrFail($item['product_id']);
 
                 if (!$product->hasStock($item['quantity'])) {
+                    DB::rollBack();
                     return response()->json([
                         'status_code' => 422,
                         'success' => false,
@@ -81,6 +83,7 @@ class TransactionApiController extends Controller
 
             $amountReceived = $validated['amount_received'];
             if ($amountReceived < $totalPrice) {
+                DB::rollBack();
                 return response()->json([
                     'status_code' => 422,
                     'success' => false,
@@ -115,6 +118,11 @@ class TransactionApiController extends Controller
 
             DB::commit();
 
+            ActivityLogger::info('transaction.created', "API transaksi {$transaction->transaction_number} berhasil dibuat", $transaction, [
+                'total_price' => $transaction->total_price,
+                'amount_received' => $transaction->amount_received,
+            ]);
+
             return response()->json([
                 'status_code' => 201,
                 'success' => true,
@@ -131,6 +139,10 @@ class TransactionApiController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            ActivityLogger::error('Gagal membuat transaksi via API', $e, [
+                'items' => $validated['items'] ?? [],
+                'amount_received' => $validated['amount_received'] ?? null,
+            ]);
             return response()->json([
                 'status_code' => 500,
                 'success' => false,
