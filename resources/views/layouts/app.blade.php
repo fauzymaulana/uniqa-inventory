@@ -167,6 +167,15 @@
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                         @csrf
                     </form>
+
+                    <div style="padding: 16px 20px; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.15);">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.9); font-size:0.72rem; font-weight:600; letter-spacing:0.05em; padding:3px 8px; border-radius:20px; border:1px solid rgba(255,255,255,0.25);">
+                                v{{ config('app.version') }}
+                            </span>
+                            <span style="color:rgba(255,255,255,0.5); font-size:0.72rem;">{{ config('app.name') }}</span>
+                        </div>
+                    </div>
                 @endauth
             </div>
 
