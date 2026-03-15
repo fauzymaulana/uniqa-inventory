@@ -352,8 +352,11 @@
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-2">Transaksi ini belum tersinkronisasi ke server.</p>
-                <button class="btn btn-sm btn-primary w-100" onclick="syncPending()">
+                <button class="btn btn-sm btn-primary w-100 mb-2" onclick="syncPending()">
                     <i class="fas fa-sync-alt me-1"></i> Sinkronkan Sekarang
+                </button>
+                <button class="btn btn-sm btn-outline-danger w-100" onclick="clearAllPending()">
+                    <i class="fas fa-trash me-1"></i> Hapus Semua Pending
                 </button>
             </div>
         </div>
@@ -386,8 +389,21 @@ let scannerTimer = null;
 let currentFacingMode = 'environment'; // default: rear camera
 
 const OFFLINE_DB_NAME = 'uniqa_pos_offline';
-const OFFLINE_DB_VERSION = 1;
+const OFFLINE_DB_VERSION = 2;
 const PENDING_STORE = 'pending_transactions';
+
+// ── Generate UUID (offline_id yang unik per transaksi) ───
+function generateOfflineId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback untuk browser lama
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
 // ── IndexedDB ────────────────────────────────────────────
 let db;
@@ -396,9 +412,11 @@ function openDB() {
         const req = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(PENDING_STORE)) {
-                db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            // Drop lama (integer autoIncrement) dan buat ulang dengan keyPath string (UUID)
+            if (db.objectStoreNames.contains(PENDING_STORE)) {
+                db.deleteObjectStore(PENDING_STORE);
             }
+            db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id' });
         };
         req.onsuccess = (e) => resolve(e.target.result);
         req.onerror = (e) => reject(e);
@@ -477,14 +495,16 @@ async function syncPending() {
         });
         const result = await resp.json();
         if (result.success) {
-            for (const s of result.synced) {
+            const synced = result.data?.synced ?? [];
+            const failed = result.data?.failed ?? [];
+            for (const s of synced) {
                 await deletePending(s.offline_id);
             }
-            if (result.synced.length > 0) {
-                showToast(`✅ ${result.synced.length} transaksi berhasil disinkronkan!`, 'success');
+            if (synced.length > 0) {
+                showToast(`✅ ${synced.length} transaksi berhasil disinkronkan!`, 'success');
             }
-            if (result.failed && result.failed.length > 0) {
-                showToast(`⚠️ ${result.failed.length} transaksi gagal disinkronkan.`, 'warning');
+            if (failed.length > 0) {
+                showToast(`⚠️ ${failed.length} transaksi gagal disinkronkan.`, 'warning');
             }
         }
     } catch (e) {
@@ -505,6 +525,20 @@ async function updatePendingUI() {
         countEl.style.display = count > 0 ? '' : 'none';
     }
     if (card) card.style.display = count > 0 ? '' : 'none';
+}
+
+async function clearAllPending() {
+    if (!confirm('Hapus semua data pending? Gunakan ini hanya jika transaksi sudah berhasil tersimpan di server.')) return;
+    const db = await openDB();
+    return new Promise((resolve) => {
+        const tx = db.transaction(PENDING_STORE, 'readwrite');
+        tx.objectStore(PENDING_STORE).clear();
+        tx.oncomplete = async () => {
+            await updatePendingUI();
+            showToast('Semua data pending telah dihapus.', 'info');
+            resolve();
+        };
+    });
 }
 
 // ── Toast Notification ───────────────────────────────────
@@ -822,8 +856,9 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     if (amountReceived < totalAfterDiscount) { showToast('Uang yang diberikan tidak cukup!', 'danger'); return; }
 
     if (!navigator.onLine) {
-        // Save to IndexedDB for later sync
+        // Save to IndexedDB for later sync — generate UUID agar idempotency server benar
         const txData = {
+            offline_id: generateOfflineId(),
             items: cart.map(item => ({ product_id: item.product_id, quantity: item.quantity, price: item.price })),
             discount_amount: discountAmount,
             amount_received: amountReceived,

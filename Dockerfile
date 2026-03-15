@@ -18,7 +18,7 @@ FROM php:8.2-fpm-alpine AS app
 
 # Install system libraries yang dibutuhkan oleh extension PHP
 RUN apk add --no-cache \
-    postgresql-dev \
+    mysql-client \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
@@ -32,7 +32,7 @@ RUN apk add --no-cache \
     git
 
 # Konfigurasi dan install PHP extensions
-# - pdo_pgsql  : driver PostgreSQL
+# - pdo_mysql  : driver MySQL
 # - gd         : generate barcode & QR code (picqer + simple-qrcode)
 # - bcmath     : kalkulasi angka presisi tinggi
 # - pcntl      : process control (queue worker)
@@ -44,8 +44,7 @@ RUN apk add --no-cache \
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         pdo \
-        pdo_pgsql \
-        pgsql \
+        pdo_mysql \
         gd \
         bcmath \
         pcntl \

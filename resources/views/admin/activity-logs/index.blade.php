@@ -99,8 +99,8 @@
                 @forelse($logs as $log)
                     <tr>
                         <td class="text-nowrap">
-                            <div>{{ $log->created_at->format('d M Y') }}</div>
-                            <small class="text-muted">{{ $log->created_at->format('H:i:s') }}</small>
+                            <div class="local-date" data-utc="{{ $log->created_at->toIso8601String() }}">{{ $log->created_at->format('d M Y') }}</div>
+                            <small class="text-muted local-time" data-utc="{{ $log->created_at->toIso8601String() }}">{{ $log->created_at->format('H:i:s') }}</small>
                         </td>
                         <td>
                             <span class="badge text-bg-{{ $log->level === 'info' ? 'primary' : ($log->level === 'warning' ? 'warning' : ($log->level === 'error' ? 'danger' : 'dark')) }}">
@@ -139,4 +139,17 @@
         {{ $logs->links() }}
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dateOpts = { day: '2-digit', month: 'short', year: 'numeric' };
+    const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+    document.querySelectorAll('.local-date[data-utc]').forEach(function (el) {
+        el.textContent = new Date(el.dataset.utc).toLocaleDateString('id-ID', dateOpts);
+    });
+    document.querySelectorAll('.local-time[data-utc]').forEach(function (el) {
+        el.textContent = new Date(el.dataset.utc).toLocaleTimeString('id-ID', timeOpts);
+    });
+});
+</script>
 @endsection

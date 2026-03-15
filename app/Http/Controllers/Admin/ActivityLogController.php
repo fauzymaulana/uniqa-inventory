@@ -44,9 +44,9 @@ class ActivityLogController extends Controller
         // Search deskripsi
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
-                $q->where('description', 'ilike', "%{$search}%")
-                  ->orWhere('exception_message', 'ilike', "%{$search}%")
-                  ->orWhere('event', 'ilike', "%{$search}%");
+                $q->where('description', 'like', "%{$search}%")
+                  ->orWhere('exception_message', 'like', "%{$search}%")
+                  ->orWhere('event', 'like', "%{$search}%");
             });
         }
 
@@ -59,7 +59,7 @@ class ActivityLogController extends Controller
         $todayWarnings  = ActivityLog::whereDate('created_at', $today)->where('level', 'warning')->count();
 
         // Event groups untuk dropdown filter
-        $eventGroups = ActivityLog::selectRaw("split_part(event, '.', 1) as event_group")
+        $eventGroups = ActivityLog::selectRaw("SUBSTRING_INDEX(event, '.', 1) as event_group")
             ->distinct()
             ->orderBy('event_group')
             ->pluck('event_group');

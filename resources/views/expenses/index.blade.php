@@ -188,12 +188,13 @@ const EXPENSE_STORE = 'pending_expenses';
 
 function openExpenseDB() {
     return new Promise((resolve, reject) => {
-        const req = indexedDB.open(EXPENSE_DB_NAME, 1);
+        const req = indexedDB.open(EXPENSE_DB_NAME, 2);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(EXPENSE_STORE)) {
-                db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            if (db.objectStoreNames.contains(EXPENSE_STORE)) {
+                db.deleteObjectStore(EXPENSE_STORE);
             }
+            db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id' });
         };
         req.onsuccess = (e) => resolve(e.target.result);
         req.onerror = (e) => reject(e);
@@ -236,8 +237,8 @@ async function syncPendingExpenses() {
             body: JSON.stringify({ expenses: pending }),
         });
         const result = await resp.json();
-        if (result.success && result.synced.length > 0) {
-            for (const s of result.synced) {
+        if (result.success && result.data?.synced?.length > 0) {
+            for (const s of result.data.synced) {
                 await deletePendingExpense(db, s.offline_id);
             }
             // Reload page to show synced data

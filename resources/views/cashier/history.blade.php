@@ -98,15 +98,16 @@ const PENDING_STORE = 'pending_transactions';
 
 function openDB() {
     return new Promise((resolve, reject) => {
-        const req = indexedDB.open(OFFLINE_DB_NAME, 1);
-        req.onsuccess = (e) => resolve(e.target.result);
-        req.onerror = (e) => reject(e);
+        const req = indexedDB.open(OFFLINE_DB_NAME, 2);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(PENDING_STORE)) {
-                db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            if (db.objectStoreNames.contains(PENDING_STORE)) {
+                db.deleteObjectStore(PENDING_STORE);
             }
+            db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id' });
         };
+        req.onsuccess = (e) => resolve(e.target.result);
+        req.onerror = (e) => reject(e);
     });
 }
 
