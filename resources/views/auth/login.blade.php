@@ -167,19 +167,6 @@
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
             </form>
-
-            <div class="demo-credentials">
-                <h6>📋 Akun Demo:</h6>
-                <p><strong>Admin:</strong></p>
-                <p>Email: <code>admin@inventory.test</code></p>
-                <p>Password: <code>password</code></p>
-                
-                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e0e0e0;">
-                
-                <p style="margin-top: 10px;"><strong>Kasir:</strong></p>
-                <p>Email: <code>cashier1@inventory.test</code></p>
-                <p>Password: <code>password</code></p>
-            </div>
         </div>
     </div>
 
