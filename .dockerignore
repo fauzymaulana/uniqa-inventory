@@ -1,0 +1,64 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Dependency directories (di-install di dalam container)
+vendor/
+node_modules/
+
+# Build output lokal (akan di-build ulang di dalam container)
+public/build/
+public/hot/
+
+# Storage (di-mount sebagai Docker volume)
+storage/
+
+# Environment files sensitif
+.env
+.env.backup
+.env.production
+.env.*.local
+
+# Cache & testing
+bootstrap/cache/
+.phpunit.cache
+.phpunit.result.cache
+
+# Dokumentasi & file pengembangan
+*.md
+!README.md
+SETUP_GUIDE.md
+IMPLEMENTATION_*.md
+ADMIN_DASHBOARD_*.md
+API_DOCUMENTATION.md
+BARCODE_*.md
+BUG_FIXES_*.md
+DOCUMENTATION_*.md
+FINAL_*.md
+MIDDLEWARE_*.md
+NEXT_STEPS.md
+PROJECT_*.md
+
+# IDE & editor
+.idea/
+.vscode/
+.fleet/
+.nova/
+.zed/
+.editorconfig
+.phpactor.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# docker-compose tidak perlu masuk ke build context aplikasi
+docker-compose*.yml
+
+# Test files
+tests/
+phpunit.xml
+
+# Setup scripts
+setup.sh
