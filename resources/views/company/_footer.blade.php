@@ -7,15 +7,15 @@
 
         <div class="footer-social mb-2">
             <a href="https://instagram.com/uniqa.id" target="_blank" rel="noopener" aria-label="Instagram">
-                <i class="fab fa-instagram"></i>
+                <i class="fab fa-instagram">  uniqa.id</i>
             </a>
-            <a href="https://wa.me/6281234567890" target="_blank" rel="noopener" aria-label="WhatsApp">
-                <i class="fab fa-whatsapp"></i>
+            <a href="https://wa.me/6285362533619" target="_blank" rel="noopener" aria-label="WhatsApp">
+                <i class="fab fa-whatsapp">  +62 853 6253 3619</i>
             </a>
         </div>
 
         <div class="footer-copy">
-            Copyright &copy; 2021&ndash;{{ date('Y') }}, Uniqa.id &mdash; All Rights Reserved.
+            Copyright &copy; 2015&ndash;{{ date('Y') }}, Uniqa.id &mdash; All Rights Reserved.
         </div>
     </div>
 </footer>

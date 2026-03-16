@@ -25,7 +25,7 @@
 
 <div class="row g-4">
     {{-- ── Kiri: Info Penghutang + Statistik ──────────────────── --}}
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
         <div class="card mb-3">
             <div class="card-body">
                 <h5 class="fw-bold mb-1">
@@ -92,7 +92,7 @@
     </div>
 
     {{-- ── Kanan: Tabel Catatan Hutang ─────────────────────────── --}}
-    <div class="col-md-8">
+    <div class="col-12 col-md-8">
         <div class="card">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0">

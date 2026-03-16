@@ -14,6 +14,7 @@
     <div class="card-body">
         <a href="{{ route('admin.cashiers.create') }}" class="btn btn-primary mb-3">Buat Kasir Baru</a>
 
+        <div class="table-responsive">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -41,6 +42,7 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 @endsection

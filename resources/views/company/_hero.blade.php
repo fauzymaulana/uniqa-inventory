@@ -1,10 +1,10 @@
 {{-- resources/views/company/_hero.blade.php --}}
 <section class="hero-section" id="hero">
-    <div class="container">
-        <div class="row align-items-center g-4">
 
-            {{-- Headline & CTA --}}
-            <div class="col-lg-5" data-aos="fade-right" data-aos-duration="800">
+    {{-- Text block --}}
+    <div class="hero-text-wrap">
+        <div class="container">
+            <div class="hero-text-block" data-aos="fade-down" data-aos-duration="700">
                 <h1 class="hero-headline">
                     Platform <span>Wedding</span> for YOU!
                 </h1>
@@ -16,30 +16,49 @@
                     LIHAT CONTOH KATALOG <i class="fas fa-angles-right ms-1"></i>
                 </a>
             </div>
-
-            {{-- Hero Image Grid --}}
-            <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
-                <div class="hero-grid">
-                    @if ($heroContents->count())
-                        @foreach ($heroContents->take(6) as $hero)
-                            <div class="hero-grid-item">
-                                <img
-                                    src="{{ asset('storage/konten/' . $hero->image) }}"
-                                    alt="{{ $hero->title }}"
-                                    loading="lazy"
-                                >
-                            </div>
-                        @endforeach
-                    @else
-                        @for ($i = 1; $i <= 6; $i++)
-                            <div class="hero-grid-item" style="background:var(--beige);display:flex;align-items:center;justify-content:center;">
-                                <i class="fas fa-image fa-2x" style="color:var(--gold);opacity:.4"></i>
-                            </div>
-                        @endfor
-                    @endif
-                </div>
-            </div>
-
         </div>
     </div>
+
+    {{-- 3D Infinite Marquee Carousel --}}
+    <div class="hero-carousel-perspective">
+        <div class="hero-carousel-track" id="heroTrack">
+            @if ($heroContents->count())
+                {{-- Original set --}}
+                @foreach ($heroContents->take(10) as $hero)
+                    <div class="hero-carousel-item">
+                        <img
+                            src="{{ asset('storage/konten/' . $hero->image) }}"
+                            alt="{{ $hero->title }}"
+                            loading="lazy"
+                            draggable="false"
+                        >
+                    </div>
+                @endforeach
+                {{-- Duplicate for seamless infinite loop --}}
+                @foreach ($heroContents->take(10) as $hero)
+                    <div class="hero-carousel-item" aria-hidden="true">
+                        <img
+                            src="{{ asset('storage/konten/' . $hero->image) }}"
+                            alt=""
+                            loading="lazy"
+                            draggable="false"
+                        >
+                    </div>
+                @endforeach
+            @else
+                {{-- Placeholder x2 for seamless loop --}}
+                @for ($i = 1; $i <= 5; $i++)
+                    <div class="hero-carousel-item hero-carousel-empty">
+                        <i class="fas fa-image fa-2x"></i>
+                    </div>
+                @endfor
+                @for ($i = 1; $i <= 5; $i++)
+                    <div class="hero-carousel-item hero-carousel-empty" aria-hidden="true">
+                        <i class="fas fa-image fa-2x"></i>
+                    </div>
+                @endfor
+            @endif
+        </div>
+    </div>
+
 </section>

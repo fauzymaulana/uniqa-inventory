@@ -13,11 +13,11 @@
 <div class="card mb-4">
     <div class="card-body">
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label">Cari Produk</label>
                 <input type="text" id="searchInput" class="form-control" placeholder="Nama atau SKU produk" value="{{ request('search') }}">
             </div>
-            <div class="col-md-6 d-flex align-items-end">
+            <div class="col-12 col-md-6 d-flex align-items-end">
                 <button type="button" id="resetBtn" class="btn btn-secondary w-100">
                     <i class="fas fa-redo"></i> Reset
                 </button>
@@ -26,8 +26,8 @@
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-boxes"></i> Total Nilai Inventory</h5>
@@ -35,12 +35,12 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-exclamation"></i> Stok Rendah</h5>
                 <div class="number" id="lowStockCount">{{ $lowStockCount }}</div>
-                <small class="text-muted">Produk dengan stok < 10</small>
+                <small class="text-muted">Produk dengan stok &lt; 10</small>
             </div>
         </div>
     </div>

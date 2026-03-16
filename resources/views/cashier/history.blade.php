@@ -14,11 +14,11 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('cashier.history') }}" class="row g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <label class="form-label">Bulan</label>
                 <input type="month" name="month" class="form-control" value="{{ $month }}">
             </div>
-            <div class="col-md-8 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-8 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-filter"></i> Filter
                 </button>

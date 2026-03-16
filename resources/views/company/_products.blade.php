@@ -3,7 +3,7 @@
     <div class="container">
 
         <h2 class="products-title" data-aos="fade-up">
-            Katalog <span style="color:var(--gold)">Undangan</span>
+            Katalog <span style="color:var(--teal)">Produk</span>
         </h2>
         <p class="text-center text-muted mb-2" data-aos="fade-up">
             Temukan desain undangan yang sesuai dengan gaya pernikahanmu

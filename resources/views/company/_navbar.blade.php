@@ -28,11 +28,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#about">About Us</a>
                 </li>
-                <li class="nav-item ms-lg-2">
-                    <a class="nav-link nav-login-btn" href="{{ route('login') }}">
-                        <i class="fas fa-sign-in-alt me-1"></i> Login
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

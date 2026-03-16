@@ -96,4 +96,81 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* ---- Hero 3D Marquee Carousel ---- */
+    (function () {
+        var track = document.getElementById('heroTrack');
+        if (!track) return;
+
+        var pos        = 0;       // current translateX in px
+        var speed      = 0.55;    // px per frame (auto-scroll speed)
+        var isDragging = false;
+        var dragLastX  = 0;
+        var RX = 15, RY = -4;    // 3D tilt angles (degrees)
+
+        function halfWidth() {
+            // track has items duplicated → half = one full set width
+            return track.scrollWidth / 2;
+        }
+
+        function normalize() {
+            var hw = halfWidth();
+            if (hw <= 0) return;
+            // wrap within [−hw, 0] for seamless loop
+            while (pos < -hw) pos += hw;
+            while (pos > 0)   pos -= hw;
+        }
+
+        function applyTransform() {
+            track.style.transform =
+                'rotateX(' + RX + 'deg) rotateY(' + RY + 'deg) translateX(' + pos + 'px)';
+        }
+
+        function tick() {
+            if (!isDragging) {
+                pos -= speed;
+                normalize();
+            }
+            applyTransform();
+            requestAnimationFrame(tick);
+        }
+
+        /* Mouse drag */
+        track.addEventListener('mousedown', function (e) {
+            isDragging = true;
+            dragLastX  = e.clientX;
+            track.style.cursor = 'grabbing';
+            e.preventDefault();
+        });
+        document.addEventListener('mousemove', function (e) {
+            if (!isDragging) return;
+            pos      += e.clientX - dragLastX;
+            dragLastX = e.clientX;
+            normalize();
+        });
+        document.addEventListener('mouseup', function () {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.cursor = '';
+        });
+
+        /* Touch drag */
+        track.addEventListener('touchstart', function (e) {
+            isDragging = true;
+            dragLastX  = e.touches[0].clientX;
+        }, { passive: true });
+        track.addEventListener('touchmove', function (e) {
+            if (!isDragging) return;
+            pos      += e.touches[0].clientX - dragLastX;
+            dragLastX = e.touches[0].clientX;
+            normalize();
+        }, { passive: true });
+        track.addEventListener('touchend', function () {
+            isDragging = false;
+        });
+
+        /* Kick off */
+        applyTransform();
+        requestAnimationFrame(tick);
+    })();
+
 });

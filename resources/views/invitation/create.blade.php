@@ -11,7 +11,7 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-12 col-lg-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-envelope-open-text"></i> Form Produk Undangan</h5>

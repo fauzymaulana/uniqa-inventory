@@ -9,11 +9,25 @@
         grid-template-columns: 2fr 1fr;
         gap: 20px;
     }
+    @media (max-width: 991.98px) {
+        .pos-container {
+            grid-template-columns: 1fr;
+        }
+        .pos-container > div:last-child {
+            order: -1; /* Cart tampil di atas produk pada mobile */
+        }
+    }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
         margin-bottom: 20px;
+    }
+    @media (max-width: 575.98px) {
+        .product-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+        .product-card { padding: 10px 8px; }
+        .product-name { font-size: 0.8rem; }
+        .product-price { font-size: 0.95rem; }
     }
     .product-card {
         border: 1px solid #ddd;
@@ -182,6 +196,10 @@
     }
     .sync-status-bar.online { background: #d4edda; color: #155724; }
     .sync-status-bar.offline { background: #fff3cd; color: #856404; }
+    /* Mobile cart toggle */
+    .cart-badge { position: absolute; top: -6px; right: -6px; font-size: .65rem; padding: 2px 5px; }
+    #mobileCartToggleWrapper { display: none; }
+    @media (max-width: 991.98px) { #mobileCartToggleWrapper { display: block; margin-bottom: 12px; } }
 </style>
 @endsection
 

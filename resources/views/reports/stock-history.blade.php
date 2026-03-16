@@ -13,15 +13,15 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.reports.stock-history') }}" class="row g-3">
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label class="form-label">Tanggal Akhir</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label class="form-label">Jenis Perubahan</label>
                 <select name="type" class="form-select">
                     <option value="">-- Semua --</option>
@@ -29,7 +29,7 @@
                     <option value="out" @selected(request('type') == 'out')>Keluar (Out)</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex align-items-end">
+            <div class="col-12 col-sm-6 col-md-3 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-search"></i> Filter
                 </button>

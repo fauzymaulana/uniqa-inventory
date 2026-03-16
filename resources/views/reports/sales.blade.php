@@ -13,15 +13,15 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.reports.sales') }}" class="row g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Akhir</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-4 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="fas fa-search"></i> Filter
                 </button>
@@ -33,8 +33,8 @@
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-dollar-sign"></i> Total Penjualan</h5>
@@ -42,7 +42,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-receipt"></i> Total Transaksi</h5>

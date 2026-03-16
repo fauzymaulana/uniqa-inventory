@@ -32,14 +32,14 @@
     <strong>Mode Offline</strong> — Form tetap bisa digunakan. Data akan otomatis ter-upload saat koneksi pulih.
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
     <div>
         <h4 class="fw-bold mb-0">
             <i class="fas fa-hand-holding-usd me-2 text-danger"></i>Riwayat Hutang
         </h4>
         <small class="text-muted">Kelola semua catatan hutang penghutang</small>
     </div>
-    <div class="d-flex gap-2 align-items-center">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
         <span id="pendingBadge" class="not-sync-badge d-none">
             <i class="fas fa-cloud-upload-alt"></i>
             <span id="pendingCount">0</span> pending
@@ -116,12 +116,12 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route(auth()->user()->role . '.debts.index') }}" class="row g-2 align-items-end">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold mb-1">Cari Nama Penghutang</label>
                 <input type="text" name="search" value="{{ $search }}" class="form-control"
                        placeholder="Ketik nama penghutang...">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label class="form-label fw-semibold mb-1">Status</label>
                 <select name="filter" class="form-select">
                     <option value="all"    @selected($filter === 'all')>Semua</option>
@@ -129,7 +129,7 @@
                     <option value="paid"   @selected($filter === 'paid')>Lunas</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex gap-2">
+            <div class="col-12 col-sm-6 col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-search me-1"></i> Filter
                 </button>
@@ -440,12 +440,12 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route(auth()->user()->role . '.debts.index') }}" class="row g-2 align-items-end">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold mb-1">Cari Nama Penghutang</label>
                 <input type="text" name="search" value="{{ $search }}" class="form-control"
                        placeholder="Ketik nama penghutang...">
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3">
                 <label class="form-label fw-semibold mb-1">Status</label>
                 <select name="filter" class="form-select">
                     <option value="all"    @selected($filter === 'all')>Semua</option>
@@ -453,7 +453,7 @@
                     <option value="paid"   @selected($filter === 'paid')>Lunas</option>
                 </select>
             </div>
-            <div class="col-md-3 d-flex gap-2">
+            <div class="col-12 col-sm-6 col-md-3 d-flex gap-2">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-search me-1"></i> Filter
                 </button>

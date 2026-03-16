@@ -22,7 +22,11 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            padding: 50px 40px;
+            padding: 40px 32px;
+        }
+        @media (max-width: 575.98px) {
+            .login-card { padding: 28px 20px; border-radius: 12px; }
+            body { align-items: flex-start; padding: 24px 0; }
         }
         .login-header {
             text-align: center;
