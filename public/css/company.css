@@ -58,6 +58,16 @@ body {
     color: var(--primary) !important;
     letter-spacing: .5px;
 }
+.navbar-logo {
+    height: 50px; width: auto;
+    max-width: 200px;
+    object-fit: contain;
+    display: block;
+    transition: opacity .3s;
+}
+.navbar-custom:hover .navbar-logo {
+    opacity: .9;
+}
 .navbar-custom .nav-link {
     color: var(--dark) !important;
     font-weight: 500; font-size: .95rem;
@@ -131,6 +141,7 @@ body {
     flex-shrink: 0;
     width: 160px;
     height: 220px;
+    aspect-ratio: 8 / 11;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0,0,0,.14);
@@ -431,7 +442,17 @@ body {
 /* ---------- Footer ---------- */
 .footer { background: var(--dark); color: #ccc; padding: 2.5rem 0 1.5rem; }
 .footer-brand { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
-.footer-social a { color: #ccc; font-size: 1.3rem; margin-right: 1rem; transition: color .25s; }
+.footer-logo {
+    height: 40px; width: auto;
+    max-width: 180px;
+    object-fit: contain;
+    display: inline-block;
+    filter: brightness(0) invert(1);
+    opacity: .95;
+    transition: opacity .25s;
+}
+.footer:hover .footer-logo { opacity: 1; }
+.footer-social a { color: #ccc; font-size: 1.0rem; margin-right: 1rem; transition: color .25s; }
 .footer-social a:hover { color: var(--primary); }
 .footer-copy { font-size: .85rem; color: #999; margin-top: 1rem; }
 
@@ -449,15 +470,54 @@ body {
 .scroll-top:hover { background: var(--primary-dark); transform: translateY(-3px); }
 .scroll-top.show { display: flex; }
 
+/* ---------- Floating WhatsApp Button ---------- */
+.floating-wa-button {
+    position: fixed; bottom: 40px; right: 40px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: flex-end;
+    gap: .6rem; z-index: 999;
+    text-decoration: none; transition: bottom .3s ease;
+}
+.floating-wa-button:hover { opacity: .9; }
+.floating-wa-button:active { transform: scale(0.98); }
+.floating-wa-circle {
+    width: 60px; height: 60px;
+    background: #25d366; color: #fff;
+    border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, .4);
+    transition: all .3s ease;
+}
+.floating-wa-button:hover .floating-wa-circle {
+    background: #1da851;
+    box-shadow: 0 8px 30px rgba(37, 211, 102, .6);
+    transform: scale(1.1);
+}
+.floating-wa-label {
+    background: #25d366; color: #fff;
+    padding: .4rem .8rem; border-radius: 6px;
+    font-size: .75rem; font-weight: 600;
+    letter-spacing: .5px; white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(37, 211, 102, .3);
+    transition: all .3s ease;
+}
+.floating-wa-button:hover .floating-wa-label {
+    background: #1da851;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, .5);
+}
+/* Adjust when scroll-to-top button is visible */
+.floating-wa-button.scroll-active { bottom: 120px; }
+
 /* ---------- Responsive ---------- */
 @media (max-width: 991px) {
     .hero-headline { font-size: 2.2rem; }
-    .hero-carousel-item { width: 130px; height: 180px; }
+    .hero-carousel-item { width: 130px; height: 180px; aspect-ratio: 8 / 11; }
 }
 @media (max-width: 767px) {
     .hero-section { padding-top: 4.5rem; }
     .hero-headline { font-size: 1.8rem; }
-    .hero-carousel-item { width: 110px; height: 155px; }
+    .hero-carousel-item { width: 110px; height: 155px; aspect-ratio: 8 / 11; }
     .hero-carousel-perspective { padding-bottom: 2.5rem; }
     .about-title { font-size: 1.6rem; }
     .stat-number { font-size: 1.6rem; }
@@ -472,6 +532,14 @@ body {
 @media (max-width: 575px) {
     .hero-section { padding-top: 4rem; }
     .hero-headline { font-size: 1.5rem; }
-    .hero-carousel-item { width: 95px; height: 135px; }
+    .hero-carousel-item { width: 95px; height: 135px; aspect-ratio: 8 / 11; }
     .hero-text-wrap { padding: 1.5rem 0 2rem; }
-}
+    .floating-wa-button {
+        bottom: 25px; right: 25px;
+    }
+    .floating-wa-circle {
+        width: 54px; height: 54px;
+        font-size: 1.5rem;
+    }
+    .floating-wa-label { font-size: .7rem; padding: .35rem .7rem; }
+    .floating-wa-button.scroll-active { bottom: 110px; }\n}

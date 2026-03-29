@@ -2,7 +2,7 @@
 <footer class="footer">
     <div class="container text-center">
         <div class="footer-brand mb-2">
-            <i class="fas fa-ring me-2"></i>Uniqa.id
+            <img src="{{ asset('images/img_logo.png') }}" alt="Uniqa.id" class="footer-logo">
         </div>
 
         <div class="footer-social mb-2">

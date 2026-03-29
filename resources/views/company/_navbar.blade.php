@@ -1,8 +1,8 @@
 {{-- resources/views/company/_navbar.blade.php --}}
 <nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
     <div class="container">
-        <a class="navbar-brand navbar-brand-text" href="#hero">
-            <i class="fas fa-ring me-2"></i>Wedding by Uniqa
+        <a class="navbar-brand" href="#hero">
+            <img src="{{ asset('images/img_logo.png') }}" alt="Wedding by Uniqa" class="navbar-logo">
         </a>
 
         <button

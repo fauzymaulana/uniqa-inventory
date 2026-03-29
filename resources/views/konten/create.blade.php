@@ -40,7 +40,8 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tipe Konten <span class="text-danger">*</span></label>
-                        <select name="type" class="form-select @error('type') is-invalid @enderror" required>
+                        <select name="type" class="form-select @error('type') is-invalid @enderror" required id="contentType">
+                            <option value="">-- Pilih Tipe Konten --</option>
                             <option value="hero" {{ old('type') === 'hero' ? 'selected' : '' }}>🏠 Hero Section (Tampilan Utama Website)</option>
                             <option value="banner" {{ old('type') === 'banner' ? 'selected' : '' }}>📢 Banner Iklan</option>
                             <option value="promo" {{ old('type') === 'promo' ? 'selected' : '' }}>🏷️ Poster Promo</option>
@@ -48,6 +49,10 @@
                         @error('type')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <div id="contentTypeInfo" class="alert alert-info mt-2" style="display: none;">
+                            <strong>📐 Ukuran Gambar yang Disarankan:</strong>
+                            <p id="sizeInfo" class="mb-0"></p>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -97,6 +102,42 @@
 
 @section('scripts')
 <script>
+// Content type info mapping
+const contentTypeInfo = {
+    'hero': {
+        label: 'Hero Section',
+        sizes: ['1600 × 2200px (rekomendasi)', '800 × 1100px (alternatif)', 'Rasio aspek: 8:11 (portrait)', 'Ukuran item carousel: 160×220px']
+    },
+    'banner': {
+        label: 'Banner Iklan',
+        sizes: ['1320 × 880px (rekomendasi)', '1200 × 800px (alternatif)', 'Rasio aspek: 3:2 (landscape)', 'Display area: 330×220px (3 kolom di desktop)']
+    },
+    'promo': {
+        label: 'Poster Promo (Polaroid)',
+        sizes: ['840 × 960px (rekomendasi)', '700 × 800px (alternatif)', 'Rasio aspek: 7:8 (portrait)', 'Ukuran polaroid: 140-150×160-170px']
+    }
+};
+
+// Update content type info
+const contentTypeSelect = document.getElementById('contentType');
+const contentTypeInfoDiv = document.getElementById('contentTypeInfo');
+const sizeInfo = document.getElementById('sizeInfo');
+
+function updateContentTypeInfo() {
+    const selectedType = contentTypeSelect.value;
+    if (selectedType && contentTypeInfo[selectedType]) {
+        const info = contentTypeInfo[selectedType];
+        sizeInfo.innerHTML = info.sizes.map(size => `<span style="display: block; padding: 4px 0;">• ${size}</span>`).join('');
+        contentTypeInfoDiv.style.display = 'block';
+    } else {
+        contentTypeInfoDiv.style.display = 'none';
+    }
+}
+
+contentTypeSelect.addEventListener('change', updateContentTypeInfo);
+window.addEventListener('load', updateContentTypeInfo);
+
+// Image preview
 document.getElementById('imageInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {

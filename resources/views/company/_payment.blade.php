@@ -6,14 +6,14 @@
         <div class="payment-grid" data-aos="fade-up" data-aos-delay="100">
             @php
                 $payments = [
-                    ['img' => 'bri.png',       'label' => 'Bank BRI'],
-                    ['img' => 'bca.png',       'label' => 'Bank BCA'],
-                    ['img' => 'mandiri.png',   'label' => 'Bank Mandiri'],
-                    ['img' => 'bsi.png',       'label' => 'Bank BSI'],
-                    ['img' => 'gopay.png',     'label' => 'GoPay'],
-                    ['img' => 'shopeepay.png', 'label' => 'ShopeePay'],
-                    ['img' => 'ovo.png',       'label' => 'OVO'],
-                    ['img' => 'dana.png',      'label' => 'DANA'],
+                    ['img' => 'img_bri.png',       'label' => 'Bank BRI'],
+                    ['img' => 'img_bca.png',       'label' => 'Bank BCA'],
+                    ['img' => 'img_mandiri.png',   'label' => 'Bank Mandiri'],
+                    ['img' => 'img_bsi.png',       'label' => 'Bank BSI'],
+                    ['img' => 'img_gopay.png',     'label' => 'GoPay'],
+                    ['img' => 'img_shopeepay.png', 'label' => 'ShopeePay'],
+                    ['img' => 'img_ovo.png',       'label' => 'OVO'],
+                    ['img' => 'img_dana.png',      'label' => 'DANA'],
                 ];
             @endphp
 
@@ -25,7 +25,7 @@
                         class="payment-logo"
                         loading="lazy"
                     >
-                    <span>{{ $payment['label'] }}</span>
+                    <!-- <span>{{ $payment['label'] }}</span> -->
                 </div>
             @endforeach
         </div>

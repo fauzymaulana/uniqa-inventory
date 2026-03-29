@@ -21,8 +21,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* ---- Scroll to Top Button ---- */
     var stBtn = document.getElementById('scrollTop');
+    var waBtn = document.getElementById('floatingWaBtn');
     window.addEventListener('scroll', function () {
         stBtn.classList.toggle('show', window.scrollY > 400);
+        if (waBtn) {
+            waBtn.classList.toggle('scroll-active', window.scrollY > 400);
+        }
     });
     stBtn.addEventListener('click', function () {
         window.scrollTo({ top: 0, behavior: 'smooth' });
