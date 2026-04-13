@@ -332,9 +332,29 @@
                         </div>
                     </div>
 
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" id="dpSwitch" name="is_dp">
+                        <label class="form-check-label" for="dpSwitch">Aktifkan DP / Buat Hutang</label>
+                    </div>
+                    <div id="dpFields" class="dp-panel" style="display:none;">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Konsumen</label>
+                            <input type="text" id="debtorName" name="debtor_name" class="form-control" placeholder="Masukkan nama konsumen">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">No. HP</label>
+                            <input type="text" id="debtorPhone" name="debtor_phone" class="form-control" placeholder="0812xxxxxxx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sisa Hutang</label>
+                            <div class="alert alert-success" id="debtAmountDisplay">Rp 0</div>
+                        </div>
+                        <input type="hidden" id="debtDueDate" name="debt_due_date" value="{{ now()->addDays(30)->toDateString() }}">
+                    </div>
+
                     <div class="mt-3">
                         <label class="form-label">Uang Diterima</label>
-                        <input type="number" id="amountReceived" name="amount_received" class="form-control" placeholder="0" step="100" required>
+                        <input type="number" min="0" id="amountReceived" name="amount_received" class="form-control" placeholder="0" step="100" required>
                     </div>
                     <div class="mt-2">
                         <label class="form-label">Potongan (Rp)</label>
@@ -857,6 +877,7 @@ function updateCart() {
     warning.style.display = hasZeroPrice ? '' : 'none';
 
     updateChange(totalPrice);
+    updateDpInfo(totalPrice);
 }
 
 function updateChange(totalPrice) {
@@ -871,6 +892,17 @@ function updateChange(totalPrice) {
     }
 }
 
+function updateDpInfo(totalPrice) {
+    const dpEnabled = document.getElementById('dpSwitch').checked;
+    const dpFields = document.getElementById('dpFields');
+    const amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const totalAfterDiscount = Math.max(0, totalPrice - discountAmount);
+    const debtAmount = Math.max(0, totalAfterDiscount - amountReceived);
+    document.getElementById('debtAmountDisplay').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(debtAmount);
+    dpFields.style.display = dpEnabled ? '' : 'none';
+}
+
 function clearCart() {
     if (confirm('Hapus semua item dari keranjang?')) {
         cart = [];
@@ -882,9 +914,14 @@ function clearCart() {
 document.getElementById('amountReceived').addEventListener('input', function () {
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     updateChange(totalPrice);
+    updateDpInfo(totalPrice);
 });
 
 document.getElementById('discountAmount').addEventListener('input', function () {
+    updateCart();
+});
+
+document.getElementById('dpSwitch').addEventListener('change', function () {
     updateCart();
 });
 
@@ -902,9 +939,15 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
     const totalAfterDiscount = Math.max(0, totalPrice - discountAmount);
     const amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+    const dpEnabled = document.getElementById('dpSwitch').checked;
+    const debtorName = document.getElementById('debtorName').value.trim();
+    const debtorPhone = document.getElementById('debtorPhone').value.trim();
 
     if (discountAmount > totalPrice) { showToast('Potongan melebihi subtotal', 'warning'); return; }
-    if (amountReceived < totalAfterDiscount) { showToast('Uang yang diberikan tidak cukup!', 'danger'); return; }
+    if (dpEnabled && !debtorName) { showToast('Nama konsumen harus diisi untuk DP', 'warning'); return; }
+    if (dpEnabled && !debtorPhone) { showToast('No. HP konsumen harus diisi untuk DP', 'warning'); return; }
+    if (!dpEnabled && amountReceived < totalAfterDiscount) { showToast('Uang yang diberikan tidak cukup!', 'danger'); return; }
+    if (dpEnabled && amountReceived <= 0) { showToast('Masukkan jumlah DP minimal Rp 1', 'warning'); return; }
 
     if (!navigator.onLine) {
         // Save to IndexedDB for later sync — generate UUID agar idempotency server benar
@@ -915,6 +958,10 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             amount_received: amountReceived,
             payment_method: paymentMethod,
             notes: document.getElementById('notesInput').value,
+            is_dp: dpEnabled,
+            debtor_name: debtorName,
+            debtor_phone: debtorPhone,
+            debt_due_date: document.getElementById('debtDueDate').value,
         };
         await savePending(txData);
         cart = [];

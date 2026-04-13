@@ -20,15 +20,28 @@
         
 
         <div class="row g-4">
+            @php
+                // Hardcode thumbnail mapping - ubah sesuai dengan nama file Anda di folder images
+                $categoryThumbnails = [
+                    'digital' => 'images/digital_invitation.jpg',
+                    'cetak' => 'images/print_invitation.jpg',
+                    'souvenir' => 'images/print_invitation.jpg',
+                ];
+            @endphp
             @if ($invitationCategories->count())
                 @foreach ($invitationCategories->take(3) as $cat)
                     <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 150 }}">
                         <a href="{{ route('company.catalog', ['slug' => $cat->slug]) }}" style="text-decoration: none; color: inherit;">
                             <div class="category-card-wrapper">
                                 <div class="category-card">
-                                    @if ($cat->products->first() && $cat->products->first()->thumbnail)
+                                    @php
+                                        $words = explode(' ', $cat->name);
+                                        $key = strtolower(end($words));
+                                        $thumbnail = $categoryThumbnails[$key] ?? null;
+                                    @endphp
+                                    @if ($thumbnail)
                                         <img
-                                            src="{{ asset('storage/undangan/' . $cat->products->first()->thumbnail) }}"
+                                            src="{{ asset($thumbnail) }}"
                                             alt="{{ $cat->name }}"
                                             loading="lazy"
                                         >
@@ -52,12 +65,25 @@
             @else
                 @php $defaultCats = ['UNDANGAN DIGITAL', 'UNDANGAN CETAK', 'SOUVENIR']; @endphp
                 @foreach ($defaultCats as $dc)
+                    @php
+                        $words = explode(' ', $dc);
+                        $key = strtolower(end($words));
+                        $thumbnail = $categoryThumbnails[$key] ?? null;
+                    @endphp
                     <div class="col-md-4" data-aos="zoom-in" data-aos-delay="{{ $loop->index * 150 }}">
                         <div class="category-card-wrapper">
                             <div class="category-card">
-                                <div class="category-card-placeholder">
-                                    <i class="fas fa-image fa-3x" style="color:var(--gold);opacity:.3"></i>
-                                </div>
+                                @if ($thumbnail)
+                                    <img
+                                        src="{{ asset($thumbnail) }}"
+                                        alt="{{ $dc }}"
+                                        loading="lazy"
+                                    >
+                                @else
+                                    <div class="category-card-placeholder">
+                                        <i class="fas fa-image fa-3x" style="color:var(--gold);opacity:.3"></i>
+                                    </div>
+                                @endif
                             </div>
                             <div class="category-overlay">
                                 <div class="category-label">{{ $dc }}</div>
