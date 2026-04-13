@@ -125,15 +125,9 @@
                         <label class="form-label fw-bold">Video Demo (MP4)</label>
                         <input type="file" name="video_demo" id="videoInput"
                                class="form-control @error('video_demo') is-invalid @enderror"
-                               accept="video/mp4">
+                               accept="video/*,.mp4,.mov,.avi,.webm">
                         <div class="form-text">
-                            Format: MP4. Maks 20MB. Durasi maks 60 detik.<br>
-                            <i class="fas fa-info-circle text-info"></i>
-                            <strong>Dimensi yang diterima:</strong>
-                            Portrait <code>1080×1920</code> px (9:16) &nbsp;|&nbsp;
-                            Landscape <code>1920×1080</code> px (16:9) &nbsp;|&nbsp;
-                            Square <code>1080×1080</code> px (1:1)<br>
-                            Toleransi aspek rasio: <code>±5%</code>
+                            Format: MP4. Maks 20MB. Durasi maks 60 detik.
                         </div>
                         @error('video_demo')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -299,32 +293,36 @@
             return;
         }
 
+        showFeedback('videoFeedback', 'info',
+            `<i class="fas fa-spinner fa-spin"></i> Loading video metadata...`);
+
         const url = URL.createObjectURL(file);
         videoEl.src = url;
         preview.style.display = 'block';
 
+        // Set timeout for metadata loading
+        const metadataTimeout = setTimeout(() => {
+            if (!videoEl.videoWidth) {
+                showFeedback('videoFeedback', 'warning',
+                    `<i class="fas fa-exclamation-circle"></i> Tidak bisa membaca metadata video. File mungkin corrupt atau format tidak mendukung.`);
+                setInputError(this, false);
+            }
+        }, 5000);
+
         videoEl.onloadedmetadata = () => {
+            clearTimeout(metadataTimeout);
+            
             const w  = videoEl.videoWidth;
             const h  = videoEl.videoHeight;
             const dur = videoEl.duration;
             const errors = [];
 
-            // Duration check
+            // Duration check only
             if (dur > MAX_VIDEO_DURATION) {
                 errors.push(`Durasi video <strong>${dur.toFixed(1)} detik</strong> melebihi batas 60 detik.`);
             }
 
-            // Ratio check
-            const matched = isRatioAllowed(w, h, VIDEO_RATIOS);
-            if (!matched) {
-                errors.push(
-                    `Dimensi <strong>${w}×${h} px</strong> tidak sesuai.<br>
-                     Rasio yang diterima:<br>
-                     ${VIDEO_RATIOS.map(r => '• ' + r.label).join('<br>')}`
-                );
-            }
-
-            infoEl.textContent = `Dimensi: ${w} × ${h} px | Durasi: ${dur.toFixed(1)} dtk | Rasio: ${(w/h).toFixed(3)}`;
+            infoEl.textContent = `Dimensi: ${w} × ${h} px | Durasi: ${dur.toFixed(1)} dtk | Size: ${(file.size/1024/1024).toFixed(2)} MB | Format: ${file.type || 'unknown'}`;
 
             if (errors.length) {
                 showFeedback('videoFeedback', 'danger',
@@ -332,9 +330,16 @@
                 setInputError(document.getElementById('videoInput'), true);
             } else {
                 showFeedback('videoFeedback', 'success',
-                    `<i class="fas fa-check-circle"></i> Video valid — ${matched.label} (${w}×${h} px, ${dur.toFixed(1)} dtk)`);
+                    `<i class="fas fa-check-circle"></i> Video valid (${w}×${h} px, ${dur.toFixed(1)} dtk)`);
                 setInputError(document.getElementById('videoInput'), false);
             }
+        };
+
+        videoEl.onerror = () => {
+            clearTimeout(metadataTimeout);
+            showFeedback('videoFeedback', 'danger',
+                `<i class="fas fa-times-circle"></i> Gagal membaca file video. File mungkin corrupt atau format tidak didukung.`);
+            setInputError(this, true);
         };
     });
 
@@ -347,6 +352,16 @@
         errList.innerHTML = '';
         errBox.classList.add('d-none');
 
+        // Debug: Log form data
+        const videoInput = document.getElementById('videoInput');
+        const videoFile = videoInput.files[0];
+        console.log('=== Form Submit Debug ===');
+        console.log('Video file selected:', videoFile ? videoFile.name : 'NONE');
+        console.log('Video file size:', videoFile ? videoFile.size : 'N/A');
+        console.log('Form enctype:', this.getAttribute('enctype'));
+        console.log('Video input value:', videoInput.value);
+        console.log('Video input files:', videoInput.files.length);
+
         // Required fields
         if (!document.getElementById('categorySelect').value) {
             errors.push('Kategori wajib dipilih.');
@@ -357,7 +372,6 @@
 
         // Check any invalid file inputs
         const thumbInput = document.getElementById('thumbnailInput');
-        const videoInput = document.getElementById('videoInput');
         if (thumbInput.classList.contains('is-invalid')) {
             errors.push('Perbaiki file Thumbnail terlebih dahulu (dimensi atau ukuran tidak sesuai).');
         }
@@ -381,8 +395,23 @@
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+        
+        console.log('Form validated, submitting...');
     });
 
 })();
+</script>
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    tinymce.init({
+        selector: 'textarea[name=description]',
+        menubar: false,
+        plugins: 'lists link paste autoresize',
+        toolbar: 'undo redo | bold italic underline | bullist numlist | alignleft aligncenter alignright | removeformat',
+        branding: false,
+        height: 250,
+        statusbar: false,
+        content_style: 'body { font-family: Lato, sans-serif; font-size: 14px; color: #333; }'
+    });
 </script>
 @endsection

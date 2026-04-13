@@ -27,4 +27,16 @@ class CompanyController extends Controller
 
         return view('company', compact('heroContents', 'bannerContents', 'promoContents', 'invitationCategories'));
     }
+
+    public function catalog($slug)
+    {
+        $invitationCategories = InvitationCategory::with(['products' => function ($query) {
+            $query->where('is_active', true);
+        }])->get();
+
+        $selectedCategory = $invitationCategories->firstWhere('slug', $slug);
+        $products = $selectedCategory ? $selectedCategory->products : collect();
+
+        return view('company-catalog', compact('invitationCategories', 'selectedCategory', 'slug', 'products'));
+    }
 }

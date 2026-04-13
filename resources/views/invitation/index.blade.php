@@ -12,7 +12,7 @@
 
 @if(in_array(auth()->user()->role, ['admin', 'cashier']))
 <div class="row mb-3">
-    <div class="col-12 d-flex gap-2">
+    <div class="col-12 d-flex gap-2 flex-wrap">
         <a href="{{ auth()->user()->role === 'admin' ? route('admin.invitation.create') : route('cashier.invitation.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Tambah Produk
         </a>
@@ -23,7 +23,31 @@
 </div>
 @endif
 
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="admin-category-tabs d-flex flex-wrap gap-2 align-items-center">
+            <button type="button" class="btn btn-outline-primary admin-filter-tab active" data-target="all">Semua Kategori</button>
+            @foreach($categories as $category)
+                <button type="button" class="btn btn-outline-primary admin-filter-tab" data-target="{{ $category->slug }}">{{ $category->name }}</button>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-category-tabs .admin-filter-tab.active {
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+    }
+    .admin-filter-tab {
+        border-radius: 999px;
+        font-weight: 600;
+    }
+</style>
+
 @foreach($categories as $category)
+<div class="category-section" data-category="{{ $category->slug }}">
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
         <h5 class="mb-0">
@@ -191,4 +215,29 @@
     </div>
 </div>
 @endif
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.admin-filter-tab');
+        const sections = document.querySelectorAll('.category-section');
+
+        function setActive(target) {
+            tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.target === target);
+            });
+            sections.forEach(section => {
+                section.style.display = (target === 'all' || section.dataset.category === target) ? 'block' : 'none';
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                setActive(this.dataset.target);
+            });
+        });
+
+        setActive('all');
+    });
+</script>
 @endsection

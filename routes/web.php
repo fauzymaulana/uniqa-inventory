@@ -67,6 +67,7 @@ Route::post('/labels/export', [BarcodeController::class, 'exportLabels'])->name(
 
 // Company Profile Website (public)
 Route::get('/company', [App\Http\Controllers\CompanyController::class, 'index'])->name('company.index');
+Route::get('/company/catalog/{slug}', [App\Http\Controllers\CompanyController::class, 'catalog'])->name('company.catalog');
 
 Route::middleware(['auth', 'activity'])->group(function () {
     // Admin Routes
@@ -191,3 +192,5 @@ Route::middleware(['auth', 'activity'])->group(function () {
 
 });
 
+// Public Company3 Landing Page
+Route::get('/company3', [App\Http\Controllers\Company3Controller::class, 'index'])->name('company3.index');

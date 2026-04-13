@@ -1,26 +1,26 @@
-{{-- resources/views/company/_navbar.blade.php --}}
+{{-- resources/views/company3/sections/navbar.blade.php --}}
 <nav id="c3Navbar" class="c3-navbar navbar navbar-expand-md fixed-top">
     <div class="container">
 
-        <a href="#hero" class="navbar-brand">
-            <img src="{{ asset('images/img_logo.png') }}" alt="Wedding by Uniqa" class="c3-navbar-logo">
+        <a href="#beranda" class="navbar-brand c3-brand">
+            Everlasting<span class="c3-brand-dot">.</span>
         </a>
 
         <button class="navbar-toggler c3-toggler" type="button"
-            data-bs-toggle="collapse" data-bs-target="#companyNavMenu"
-            aria-controls="companyNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+            data-bs-toggle="collapse" data-bs-target="#c3NavMenu"
+            aria-controls="c3NavMenu" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fas fa-bars"></i>
         </button>
 
-        <div class="collapse navbar-collapse" id="companyNavMenu">
+        <div class="collapse navbar-collapse" id="c3NavMenu">
             <ul class="navbar-nav ms-auto align-items-md-center gap-md-1 py-3 py-md-0">
                 @php
                     $navLinks = [
-                        ['label' => 'Beranda',    'href' => '#hero'],
+                        ['label' => 'Beranda',    'href' => '#beranda'],
                         ['label' => 'Layanan',    'href' => '#layanan'],
                         ['label' => 'Fitur',      'href' => '#fitur'],
                         ['label' => 'Cara Kerja', 'href' => '#cara-kerja'],
-                        ['label' => 'Katalog',    'href' => '#katalog'],
+                        ['label' => 'Portofolio', 'href' => '#portofolio'],
                         ['label' => 'FAQ',        'href' => '#faq'],
                     ];
                 @endphp
@@ -30,7 +30,7 @@
                     </li>
                 @endforeach
                 <li class="nav-item mt-2 mt-md-0 ms-md-3">
-                    <a href="https://wa.me/6285362533619" target="_blank" rel="noopener noreferrer"
+                    <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"
                         class="btn c3-btn-cta">
                         Hubungi Kami
                     </a>

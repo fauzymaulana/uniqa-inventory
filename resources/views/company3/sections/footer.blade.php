@@ -1,4 +1,4 @@
-{{-- resources/views/company/_footer.blade.php --}}
+{{-- resources/views/company3/sections/footer.blade.php --}}
 <footer class="c3-footer">
     <div class="container">
 
@@ -6,9 +6,9 @@
 
             {{-- Brand --}}
             <div class="col-md-4">
-                <a href="#hero">
-                    <img src="{{ asset('images/img_logo.png') }}" alt="Wedding by Uniqa" class="c3-footer-logo mb-3">
-                </a>
+                <h3 class="c3-footer-brand">
+                    Everlasting<span class="c3-brand-dot">.</span>
+                </h3>
                 <p class="c3-footer-desc">
                     Solusi undangan pernikahan digital dan cetak premium.
                     Wujudkan hari istimewa Anda dengan desain yang memukau.
@@ -19,7 +19,7 @@
             <div class="col-6 col-md-2 offset-md-1">
                 <h4 class="c3-footer-heading">Menu</h4>
                 <ul class="c3-footer-links">
-                    @foreach (['Beranda' => '#hero', 'Layanan' => '#layanan', 'Katalog' => '#katalog', 'About' => '#about', 'FAQ' => '#faq'] as $label => $href)
+                    @foreach (['Beranda' => '#beranda', 'Layanan' => '#layanan', 'Fitur' => '#fitur', 'Portofolio' => '#portofolio', 'FAQ' => '#faq'] as $label => $href)
                         <li><a href="{{ $href }}">{{ $label }}</a></li>
                     @endforeach
                 </ul>
@@ -30,13 +30,18 @@
                 <h4 class="c3-footer-heading">Hubungi Kami</h4>
                 <ul class="c3-footer-contacts">
                     <li>
-                        <a href="https://wa.me/6285362533619" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-whatsapp"></i> +62 853-6253-3619
+                        <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-comment-dots"></i> +62 812-3456-7890
                         </a>
                     </li>
                     <li>
-                        <a href="https://instagram.com/uniqa.id" target="_blank" rel="noopener noreferrer">
-                            <i class="fab fa-instagram"></i> @uniqa.id
+                        <a href="mailto:hello@everlasting.id">
+                            <i class="fas fa-envelope"></i> hello@everlasting.id
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram"></i> @everlasting.invitation
                         </a>
                     </li>
                     <li class="c3-footer-location">
@@ -48,7 +53,7 @@
         </div>
 
         <div class="c3-footer-bottom">
-            Copyright &copy; 2015&ndash;{{ date('Y') }}, Uniqa.id &mdash; All Rights Reserved.
+            &copy; {{ date('Y') }} Everlasting Invitation. All rights reserved.
         </div>
 
     </div>

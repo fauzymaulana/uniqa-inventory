@@ -14,9 +14,9 @@ document.addEventListener('DOMContentLoaded', function () {
     AOS.init({ once: true, duration: 600, offset: 80 });
 
     /* ---- Navbar Scroll Effect ---- */
-    var nav = document.getElementById('mainNav');
+    var nav = document.getElementById('c3Navbar');
     window.addEventListener('scroll', function () {
-        nav.classList.toggle('scrolled', window.scrollY > 50);
+        if (nav) nav.classList.toggle('scrolled', window.scrollY > 50);
     });
 
     /* ---- Scroll to Top Button ---- */
@@ -127,6 +127,24 @@ document.addEventListener('DOMContentLoaded', function () {
         function applyTransform() {
             track.style.transform =
                 'rotateX(' + RX + 'deg) rotateY(' + RY + 'deg) translateX(' + pos + 'px)';
+            
+            // Apply scale to individual items based on their distance from viewport center
+            var items = track.querySelectorAll('.hero-carousel-item');
+            var viewportCenter = window.innerWidth / 2;
+            
+            items.forEach(function(item) {
+                var rect = item.getBoundingClientRect();
+                var itemCenter = rect.left + rect.width / 2;
+                var distFromCenter = Math.abs(itemCenter - viewportCenter);
+                
+                // Bell curve scaling: center = biggest (1.4), edges = smallest (0.65)
+                // Using quadratic easing for smooth falloff
+                var maxDist = viewportCenter;
+                var normalized = Math.min(1, distFromCenter / maxDist); // 0 at center, 1 at edges
+                var scale = 1.4 - (normalized * normalized * 0.75); // Quadratic falloff
+                
+                item.style.transform = 'scale(' + Math.max(0.65, scale) + ')';
+            });
         }
 
         function tick() {
@@ -175,6 +193,145 @@ document.addEventListener('DOMContentLoaded', function () {
         /* Kick off */
         applyTransform();
         requestAnimationFrame(tick);
+    })();
+
+    /* ---- Product Detail Modal ---- */
+    (function () {
+        var modal     = document.getElementById('productModal');
+        var pmMedia   = document.getElementById('pmMedia');
+        var pmName    = document.getElementById('pmName');
+        var pmDesc    = document.getElementById('pmDesc');
+        var pmPrice   = document.getElementById('pmPrice');
+        var pmActions = document.getElementById('pmActions');
+
+        if (!modal) return;
+
+        var bsModal = new bootstrap.Modal(modal);
+
+        // Stop video when modal closes
+        modal.addEventListener('hidden.bs.modal', function () {
+            var vid = pmMedia.querySelector('video');
+            if (vid) { vid.pause(); vid.currentTime = 0; }
+        });
+
+        document.querySelectorAll('.product-card-clickable').forEach(function (card) {
+            function openModal() {
+                var name    = card.dataset.name    || '';
+                var desc    = card.dataset.desc    || '';
+                var price   = card.dataset.price   || '';
+                var video   = card.dataset.video   || '';
+                var image   = card.dataset.image   || '';
+                var link    = card.dataset.link    || '';
+                var wa      = card.dataset.wa      || '';
+
+                // Populate name / desc / price
+                pmName.textContent  = name;
+                pmDesc.textContent  = desc;
+                pmDesc.style.display = desc ? '' : 'none';
+                pmPrice.textContent = price ? 'Rp ' + price : '';
+
+                // Build actions
+                pmActions.innerHTML = '';
+                if (wa) {
+                    pmActions.innerHTML +=
+                        '<a href="https://wa.me/6285362533619?text=' + wa + '" target="_blank" rel="noopener" class="pm-btn-wa">'
+                        + '<i class="fab fa-whatsapp"></i> Pesan Sekarang</a>';
+                }
+                if (link) {
+                    pmActions.innerHTML +=
+                        '<a href="' + link + '" target="_blank" rel="noopener" class="pm-btn-preview">'
+                        + '<i class="fas fa-eye"></i> Lihat Demo</a>';
+                }
+
+                // Build media
+                pmMedia.innerHTML = '';
+                if (video) {
+                    // Video player
+                    var vid = document.createElement('video');
+                    vid.controls  = true;
+                    vid.autoplay  = true;
+                    vid.playsinline = true;
+                    vid.loop      = true;
+                    var src = document.createElement('source');
+                    src.src  = video;
+                    src.type = 'video/mp4';
+                    vid.appendChild(src);
+                    pmMedia.appendChild(vid);
+                } else if (image) {
+                    // Image swiper (single image; extend array for multi-image future support)
+                    var images = [image];
+                    var current = 0;
+
+                    var wrap = document.createElement('div');
+                    wrap.className = 'pm-swiper';
+
+                    var track = document.createElement('div');
+                    track.className = 'pm-swiper-track';
+
+                    images.forEach(function (src) {
+                        var img = document.createElement('img');
+                        img.src = src;
+                        img.alt = name;
+                        track.appendChild(img);
+                    });
+                    wrap.appendChild(track);
+
+                    function goTo(idx) {
+                        current = (idx + images.length) % images.length;
+                        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+                        wrap.querySelectorAll('.pm-swiper-dot').forEach(function (d, i) {
+                            d.classList.toggle('active', i === current);
+                        });
+                    }
+
+                    if (images.length > 1) {
+                        var btnPrev = document.createElement('button');
+                        btnPrev.className   = 'pm-swiper-btn pm-swiper-prev';
+                        btnPrev.innerHTML   = '<i class="fas fa-chevron-left"></i>';
+                        btnPrev.addEventListener('click', function () { goTo(current - 1); });
+
+                        var btnNext = document.createElement('button');
+                        btnNext.className   = 'pm-swiper-btn pm-swiper-next';
+                        btnNext.innerHTML   = '<i class="fas fa-chevron-right"></i>';
+                        btnNext.addEventListener('click', function () { goTo(current + 1); });
+
+                        var dots = document.createElement('div');
+                        dots.className = 'pm-swiper-dots';
+                        images.forEach(function (_, i) {
+                            var dot = document.createElement('div');
+                            dot.className = 'pm-swiper-dot' + (i === 0 ? ' active' : '');
+                            dot.addEventListener('click', function () { goTo(i); });
+                            dots.appendChild(dot);
+                        });
+
+                        wrap.appendChild(btnPrev);
+                        wrap.appendChild(btnNext);
+                        wrap.appendChild(dots);
+                    }
+
+                    // Touch/swipe support
+                    var touchStartX = 0;
+                    wrap.addEventListener('touchstart', function (e) {
+                        touchStartX = e.touches[0].clientX;
+                    }, { passive: true });
+                    wrap.addEventListener('touchend', function (e) {
+                        var diff = touchStartX - e.changedTouches[0].clientX;
+                        if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+                    }, { passive: true });
+
+                    pmMedia.appendChild(wrap);
+                } else {
+                    pmMedia.innerHTML = '<div class="pm-media-placeholder"><i class="fas fa-image"></i></div>';
+                }
+
+                bsModal.show();
+            }
+
+            card.addEventListener('click', openModal);
+            card.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
+            });
+        });
     })();
 
 });

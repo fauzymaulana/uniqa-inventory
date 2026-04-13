@@ -14,21 +14,27 @@
 
     @include('company._hero')
 
+    @include('company._services')
+
     @include('company._banner')
 
     @include('company._about')
 
-    @include('company._faq')
-
     @include('company._categories')
+
+    <!-- @include('company._products') -->
 
     @include('company._stats')
 
-    @include('company._products')
-
     @include('company._features')
 
+    @include('company._how_it_works')
+
+    @include('company._faq')
+
     @include('company._payment')
+
+    @include('company._cta')
 
     @include('company._footer')
 

@@ -3,15 +3,18 @@
     <div class="container">
         <div class="row align-items-center g-5">
 
-            {{-- Benefit List --}}
-            <div class="col-lg-6" data-aos="fade-right" data-aos-duration="700">
+        {{-- About Heading & Benefits --}}
+            <div class="col-lg-6" data-aos="fade-left" data-aos-duration="700" data-aos-delay="150">
+                <h2 class="about-title-large mb-4">
+                    <span></span><br>
+                </h2>
                 @php
                     $benefits = [
-                        ['icon' => 'fas fa-check', 'title' => 'Garansi UANG KEMBALI 100%',                   'desc' => 'Kepuasan Anda adalah prioritas utama kami.'],
-                        ['icon' => 'fas fa-check', 'title' => 'Desain Eksklusif &amp; Harga Bersahabat',     'desc' => 'Tampilan premium tanpa harus mahal.'],
-                        ['icon' => 'fas fa-check', 'title' => 'Full Service (Respon Cepat)',                  'desc' => 'Tim kami siap membantu kapan saja.'],
-                        ['icon' => 'fas fa-check', 'title' => 'Ramah Lingkungan',                             'desc' => 'Undangan digital mengurangi penggunaan kertas.'],
-                        ['icon' => 'fas fa-check', 'title' => 'Undangan Web bisa jadi Album Nikah Seumur Hidup', 'desc' => 'Kenangan abadi dalam format digital.'],
+                        ['icon' => 'fas fa-heart', 'title' => 'Garansi UANG KEMBALI 100%',                   'desc' => 'Kepuasan Anda adalah prioritas utama kami.'],
+                        ['icon' => 'fas fa-heart', 'title' => 'Desain Eksklusif &amp; Harga Bersahabat',     'desc' => 'Tampilan premium tanpa harus mahal.'],
+                        ['icon' => 'fas fa-heart', 'title' => 'Full Service (Respon Cepat)',                  'desc' => 'Tim kami siap membantu kapan saja.'],
+                        ['icon' => 'fas fa-heart', 'title' => 'Ramah Lingkungan',                             'desc' => 'Undangan digital mengurangi penggunaan kertas.'],
+                        ['icon' => 'fas fa-heart', 'title' => 'Undangan Web bisa jadi Album Nikah Seumur Hidup', 'desc' => 'Kenangan abadi dalam format digital.'],
                     ];
                 @endphp
 
@@ -23,13 +26,28 @@
                         </div>
                     </div>
                 @endforeach
+
+                <p class="text-muted mb-3 mt-3">
+                    Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash;
+                    dengan kualitas terbaik dan layanan personal yang memuaskan.
+                </p>
+
+                <a
+                    href="https://wa.me/6285362533619?text=Halo%20Uniqa%2C%20saya%20ingin%20pesan%20undangan%20pernikahan"
+                    class="btn-brown"
+                    target="_blank"
+                    rel="noopener"
+                >
+                    <i class="fab fa-whatsapp me-1"></i> Pesan Sekarang Juga!
+                </a>
             </div>
 
-            {{-- About Headline & Polaroid Gallery --}}
-            <div class="col-lg-6" data-aos="fade-left" data-aos-duration="700" data-aos-delay="150">
-                <h2 class="about-title mb-3">Kenapa <span>Uniqa.id</span>?</h2>
-
-                <div class="polaroid-gallery mb-3">
+            {{-- Polaroid Gallery (Large) --}}
+            <div class="col-lg-6" data-aos="fade-right" data-aos-duration="700">
+                <h2 class="about-title-large mb-4">
+                    Kenapa<br><span>Uniqa.id?</span>
+                </h2>
+                <div class="polaroid-gallery-large">
                     @if ($promoContents->count())
                         @foreach ($promoContents->take(4) as $promo)
                             <div class="polaroid">
@@ -54,21 +72,9 @@
                         @endfor
                     @endif
                 </div>
-
-                <p class="text-muted mb-3">
-                    Kami menghadirkan solusi undangan pernikahan lengkap &mdash; dari digital hingga cetak &mdash;
-                    dengan kualitas terbaik dan layanan personal yang memuaskan.
-                </p>
-
-                <a
-                    href="https://wa.me/6281234567890?text=Halo%20Uniqa%2C%20saya%20ingin%20pesan%20undangan%20pernikahan"
-                    class="btn-teal"
-                    target="_blank"
-                    rel="noopener"
-                >
-                    <i class="fab fa-whatsapp me-1"></i> Pesan Sekarang Juga!
-                </a>
             </div>
+
+            
 
         </div>
     </div>

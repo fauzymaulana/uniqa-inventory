@@ -1,5 +1,5 @@
-{{-- resources/views/company/_hero.blade.php --}}
-<section id="hero" class="c3-hero">
+{{-- resources/views/company3/sections/hero.blade.php --}}
+<section id="beranda" class="c3-hero">
 
     <div class="c3-hero-bg-warm"></div>
     <div class="c3-hero-bg-blob"></div>
@@ -26,18 +26,17 @@
                 </h1>
 
                 <p class="c3-hero-sub">
-                    Wujudkan undangan pernikahan impian Anda &mdash; elegan, personal, dan mudah dibagikan.
+                    Wujudkan undangan impian Anda &mdash; elegan, personal, dan mudah dibagikan.
                     Dari desain digital hingga cetak premium, kami siap membuat hari istimewa Anda sempurna.
                 </p>
 
                 <div class="c3-hero-actions">
-                    <a href="https://wa.me/6285362533619?text=Halo%20Uniqa.id%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20undangan%20pernikahan"
-                        target="_blank" rel="noopener noreferrer"
+                    <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer"
                         class="btn c3-btn-primary">
                         Pesan Sekarang <i class="fas fa-arrow-right ms-2"></i>
                     </a>
-                    <a href="#katalog" class="btn c3-btn-outline">
-                        Lihat Katalog
+                    <a href="#portofolio" class="btn c3-btn-outline">
+                        Lihat Portofolio
                     </a>
                 </div>
             </div>
@@ -45,15 +44,9 @@
             {{-- Right: Image --}}
             <div class="col-lg-6" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
                 <div class="c3-hero-img-wrap">
-                    @if (isset($heroContents) && $heroContents->count())
-                        <img src="{{ asset('storage/konten/' . $heroContents->first()->image) }}"
-                            alt="{{ $heroContents->first()->title }}"
-                            class="c3-hero-img" loading="eager">
-                    @else
-                        <img src="{{ asset('images/img_hero_default.jpg') }}"
-                            alt="Koleksi undangan pernikahan digital dan cetak"
-                            class="c3-hero-img">
-                    @endif
+                    <img src="{{ asset('images/template.png') }}"
+                        alt="Koleksi undangan pernikahan digital dan cetak"
+                        class="c3-hero-img">
 
                     <div class="c3-float-card c3-float-bottom-left c3-float-anim-1">
                         <p class="c3-float-number">1000+</p>
