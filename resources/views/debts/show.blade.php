@@ -179,7 +179,7 @@
                                             {{ $debt->recorder?->name ?? '-' }}
                                         </span>
                                         <div class="text-muted" style="font-size:.7rem;">
-                                            {{ $debt->created_at->translatedFormat('d M Y, H:i') }}
+                                            {{ $debt->created_at->timezone(config('app.timezone'))->translatedFormat('d M Y, H:i') }}
                                         </div>
                                     </td>
 

@@ -69,6 +69,15 @@
         gap: 5px;
     }
     .cart-item-qty button { padding: 2px 8px; font-size: 0.8rem; }
+    .cart-item-qty input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: none;
+    }
+    .cart-item-qty input[type="number"]::-webkit-outer-spin-button,
+    .cart-item-qty input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
     .cart-summary {
         background-color: #f8f9fa;
         padding: 15px;
@@ -780,6 +789,24 @@ function updateQuantity(productId, delta) {
     updateCart();
 }
 
+function setQuantity(productId, rawValue) {
+    const item = cart.find(item => item.product_id === productId);
+    if (!item) return;
+
+    let quantity = parseInt(rawValue, 10);
+    if (Number.isNaN(quantity) || quantity < 1) {
+        quantity = 1;
+    }
+
+    if (quantity > item.stock) {
+        quantity = item.stock;
+        showToast('Stok tidak cukup!', 'warning');
+    }
+
+    item.quantity = quantity;
+    updateCart();
+}
+
 function removeItem(productId) {
     cart = cart.filter(item => item.product_id !== productId);
     updateCart();
@@ -794,7 +821,13 @@ function updateCart() {
             </div>
             <div class="cart-item-qty">
                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.product_id}, -1)">-</button>
-                <input type="text" value="${item.quantity}" readonly style="width:35px;text-align:center;border:1px solid #ddd;">
+                <input type="number"
+                       min="1"
+                       max="${item.stock}"
+                       inputmode="numeric"
+                       value="${item.quantity}"
+                       onchange="setQuantity(${item.product_id}, this.value)"
+                       style="width:60px;text-align:center;border:1px solid #ddd;">
                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.product_id}, 1)">+</button>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${item.product_id})"><i class="fas fa-trash"></i></button>
             </div>
