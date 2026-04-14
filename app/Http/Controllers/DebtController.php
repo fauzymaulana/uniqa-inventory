@@ -25,7 +25,7 @@ class DebtController extends Controller
             ->withSum('debts', 'amount')
             ->withSum(['debts as unpaid_total' => fn($q) => $q->where('is_paid', false)], 'amount')
             ->withSum(['debts as unpaid_paid'  => fn($q) => $q->where('is_paid', false)], 'amount_paid')
-            ->when($search, fn($q) => $q->where('name', 'ilike', "%{$search}%"))
+            ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%"))
             ->when($filter === 'unpaid', fn($q) => $q->whereHas('debts', fn($q2) => $q2->where('is_paid', false)))
             ->when($filter === 'paid', fn($q) => $q->whereHas('debts')->whereDoesntHave('debts', fn($q2) => $q2->where('is_paid', false)))
             ->latest()

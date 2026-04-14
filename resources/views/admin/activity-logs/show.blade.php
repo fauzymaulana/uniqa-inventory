@@ -19,7 +19,7 @@
             <div class="card-body">
                 <h5 class="card-title">Informasi Utama</h5>
                 <table class="table table-sm">
-                    <tr><th width="180">Waktu</th><td>{{ $activityLog->created_at->format('d M Y H:i:s') }}</td></tr>
+                    <tr><th width="180">Waktu</th><td><span class="local-datetime" data-utc="{{ $activityLog->created_at->toIso8601String() }}">{{ $activityLog->created_at->format('d M Y H:i:s') }}</span></td></tr>
                     <tr><th>Level</th><td>{{ strtoupper($activityLog->level) }}</td></tr>
                     <tr><th>Event</th><td>{{ $activityLog->event }}</td></tr>
                     <tr><th>User</th><td>{{ $activityLog->user_name ?? 'Guest' }} @if($activityLog->user_role) ({{ $activityLog->user_role }}) @endif</td></tr>
@@ -55,4 +55,15 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.local-datetime[data-utc]').forEach(function (el) {
+        var d = new Date(el.dataset.utc);
+        var date = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        var time = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+        el.textContent = date + ' ' + time;
+    });
+});
+</script>
 @endsection

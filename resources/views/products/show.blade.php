@@ -4,33 +4,33 @@
 
 @section('content')
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-12 col-lg-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-box"></i> {{ $product->name }}</h5>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
-                    <div class="col-md-4">
+                    <div class="col-4 col-md-4">
                         <h6>SKU</h6>
                         <p class="fw-bold">{{ $product->sku }}</p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-4 col-md-4">
                         <h6>Kategori</h6>
                         <p class="fw-bold">{{ $product->category->name }}</p>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-4 col-md-4">
                         <h6>Harga</h6>
                         <p class="fw-bold text-success">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                     </div>
                 </div>
 
                 <div class="row mb-4">
-                    <div class="col-md-4">
+                    <div class="col-12 col-md-4">
                         <h6>Stok Saat Ini</h6>
                         <p class="fw-bold">{{ $product->stock }} pcs</p>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-12 col-md-8">
                         <h6>Barcode & QR Code</h6>
                         <div class="row">
                             <div class="col-6 text-center">
@@ -71,7 +71,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
         <div class="card">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0"><i class="fas fa-history"></i> Riwayat Stok</h5>

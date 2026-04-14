@@ -2,7 +2,7 @@
 <section class="features-section" id="features">
     <div class="container">
         <h2 class="features-title" data-aos="fade-up">
-            Keunggulan Desain <span>Weddingku.Vip</span>
+            Keunggulan Desain <span>Uniqa.id</span>
         </h2>
 
         <div class="row g-4">

@@ -3,8 +3,8 @@
 @section('title', 'Edit Kategori')
 
 @section('content')
-<div class="row">
-    <div class="col-md-6 offset-md-3">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
         <h2><i class="fas fa-edit"></i> Edit Kategori</h2>
         <hr>
 

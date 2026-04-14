@@ -3,8 +3,8 @@
 @section('title', 'Tambah Pengeluaran')
 
 @section('content')
-<div class="row">
-    <div class="col-md-8 offset-md-2">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
         <a href="{{ auth()->user()->role === 'admin' ? route('admin.expenses.index') : route('cashier.expenses.index') }}" class="btn btn-secondary mb-3">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -121,14 +121,23 @@
 const EXPENSE_DB_NAME = 'uniqa_expense_offline';
 const EXPENSE_STORE = 'pending_expenses';
 
+function generateOfflineId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
 function openExpenseDB() {
     return new Promise((resolve, reject) => {
-        const req = indexedDB.open(EXPENSE_DB_NAME, 1);
+        const req = indexedDB.open(EXPENSE_DB_NAME, 2);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(EXPENSE_STORE)) {
-                db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            if (db.objectStoreNames.contains(EXPENSE_STORE)) {
+                db.deleteObjectStore(EXPENSE_STORE);
             }
+            db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id' });
         };
         req.onsuccess = (e) => resolve(e.target.result);
         req.onerror = (e) => reject(e);
@@ -178,7 +187,8 @@ async function syncPendingExpenses() {
         });
         const result = await resp.json();
         if (result.success) {
-            for (const s of result.synced) {
+            const synced = result.data?.synced ?? [];
+            for (const s of synced) {
                 await new Promise((resolve) => {
                     const tx = db.transaction(EXPENSE_STORE, 'readwrite');
                     tx.objectStore(EXPENSE_STORE).delete(s.offline_id);
@@ -195,6 +205,7 @@ document.getElementById('expenseForm').addEventListener('submit', async function
     e.preventDefault();
 
     const data = {
+        offline_id: generateOfflineId(),
         activity: document.getElementById('expActivity').value,
         type: document.getElementById('expType').value,
         category_id: document.getElementById('expCategoryId').value || null,

@@ -3,8 +3,8 @@
 @section('title', 'Edit Kasir')
 
 @section('content')
-<div class="row">
-    <div class="col-md-6">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6">
         <div class="card">
             <div class="card-header">Edit Akun Kasir</div>
             <div class="card-body">

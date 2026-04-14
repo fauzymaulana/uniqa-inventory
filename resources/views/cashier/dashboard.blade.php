@@ -10,8 +10,8 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
+<div class="row g-3">
+    <div class="col-6 col-md-4">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-dollar-sign"></i> Penjualan Hari Ini</h5>
@@ -21,7 +21,7 @@
         </div>
     </div>
     
-    <div class="col-md-4">
+    <div class="col-6 col-md-4">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-receipt"></i> Transaksi Hari Ini</h5>
@@ -31,19 +31,19 @@
         </div>
     </div>
     
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-exclamation-triangle"></i> Stok Rendah</h5>
                 <div class="number">{{ $lowStockProducts }}</div>
-                <small class="text-muted">Produk dengan stok < 10</small>
+                <small class="text-muted">Produk dengan stok &lt; 10</small>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
@@ -58,20 +58,20 @@
 </div>
 
 <div class="row mt-4">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-cash-register"></i> Menu Kasir</h5>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 col-lg-4">
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-lg-4">
                         <a href="{{ route('cashier.pos') }}" class="btn btn-lg btn-outline-primary w-100 py-3">
                             <i class="fas fa-shopping-cart fa-2x"></i><br>
                             <strong>Transaksi Baru</strong>
                         </a>
                     </div>
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-12 col-md-6 col-lg-4">
                         <a href="{{ route('cashier.history') }}" class="btn btn-lg btn-outline-info w-100 py-3">
                             <i class="fas fa-history fa-2x"></i><br>
                             <strong>Riwayat Transaksi</strong>

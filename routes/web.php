@@ -67,6 +67,7 @@ Route::post('/labels/export', [BarcodeController::class, 'exportLabels'])->name(
 
 // Company Profile Website (public)
 Route::get('/company', [App\Http\Controllers\CompanyController::class, 'index'])->name('company.index');
+Route::get('/company/catalog/{slug}', [App\Http\Controllers\CompanyController::class, 'catalog'])->name('company.catalog');
 
 Route::middleware(['auth', 'activity'])->group(function () {
     // Admin Routes
@@ -120,6 +121,11 @@ Route::middleware(['auth', 'activity'])->group(function () {
         Route::put('invitation-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('invitation.kategori.update');
         Route::delete('invitation-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('invitation.kategori.destroy');
 
+        // Invitation Sub-Categories
+        Route::post('invitation-kategori/{categoryId}/sub-kategori', [InvitationController::class, 'storeSubCategory'])->name('invitation.sub-kategori.store');
+        Route::put('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'updateSubCategory'])->name('invitation.sub-kategori.update');
+        Route::delete('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'destroySubCategory'])->name('invitation.sub-kategori.destroy');
+
         // Content Management (admin access)
         Route::resource('content', ContentController::class);
 
@@ -157,6 +163,11 @@ Route::middleware(['auth', 'activity'])->group(function () {
         Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
         Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
 
+        // Invitation Sub-Categories (cashier: manage sub-categories)
+        Route::post('invitation-kategori/{categoryId}/sub-kategori', [InvitationController::class, 'storeSubCategory'])->name('invitation.sub-kategori.store');
+        Route::put('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'updateSubCategory'])->name('invitation.sub-kategori.update');
+        Route::delete('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'destroySubCategory'])->name('invitation.sub-kategori.destroy');
+
         // Content Create (cashier access)
         Route::get('content/create', [ContentController::class, 'create'])->name('content.create');
         Route::post('content', [ContentController::class, 'store'])->name('content.store');
@@ -191,3 +202,5 @@ Route::middleware(['auth', 'activity'])->group(function () {
 
 });
 
+// Public Company3 Landing Page
+Route::get('/company3', [App\Http\Controllers\Company3Controller::class, 'index'])->name('company3.index');

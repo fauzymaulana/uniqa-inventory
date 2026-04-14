@@ -9,11 +9,25 @@
         grid-template-columns: 2fr 1fr;
         gap: 20px;
     }
+    @media (max-width: 991.98px) {
+        .pos-container {
+            grid-template-columns: 1fr;
+        }
+        .pos-container > div:last-child {
+            order: -1; /* Cart tampil di atas produk pada mobile */
+        }
+    }
     .product-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
         margin-bottom: 20px;
+    }
+    @media (max-width: 575.98px) {
+        .product-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+        .product-card { padding: 10px 8px; }
+        .product-name { font-size: 0.8rem; }
+        .product-price { font-size: 0.95rem; }
     }
     .product-card {
         border: 1px solid #ddd;
@@ -55,6 +69,15 @@
         gap: 5px;
     }
     .cart-item-qty button { padding: 2px 8px; font-size: 0.8rem; }
+    .cart-item-qty input[type="number"] {
+        -moz-appearance: textfield;
+        appearance: none;
+    }
+    .cart-item-qty input[type="number"]::-webkit-outer-spin-button,
+    .cart-item-qty input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
     .cart-summary {
         background-color: #f8f9fa;
         padding: 15px;
@@ -182,6 +205,10 @@
     }
     .sync-status-bar.online { background: #d4edda; color: #155724; }
     .sync-status-bar.offline { background: #fff3cd; color: #856404; }
+    /* Mobile cart toggle */
+    .cart-badge { position: absolute; top: -6px; right: -6px; font-size: .65rem; padding: 2px 5px; }
+    #mobileCartToggleWrapper { display: none; }
+    @media (max-width: 991.98px) { #mobileCartToggleWrapper { display: block; margin-bottom: 12px; } }
 </style>
 @endsection
 
@@ -305,9 +332,29 @@
                         </div>
                     </div>
 
+                    <div class="form-check form-switch mt-3">
+                        <input class="form-check-input" type="checkbox" id="dpSwitch" name="is_dp">
+                        <label class="form-check-label" for="dpSwitch">Aktifkan DP / Buat Hutang</label>
+                    </div>
+                    <div id="dpFields" class="dp-panel" style="display:none;">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Konsumen</label>
+                            <input type="text" id="debtorName" name="debtor_name" class="form-control" placeholder="Masukkan nama konsumen">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">No. HP</label>
+                            <input type="text" id="debtorPhone" name="debtor_phone" class="form-control" placeholder="0812xxxxxxx">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sisa Hutang</label>
+                            <div class="alert alert-success" id="debtAmountDisplay">Rp 0</div>
+                        </div>
+                        <input type="hidden" id="debtDueDate" name="debt_due_date" value="{{ now()->addDays(30)->toDateString() }}">
+                    </div>
+
                     <div class="mt-3">
                         <label class="form-label">Uang Diterima</label>
-                        <input type="number" id="amountReceived" name="amount_received" class="form-control" placeholder="0" step="100" required>
+                        <input type="number" min="0" id="amountReceived" name="amount_received" class="form-control" placeholder="0" step="100" required>
                     </div>
                     <div class="mt-2">
                         <label class="form-label">Potongan (Rp)</label>
@@ -352,8 +399,11 @@
             </div>
             <div class="card-body">
                 <p class="text-muted small mb-2">Transaksi ini belum tersinkronisasi ke server.</p>
-                <button class="btn btn-sm btn-primary w-100" onclick="syncPending()">
+                <button class="btn btn-sm btn-primary w-100 mb-2" onclick="syncPending()">
                     <i class="fas fa-sync-alt me-1"></i> Sinkronkan Sekarang
+                </button>
+                <button class="btn btn-sm btn-outline-danger w-100" onclick="clearAllPending()">
+                    <i class="fas fa-trash me-1"></i> Hapus Semua Pending
                 </button>
             </div>
         </div>
@@ -386,8 +436,21 @@ let scannerTimer = null;
 let currentFacingMode = 'environment'; // default: rear camera
 
 const OFFLINE_DB_NAME = 'uniqa_pos_offline';
-const OFFLINE_DB_VERSION = 1;
+const OFFLINE_DB_VERSION = 2;
 const PENDING_STORE = 'pending_transactions';
+
+// ── Generate UUID (offline_id yang unik per transaksi) ───
+function generateOfflineId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback untuk browser lama
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
 
 // ── IndexedDB ────────────────────────────────────────────
 let db;
@@ -396,9 +459,11 @@ function openDB() {
         const req = indexedDB.open(OFFLINE_DB_NAME, OFFLINE_DB_VERSION);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(PENDING_STORE)) {
-                db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            // Drop lama (integer autoIncrement) dan buat ulang dengan keyPath string (UUID)
+            if (db.objectStoreNames.contains(PENDING_STORE)) {
+                db.deleteObjectStore(PENDING_STORE);
             }
+            db.createObjectStore(PENDING_STORE, { keyPath: 'offline_id' });
         };
         req.onsuccess = (e) => resolve(e.target.result);
         req.onerror = (e) => reject(e);
@@ -477,14 +542,16 @@ async function syncPending() {
         });
         const result = await resp.json();
         if (result.success) {
-            for (const s of result.synced) {
+            const synced = result.data?.synced ?? [];
+            const failed = result.data?.failed ?? [];
+            for (const s of synced) {
                 await deletePending(s.offline_id);
             }
-            if (result.synced.length > 0) {
-                showToast(`✅ ${result.synced.length} transaksi berhasil disinkronkan!`, 'success');
+            if (synced.length > 0) {
+                showToast(`✅ ${synced.length} transaksi berhasil disinkronkan!`, 'success');
             }
-            if (result.failed && result.failed.length > 0) {
-                showToast(`⚠️ ${result.failed.length} transaksi gagal disinkronkan.`, 'warning');
+            if (failed.length > 0) {
+                showToast(`⚠️ ${failed.length} transaksi gagal disinkronkan.`, 'warning');
             }
         }
     } catch (e) {
@@ -505,6 +572,20 @@ async function updatePendingUI() {
         countEl.style.display = count > 0 ? '' : 'none';
     }
     if (card) card.style.display = count > 0 ? '' : 'none';
+}
+
+async function clearAllPending() {
+    if (!confirm('Hapus semua data pending? Gunakan ini hanya jika transaksi sudah berhasil tersimpan di server.')) return;
+    const db = await openDB();
+    return new Promise((resolve) => {
+        const tx = db.transaction(PENDING_STORE, 'readwrite');
+        tx.objectStore(PENDING_STORE).clear();
+        tx.oncomplete = async () => {
+            await updatePendingUI();
+            showToast('Semua data pending telah dihapus.', 'info');
+            resolve();
+        };
+    });
 }
 
 // ── Toast Notification ───────────────────────────────────
@@ -728,6 +809,24 @@ function updateQuantity(productId, delta) {
     updateCart();
 }
 
+function setQuantity(productId, rawValue) {
+    const item = cart.find(item => item.product_id === productId);
+    if (!item) return;
+
+    let quantity = parseInt(rawValue, 10);
+    if (Number.isNaN(quantity) || quantity < 1) {
+        quantity = 1;
+    }
+
+    if (quantity > item.stock) {
+        quantity = item.stock;
+        showToast('Stok tidak cukup!', 'warning');
+    }
+
+    item.quantity = quantity;
+    updateCart();
+}
+
 function removeItem(productId) {
     cart = cart.filter(item => item.product_id !== productId);
     updateCart();
@@ -742,7 +841,13 @@ function updateCart() {
             </div>
             <div class="cart-item-qty">
                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.product_id}, -1)">-</button>
-                <input type="text" value="${item.quantity}" readonly style="width:35px;text-align:center;border:1px solid #ddd;">
+                <input type="number"
+                       min="1"
+                       max="${item.stock}"
+                       inputmode="numeric"
+                       value="${item.quantity}"
+                       onchange="setQuantity(${item.product_id}, this.value)"
+                       style="width:60px;text-align:center;border:1px solid #ddd;">
                 <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${item.product_id}, 1)">+</button>
                 <button type="button" class="btn btn-sm btn-danger" onclick="removeItem(${item.product_id})"><i class="fas fa-trash"></i></button>
             </div>
@@ -772,6 +877,7 @@ function updateCart() {
     warning.style.display = hasZeroPrice ? '' : 'none';
 
     updateChange(totalPrice);
+    updateDpInfo(totalPrice);
 }
 
 function updateChange(totalPrice) {
@@ -786,6 +892,17 @@ function updateChange(totalPrice) {
     }
 }
 
+function updateDpInfo(totalPrice) {
+    const dpEnabled = document.getElementById('dpSwitch').checked;
+    const dpFields = document.getElementById('dpFields');
+    const amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const totalAfterDiscount = Math.max(0, totalPrice - discountAmount);
+    const debtAmount = Math.max(0, totalAfterDiscount - amountReceived);
+    document.getElementById('debtAmountDisplay').textContent = 'Rp ' + new Intl.NumberFormat('id-ID').format(debtAmount);
+    dpFields.style.display = dpEnabled ? '' : 'none';
+}
+
 function clearCart() {
     if (confirm('Hapus semua item dari keranjang?')) {
         cart = [];
@@ -797,9 +914,14 @@ function clearCart() {
 document.getElementById('amountReceived').addEventListener('input', function () {
     const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     updateChange(totalPrice);
+    updateDpInfo(totalPrice);
 });
 
 document.getElementById('discountAmount').addEventListener('input', function () {
+    updateCart();
+});
+
+document.getElementById('dpSwitch').addEventListener('change', function () {
     updateCart();
 });
 
@@ -817,18 +939,29 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
     const totalAfterDiscount = Math.max(0, totalPrice - discountAmount);
     const amountReceived = parseFloat(document.getElementById('amountReceived').value) || 0;
+    const dpEnabled = document.getElementById('dpSwitch').checked;
+    const debtorName = document.getElementById('debtorName').value.trim();
+    const debtorPhone = document.getElementById('debtorPhone').value.trim();
 
     if (discountAmount > totalPrice) { showToast('Potongan melebihi subtotal', 'warning'); return; }
-    if (amountReceived < totalAfterDiscount) { showToast('Uang yang diberikan tidak cukup!', 'danger'); return; }
+    if (dpEnabled && !debtorName) { showToast('Nama konsumen harus diisi untuk DP', 'warning'); return; }
+    if (dpEnabled && !debtorPhone) { showToast('No. HP konsumen harus diisi untuk DP', 'warning'); return; }
+    if (!dpEnabled && amountReceived < totalAfterDiscount) { showToast('Uang yang diberikan tidak cukup!', 'danger'); return; }
+    if (dpEnabled && amountReceived <= 0) { showToast('Masukkan jumlah DP minimal Rp 1', 'warning'); return; }
 
     if (!navigator.onLine) {
-        // Save to IndexedDB for later sync
+        // Save to IndexedDB for later sync — generate UUID agar idempotency server benar
         const txData = {
+            offline_id: generateOfflineId(),
             items: cart.map(item => ({ product_id: item.product_id, quantity: item.quantity, price: item.price })),
             discount_amount: discountAmount,
             amount_received: amountReceived,
             payment_method: paymentMethod,
             notes: document.getElementById('notesInput').value,
+            is_dp: dpEnabled,
+            debtor_name: debtorName,
+            debtor_phone: debtorPhone,
+            debt_due_date: document.getElementById('debtDueDate').value,
         };
         await savePending(txData);
         cart = [];

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Product;
+use App\Models\Debt;
+use App\Models\Debtor;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -142,7 +144,24 @@ class CashierController extends Controller
             'discount_amount' => $request->input('discount_amount', 0),
             'payment_method' => $request->input('payment_method', 'cash'),
             'notes' => $request->input('notes'),
+            'is_dp' => $request->boolean('is_dp'),
+            'debtor_name' => $request->input('debtor_name'),
+            'debtor_phone' => $request->input('debtor_phone'),
+            'debt_due_date' => $request->input('debt_due_date'),
         ];
+
+        if ($validated['is_dp']) {
+            if (!trim($validated['debtor_name'])) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'Nama konsumen harus diisi untuk DP'])
+                    ->withInput();
+            }
+            if (!trim($validated['debtor_phone'])) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'No. HP konsumen harus diisi untuk DP'])
+                    ->withInput();
+            }
+        }
 
         // Validate
         if (!is_array($validated['items']) || empty($validated['items'])) {
@@ -213,11 +232,20 @@ class CashierController extends Controller
 
             // Check if amount received is sufficient
             $amountReceived = floatval($validated['amount_received']);
+            $isDpMode = $validated['is_dp'];
+            $debtAmount = 0;
+
             if ($amountReceived < $totalAfterDiscount) {
-                throw new \Exception('Uang yang diberikan tidak cukup.');
+                if (!$isDpMode) {
+                    throw new \Exception('Uang yang diberikan tidak cukup.');
+                }
+                if ($amountReceived <= 0) {
+                    throw new \Exception('Jumlah DP harus lebih besar dari 0.');
+                }
+                $debtAmount = $totalAfterDiscount - $amountReceived;
             }
 
-            $change = $amountReceived - $totalAfterDiscount;
+            $change = max(0, $amountReceived - $totalAfterDiscount);
 
             // Create transaction
             $transaction = Transaction::create([
@@ -245,6 +273,23 @@ class CashierController extends Controller
 
                 // Reduce stock
                 $item['product']->reduceStock($item['quantity'], 'Sale - ' . $transaction->transaction_number);
+            }
+
+            if ($validated['is_dp'] && $debtAmount > 0) {
+                $debtor = Debtor::firstOrCreate(
+                    ['phone' => $validated['debtor_phone']],
+                    ['name' => $validated['debtor_name']]
+                );
+
+                Debt::create([
+                    'debtor_id' => $debtor->id,
+                    'user_id' => auth()->id(),
+                    'amount' => $debtAmount,
+                    'amount_paid' => 0,
+                    'due_date' => $validated['debt_due_date'] ?? now()->addDays(30)->toDateString(),
+                    'is_paid' => false,
+                    'description' => 'Sisa hutang DP transaksi ' . $transaction->transaction_number,
+                ]);
             }
 
             DB::commit();
@@ -345,7 +390,9 @@ class CashierController extends Controller
                 $discountAmount    = floatval($txData['discount_amount'] ?? 0);
                 $totalAfterDiscount = max(0, $totalPrice - $discountAmount);
                 $amountReceived    = floatval($txData['amount_received'] ?? $totalAfterDiscount);
-                $change            = $amountReceived - $totalAfterDiscount;
+                $isDpMode          = !empty($txData['is_dp']);
+                $debtAmount        = $isDpMode ? max(0, $totalAfterDiscount - $amountReceived) : 0;
+                $change            = max(0, $amountReceived - $totalAfterDiscount);
 
                 $transaction = Transaction::create([
                     'transaction_number' => Transaction::generateTransactionNumber(),
@@ -371,6 +418,23 @@ class CashierController extends Controller
                     ]);
 
                     $item['product']->reduceStock($item['qty'], 'Offline Sync - ' . $transaction->transaction_number);
+                }
+
+                if ($isDpMode && $debtAmount > 0 && !empty($txData['debtor_phone'])) {
+                    $debtor = Debtor::firstOrCreate(
+                        ['phone' => $txData['debtor_phone']],
+                        ['name' => $txData['debtor_name'] ?? 'Pelanggan']
+                    );
+
+                    Debt::create([
+                        'debtor_id' => $debtor->id,
+                        'user_id' => auth()->id(),
+                        'amount' => $debtAmount,
+                        'amount_paid' => 0,
+                        'due_date' => $txData['debt_due_date'] ?? now()->addDays(30)->toDateString(),
+                        'is_paid' => false,
+                        'description' => 'Sisa hutang DP transaksi ' . $transaction->transaction_number,
+                    ]);
                 }
 
                 DB::commit();

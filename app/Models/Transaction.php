@@ -48,20 +48,25 @@ class Transaction extends Model
 
     /**
      * Generate a unique transaction number, safe against race conditions.
-     * Uses a DB-level sequence count with locking to prevent duplicates.
+     * Uses MySQL GET_LOCK() to serialize number generation across concurrent requests.
      */
     public static function generateTransactionNumber(): string
     {
-        $date = now()->format('Ymd');
-        // Use a PostgreSQL advisory lock to serialize number generation.
-        // pg_advisory_xact_lock acquires a transaction-level exclusive lock
-        // using a stable integer key (CRC32 of the date), preventing duplicate
-        // numbers under concurrent requests without conflicting with FOR UPDATE
-        // on aggregate functions (which PostgreSQL disallows).
-        DB::statement('SELECT pg_advisory_xact_lock(?)', [crc32('trx_seq_' . $date)]);
-        $count = DB::table('transactions')
-            ->whereDate('created_at', now())
-            ->count() + 1;
-        return 'TRX-' . $date . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
+        $date    = now()->format('Ymd');
+        $lockKey = 'trx_seq_' . $date;
+
+        // Acquire a session-level exclusive lock (wait up to 10 seconds).
+        DB::statement('SELECT GET_LOCK(?, 10)', [$lockKey]);
+
+        try {
+            $count = DB::table('transactions')
+                ->whereDate('created_at', now())
+                ->count() + 1;
+
+            return 'TRX-' . $date . '-' . str_pad($count, 5, '0', STR_PAD_LEFT);
+        } finally {
+            // Always release the lock regardless of success or failure.
+            DB::statement('SELECT RELEASE_LOCK(?)', [$lockKey]);
+        }
     }
 }

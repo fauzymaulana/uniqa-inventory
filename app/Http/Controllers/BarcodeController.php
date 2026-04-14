@@ -11,44 +11,24 @@ class BarcodeController extends Controller
 {
     /**
      * Generate and display QR Code for a product.
+     * Uses SVG format (no imagick required).
      */
     public function qrcode(Product $product): Response
     {
-        // Create directory if not exists
-        $dirPath = storage_path('app/public/qrcodes');
-        if (!file_exists($dirPath)) {
-            mkdir($dirPath, 0755, true);
-        }
+        $payload = $product->barcode ?: $product->sku;
 
-        // Generate QR code file — always use the plain barcode string as payload.
-        // If the product has no barcode yet, fall back to the product SKU.
-        $payload  = $product->barcode ?: $product->sku;
-        $filePath = $dirPath . '/' . $product->id . '.png';
-
-        // Always regenerate so the file reflects the current barcode value.
         try {
-            QrCode::size(300)
-                ->format('png')
-                ->generate($payload, $filePath);
-        } catch (\Exception $e) {
-            // Fallback — stream on the fly without caching
             $qrCode = QrCode::size(300)
-                ->format('png')
+                ->format('svg')
                 ->generate($payload);
 
             return response($qrCode, 200, [
-                'Content-Type' => 'image/png',
-            ]);
-        }
-
-        if (file_exists($filePath)) {
-            return response(file_get_contents($filePath), 200, [
-                'Content-Type' => 'image/png',
+                'Content-Type'  => 'image/svg+xml',
                 'Cache-Control' => 'public, max-age=31536000',
             ]);
+        } catch (\Exception $e) {
+            abort(500, 'QR Code generation failed: ' . $e->getMessage());
         }
-
-        abort(404, 'QR Code not found');
     }
 
     /**

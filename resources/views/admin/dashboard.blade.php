@@ -14,15 +14,15 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ route('admin.dashboard') }}" class="row g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Akhir</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end">
+            <div class="col-12 col-md-4 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100">
                     <i class="fas fa-filter"></i> Filter
                 </button>
@@ -32,8 +32,8 @@
 </div>
 
 <!-- Today's Statistics -->
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-dollar-sign text-success"></i> Penjualan Hari Ini</h5>
@@ -42,7 +42,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-calculator text-info"></i> Transaksi Hari Ini</h5>
@@ -54,8 +54,8 @@
 </div>
 
 <!-- Period Statistics -->
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-chart-bar text-primary"></i> Penjualan Periode</h5>
@@ -64,7 +64,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-receipt text-warning"></i> Total Transaksi Periode</h5>
@@ -76,8 +76,8 @@
 </div>
 
 <!-- Inventory Statistics -->
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-box text-success"></i> Total Produk</h5>
@@ -86,7 +86,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-6 col-md-6">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-cubes text-info"></i> Total Jumlah Stok</h5>
@@ -98,8 +98,8 @@
 </div>
 
 <!-- Charts Section -->
-<div class="row mb-4">
-    <div class="col-md-6">
+<div class="row mb-4 g-3">
+    <div class="col-12 col-md-6">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
@@ -116,7 +116,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-12 col-md-6">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">

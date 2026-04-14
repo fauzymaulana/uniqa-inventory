@@ -1,42 +1,69 @@
 {{-- resources/views/company/_hero.blade.php --}}
-<section class="hero-section" id="hero">
-    <div class="container">
-        <div class="row align-items-center g-4">
+<section id="hero" class="c3-hero">
 
-            {{-- Headline & CTA --}}
-            <div class="col-lg-5" data-aos="fade-right" data-aos-duration="800">
-                <h1 class="hero-headline">
-                    Platform <span>Wedding</span> for YOU!
+    <div class="c3-hero-bg-warm"></div>
+    <div class="c3-hero-bg-blob"></div>
+
+    <div class="container c3-hero-container">
+        <div class="row align-items-center g-5">
+
+            {{-- Left: Text --}}
+            <div class="col-lg-6" data-aos="fade-up" data-aos-duration="700">
+
+                <div class="c3-rating-badge mb-4">
+                    <span class="c3-stars">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </span>
+                    <span class="c3-rating-text">Rated 4.9/5 &mdash; Dipercaya 1000+ pasangan</span>
+                </div>
+
+                <h1 class="c3-hero-title">
+                    Undangan Pernikahan
+                    <span class="c3-gradient-text">Digital &amp; Cetak</span>
+                    yang Memukau
                 </h1>
-                <p class="hero-sub">
-                    Wujudkan undangan pernikahan impian kamu dengan desain eksklusif,
-                    elegan, dan berkesan &mdash; semuanya dalam satu platform.
+
+                <p class="c3-hero-sub">
+                    Wujudkan undangan pernikahan impian Anda &mdash; elegan, personal, dan mudah dibagikan.
+                    Dari desain digital hingga cetak premium, kami siap membuat hari istimewa Anda sempurna.
                 </p>
-                <a href="#katalog" class="btn-gold mt-3">
-                    LIHAT CONTOH KATALOG <i class="fas fa-angles-right ms-1"></i>
-                </a>
+
+                <div class="c3-hero-actions">
+                    <a href="https://wa.me/6285362533619?text=Halo%20Uniqa.id%2C%20saya%20ingin%20bertanya%20tentang%20layanan%20undangan%20pernikahan"
+                        target="_blank" rel="noopener noreferrer"
+                        class="btn c3-btn-primary">
+                        Pesan Sekarang <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a href="#katalog" class="btn c3-btn-outline">
+                        Lihat Katalog
+                    </a>
+                </div>
             </div>
 
-            {{-- Hero Image Grid --}}
-            <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800" data-aos-delay="200">
-                <div class="hero-grid">
-                    @if ($heroContents->count())
-                        @foreach ($heroContents->take(6) as $hero)
-                            <div class="hero-grid-item">
-                                <img
-                                    src="{{ asset('storage/konten/' . $hero->image) }}"
-                                    alt="{{ $hero->title }}"
-                                    loading="lazy"
-                                >
-                            </div>
-                        @endforeach
+            {{-- Right: Image --}}
+            <div class="col-lg-6" data-aos="fade-up" data-aos-duration="800" data-aos-delay="200">
+                <div class="c3-hero-img-wrap">
+                    @if (isset($heroContents) && $heroContents->count())
+                        <img src="{{ asset('storage/konten/' . $heroContents->first()->image) }}"
+                            alt="{{ $heroContents->first()->title }}"
+                            class="c3-hero-img" loading="eager">
                     @else
-                        @for ($i = 1; $i <= 6; $i++)
-                            <div class="hero-grid-item" style="background:var(--beige);display:flex;align-items:center;justify-content:center;">
-                                <i class="fas fa-image fa-2x" style="color:var(--gold);opacity:.4"></i>
-                            </div>
-                        @endfor
+                        <img src="{{ asset('images/img_hero_default.jpg') }}"
+                            alt="Koleksi undangan pernikahan digital dan cetak"
+                            class="c3-hero-img">
                     @endif
+
+                    <div class="c3-float-card c3-float-bottom-left c3-float-anim-1">
+                        <p class="c3-float-number">1000+</p>
+                        <p class="c3-float-label">Undangan Dibuat</p>
+                    </div>
+
+                    <div class="c3-float-card c3-float-top-right c3-float-anim-2">
+                        <p class="c3-float-number c3-float-gold">&#11088; 4.9</p>
+                        <p class="c3-float-label">Rating Pelanggan</p>
+                    </div>
                 </div>
             </div>
 

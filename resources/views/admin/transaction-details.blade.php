@@ -3,8 +3,8 @@
 @section('title', 'Detail Transaksi')
 
 @section('content')
-<div class="row">
-    <div class="col-md-8 offset-md-2">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
         <a href="{{ route('admin.reports.sales') }}" class="btn btn-secondary mb-3">
             <i class="fas fa-arrow-left"></i> Kembali
         </a>
@@ -15,22 +15,22 @@
             </div>
             <div class="card-body">
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h6>Nomor Transaksi</h6>
                         <p class="fw-bold">{{ $transaction->transaction_number }}</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h6>Tanggal</h6>
                         <p class="fw-bold">{{ $transaction->created_at->format('d/m/Y H:i:s') }}</p>
                     </div>
                 </div>
 
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h6>Kasir</h6>
                         <p class="fw-bold">{{ $transaction->user->name }}</p>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h6>Metode Pembayaran</h6>
                         <p>
                             @if($transaction->payment_method === 'transfer')
@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="row mb-4">
-                    <div class="col-md-6">
+                    <div class="col-6 col-md-6">
                         <h6>Status</h6>
                         <p>
                             @if($transaction->status === 'completed')
@@ -86,7 +86,7 @@
                 <hr>
 
                 <div class="row">
-                    <div class="col-md-6 offset-md-6">
+                    <div class="col-12 col-md-6 offset-md-6">
                         <div class="card bg-light">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between mb-2">

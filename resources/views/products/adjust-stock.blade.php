@@ -3,8 +3,8 @@
 @section('title', 'Sesuaikan Stok')
 
 @section('content')
-<div class="row">
-    <div class="col-md-6 offset-md-3">
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-6 offset-lg-0">
         <h2><i class="fas fa-balance-scale"></i> Sesuaikan Stok Produk</h2>
         <hr>
 

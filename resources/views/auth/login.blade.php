@@ -22,7 +22,11 @@
             background: white;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            padding: 50px 40px;
+            padding: 40px 32px;
+        }
+        @media (max-width: 575.98px) {
+            .login-card { padding: 28px 20px; border-radius: 12px; }
+            body { align-items: flex-start; padding: 24px 0; }
         }
         .login-header {
             text-align: center;
@@ -167,19 +171,6 @@
                     <i class="fas fa-sign-in-alt"></i> Login
                 </button>
             </form>
-
-            <div class="demo-credentials">
-                <h6>📋 Akun Demo:</h6>
-                <p><strong>Admin:</strong></p>
-                <p>Email: <code>admin@inventory.test</code></p>
-                <p>Password: <code>password</code></p>
-                
-                <hr style="margin: 10px 0; border: none; border-top: 1px solid #e0e0e0;">
-                
-                <p style="margin-top: 10px;"><strong>Kasir:</strong></p>
-                <p>Email: <code>cashier1@inventory.test</code></p>
-                <p>Password: <code>password</code></p>
-            </div>
         </div>
     </div>
 

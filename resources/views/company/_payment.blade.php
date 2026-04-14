@@ -6,21 +6,26 @@
         <div class="payment-grid" data-aos="fade-up" data-aos-delay="100">
             @php
                 $payments = [
-                    ['icon' => 'fas fa-university', 'color' => '#003d79', 'label' => 'Bank BRI'],
-                    ['icon' => 'fas fa-university', 'color' => '#003399', 'label' => 'Bank BCA'],
-                    ['icon' => 'fas fa-university', 'color' => '#003066', 'label' => 'Bank Mandiri'],
-                    ['icon' => 'fas fa-university', 'color' => '#00a65a', 'label' => 'Bank BSI'],
-                    ['icon' => 'fas fa-wallet',     'color' => '#00aed6', 'label' => 'GoPay'],
-                    ['icon' => 'fas fa-wallet',     'color' => '#ee4d2d', 'label' => 'ShopeePay'],
-                    ['icon' => 'fas fa-wallet',     'color' => '#4c3494', 'label' => 'OVO'],
-                    ['icon' => 'fas fa-wallet',     'color' => '#108ee9', 'label' => 'DANA'],
+                    ['img' => 'img_bri.png',       'label' => 'Bank BRI'],
+                    ['img' => 'img_bca.png',       'label' => 'Bank BCA'],
+                    ['img' => 'img_mandiri.png',   'label' => 'Bank Mandiri'],
+                    ['img' => 'img_bsi.png',       'label' => 'Bank BSI'],
+                    ['img' => 'img_gopay.png',     'label' => 'GoPay'],
+                    ['img' => 'img_shopeepay.png', 'label' => 'ShopeePay'],
+                    ['img' => 'img_ovo.png',       'label' => 'OVO'],
+                    ['img' => 'img_dana.png',      'label' => 'DANA'],
                 ];
             @endphp
 
             @foreach ($payments as $payment)
                 <div class="payment-item">
-                    <i class="{{ $payment['icon'] }}" style="color:{{ $payment['color'] }}"></i>
-                    {{ $payment['label'] }}
+                    <img
+                        src="{{ asset('images/payment/' . $payment['img']) }}"
+                        alt="{{ $payment['label'] }}"
+                        class="payment-logo"
+                        loading="lazy"
+                    >
+                    <!-- <span>{{ $payment['label'] }}</span> -->
                 </div>
             @endforeach
         </div>

@@ -20,7 +20,7 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-md-8">
+    <div class="col-12 col-md-10 col-lg-8">
         <div class="card">
             <div class="card-header bg-danger text-white">
                 <h6 class="mb-0 fw-bold"><i class="fas fa-hand-holding-usd me-2"></i>Form Catatan Hutang</h6>
@@ -79,12 +79,12 @@
                                 @enderror
                             </div>
                             <div class="row g-2">
-                                <div class="col-md-6">
+                                <div class="col-12 col-sm-6 col-md-6">
                                     <label class="form-label">No. HP / WhatsApp</label>
                                     <input type="text" name="debtor_phone" value="{{ old('debtor_phone') }}"
                                            class="form-control" placeholder="Contoh: 0812-3456-7890">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-12 col-sm-6 col-md-6">
                                     <label class="form-label">Alamat</label>
                                     <input type="text" name="debtor_address" value="{{ old('debtor_address') }}"
                                            class="form-control" placeholder="Alamat penghutang (opsional)">

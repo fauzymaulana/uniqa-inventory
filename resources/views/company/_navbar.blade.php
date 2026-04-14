@@ -1,39 +1,42 @@
 {{-- resources/views/company/_navbar.blade.php --}}
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top" id="mainNav">
+<nav id="c3Navbar" class="c3-navbar navbar navbar-expand-md fixed-top">
     <div class="container">
-        <a class="navbar-brand navbar-brand-text" href="#hero">
-            <i class="fas fa-ring me-2"></i>Wedding by Uniqa
+
+        <a href="#hero" class="navbar-brand">
+            <img src="{{ asset('images/img_logo.png') }}" alt="Wedding by Uniqa" class="c3-navbar-logo">
         </a>
 
-        <button
-            class="navbar-toggler border-0"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navMenu"
-            aria-controls="navMenu"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler c3-toggler" type="button"
+            data-bs-toggle="collapse" data-bs-target="#companyNavMenu"
+            aria-controls="companyNavMenu" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
         </button>
 
-        <div class="collapse navbar-collapse" id="navMenu">
-            <ul class="navbar-nav ms-auto align-items-lg-center">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#hero">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#katalog">Katalog</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#about">About Us</a>
-                </li>
-                <li class="nav-item ms-lg-2">
-                    <a class="nav-link nav-login-btn" href="{{ route('login') }}">
-                        <i class="fas fa-sign-in-alt me-1"></i> Login
+        <div class="collapse navbar-collapse" id="companyNavMenu">
+            <ul class="navbar-nav ms-auto align-items-md-center gap-md-1 py-3 py-md-0">
+                @php
+                    $navLinks = [
+                        ['label' => 'Beranda',    'href' => '#hero'],
+                        ['label' => 'Layanan',    'href' => '#layanan'],
+                        ['label' => 'Fitur',      'href' => '#fitur'],
+                        ['label' => 'Cara Kerja', 'href' => '#cara-kerja'],
+                        ['label' => 'Katalog',    'href' => '#katalog'],
+                        ['label' => 'FAQ',        'href' => '#faq'],
+                    ];
+                @endphp
+                @foreach ($navLinks as $link)
+                    <li class="nav-item">
+                        <a href="{{ $link['href'] }}" class="nav-link c3-nav-link">{{ $link['label'] }}</a>
+                    </li>
+                @endforeach
+                <li class="nav-item mt-2 mt-md-0 ms-md-3">
+                    <a href="https://wa.me/6285362533619" target="_blank" rel="noopener noreferrer"
+                        class="btn c3-btn-cta">
+                        Hubungi Kami
                     </a>
                 </li>
             </ul>
         </div>
+
     </div>
 </nav>

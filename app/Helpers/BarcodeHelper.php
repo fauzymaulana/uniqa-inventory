@@ -7,26 +7,16 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 class BarcodeHelper
 {
     /**
-     * Generate QR Code for a product.
+     * Generate QR Code for a product (SVG, no imagick required).
      */
     public static function generateQrCode($product)
     {
         try {
-            $qrCodePath = storage_path("app/public/qrcodes/{$product->id}.png");
-            
-            if (!file_exists(dirname($qrCodePath))) {
-                mkdir(dirname($qrCodePath), 0755, true);
-            }
-
-            // Always use the plain barcode string as QR payload.
-            // If no barcode is set yet, fall back to SKU.
             $payload = $product->barcode ?: $product->sku;
 
-            QrCode::size(200)
-                ->format('png')
-                ->generate($payload, $qrCodePath);
-
-            return asset("storage/qrcodes/{$product->id}.png");
+            return 'data:image/svg+xml;base64,' . base64_encode(
+                QrCode::size(200)->format('svg')->generate($payload)
+            );
         } catch (\Exception $e) {
             return null;
         }

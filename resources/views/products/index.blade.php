@@ -49,7 +49,7 @@
 @section('content')
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3 mb-4">
             <h2><i class="fas fa-box"></i> Kelola Produk</h2>
             <div class="d-flex gap-2 flex-wrap">
                 <button class="btn btn-success" id="exportLabelBtn" style="display: none;">

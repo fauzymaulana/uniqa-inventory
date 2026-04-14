@@ -26,15 +26,15 @@
 <div class="card mb-4">
     <div class="card-body">
         <form method="GET" action="{{ auth()->user()->role === 'admin' ? route('admin.expenses.index') : route('cashier.expenses.index') }}" class="row g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="start_date" class="form-control" value="{{ $startDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-sm-6 col-md-4">
                 <label class="form-label">Tanggal Akhir</label>
                 <input type="date" name="end_date" class="form-control" value="{{ $endDate->format('Y-m-d') }}">
             </div>
-            <div class="col-md-4 d-flex align-items-end gap-2">
+            <div class="col-12 col-md-4 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary flex-fill">
                     <i class="fas fa-filter"></i> Filter
                 </button>
@@ -50,7 +50,7 @@
 
 <!-- Summary -->
 <div class="row mb-4">
-    <div class="col-md-12">
+    <div class="col-12">
         <div class="card stat-card">
             <div class="card-body">
                 <h5><i class="fas fa-money-bill-wave text-danger"></i> Total Pengeluaran Periode</h5>
@@ -78,7 +78,7 @@
 <div class="card">
     <div class="card-header bg-light">
         <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
                 <input type="text" id="searchInput" class="form-control" placeholder="Cari kegiatan atau kategori...">
             </div>
         </div>
@@ -188,12 +188,13 @@ const EXPENSE_STORE = 'pending_expenses';
 
 function openExpenseDB() {
     return new Promise((resolve, reject) => {
-        const req = indexedDB.open(EXPENSE_DB_NAME, 1);
+        const req = indexedDB.open(EXPENSE_DB_NAME, 2);
         req.onupgradeneeded = (e) => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(EXPENSE_STORE)) {
-                db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id', autoIncrement: true });
+            if (db.objectStoreNames.contains(EXPENSE_STORE)) {
+                db.deleteObjectStore(EXPENSE_STORE);
             }
+            db.createObjectStore(EXPENSE_STORE, { keyPath: 'offline_id' });
         };
         req.onsuccess = (e) => resolve(e.target.result);
         req.onerror = (e) => reject(e);
@@ -236,8 +237,8 @@ async function syncPendingExpenses() {
             body: JSON.stringify({ expenses: pending }),
         });
         const result = await resp.json();
-        if (result.success && result.synced.length > 0) {
-            for (const s of result.synced) {
+        if (result.success && result.data?.synced?.length > 0) {
+            for (const s of result.data.synced) {
                 await deletePendingExpense(db, s.offline_id);
             }
             // Reload page to show synced data

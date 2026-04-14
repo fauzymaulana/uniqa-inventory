@@ -11,7 +11,7 @@
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
+    <div class="col-12 col-lg-8">
         <div class="card">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0"><i class="fas fa-envelope-open-text"></i> Edit: {{ $product->name }}</h5>
@@ -58,7 +58,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Deskripsi</label>
-                        <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="4">{{ old('description', $product->description) }}</textarea>
+                        <textarea id="editor" name="description" class="form-control @error('description') is-invalid @enderror">{{ old('description', $product->description) }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -182,5 +182,62 @@ document.getElementById('videoInput').addEventListener('change', function(e) {
         document.getElementById('videoPreview').style.display = 'block';
     }
 });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
+
+<script>
+    (function() {
+        if (typeof tinymce === 'undefined') {
+            console.error('TinyMCE not loaded');
+            return;
+        }
+
+        tinymce.init({
+            selector: '#editor',
+            promotion: false,
+            license_key: 'gpl',
+            
+            plugins: [
+                'advlist',      // Advanced bullet/numbered lists
+                'autolink',     // Automatic links
+                'lists',        // Lists
+                'link',         // Link plugin
+                'charmap',      // Special characters
+                'searchreplace',// Search & Replace
+                'undo',         // Undo/Redo
+                'help'          // Help
+            ],
+            
+            toolbar: 'undo redo | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link charmap | removeformat help',
+            
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; } p { margin: 0.5em 0; }',
+            
+            height: 350,
+            resize: true,
+            auto_focus: false,
+            
+            link_target_list: [
+                { title: 'Same window', value: '' },
+                { title: 'New tab', value: '_blank' }
+            ],
+            link_context_toolbar: true,
+            
+            browser_spellcheck: true,
+            statusbar: true,
+            menubar: false,
+            branding: false,
+            paste_as_text: true,
+            
+            setup: function(editor) {
+                editor.on('init', function() {
+                    console.log('TinyMCE initialized successfully');
+                });
+                
+                editor.on('submit', function() {
+                    editor.save();
+                });
+            }
+        });
+    })();
 </script>
 @endsection
