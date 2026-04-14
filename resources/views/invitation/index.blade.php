@@ -254,7 +254,7 @@
 </div>
 
 <!-- Add Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1" data-bs-backdrop="true">
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ route('admin.invitation.kategori.store') }}" method="POST">
@@ -284,12 +284,57 @@
 
 @endif
 
+<style>
+    /* Ensure proper modal z-index */
+    .modal {
+        z-index: 1050 !important;
+    }
+    
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+    
+    /* Prevent multiple backdrops */
+    body.modal-open .modal-backdrop:not(:last-child) {
+        display: none;
+    }
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    
+    // Clean up any orphaned backdrops on page load
+    function cleanupBackdrops() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        if (backdrops.length > 1) {
+            backdrops.forEach((backdrop, index) => {
+                if (index < backdrops.length - 1) {
+                    backdrop.remove();
+                }
+            });
+        }
+    }
+    
+    // Clean backdrops periodically
+    setInterval(cleanupBackdrops, 500);
+    
+    // Also clean on modal hide
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function() {
+            cleanupBackdrops();
+            // Remove any remaining backdrop from body
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop && !document.querySelector('.modal.show')) {
+                backdrop.remove();
+            }
+        });
+    });
 
     // Edit Category Modal
     document.querySelectorAll('.btn-open-edit-category').forEach(btn => {
         btn.addEventListener('click', function () {
+            cleanupBackdrops();
             document.getElementById('categoryName').value = this.dataset.categoryName;
             document.getElementById('categoryDesc').value = this.dataset.categoryDesc || '';
             document.getElementById('editCategoryForm').action =
@@ -300,6 +345,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add Sub-Category Modal
     document.querySelectorAll('.btn-open-sub-category').forEach(btn => {
         btn.addEventListener('click', function () {
+            cleanupBackdrops();
             const categoryId   = this.dataset.categoryId;
             const categoryName = this.dataset.categoryName;
             const role         = '{{ auth()->user()->role }}';
