@@ -121,6 +121,11 @@ Route::middleware(['auth', 'activity'])->group(function () {
         Route::put('invitation-kategori/{id}', [InvitationController::class, 'updateCategory'])->name('invitation.kategori.update');
         Route::delete('invitation-kategori/{id}', [InvitationController::class, 'destroyCategory'])->name('invitation.kategori.destroy');
 
+        // Invitation Sub-Categories
+        Route::post('invitation-kategori/{categoryId}/sub-kategori', [InvitationController::class, 'storeSubCategory'])->name('invitation.sub-kategori.store');
+        Route::put('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'updateSubCategory'])->name('invitation.sub-kategori.update');
+        Route::delete('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'destroySubCategory'])->name('invitation.sub-kategori.destroy');
+
         // Content Management (admin access)
         Route::resource('content', ContentController::class);
 
@@ -157,6 +162,11 @@ Route::middleware(['auth', 'activity'])->group(function () {
         Route::get('invitation', [InvitationController::class, 'index'])->name('invitation.index');
         Route::get('invitation/create', [InvitationController::class, 'create'])->name('invitation.create');
         Route::post('invitation', [InvitationController::class, 'store'])->name('invitation.store');
+
+        // Invitation Sub-Categories (cashier: manage sub-categories)
+        Route::post('invitation-kategori/{categoryId}/sub-kategori', [InvitationController::class, 'storeSubCategory'])->name('invitation.sub-kategori.store');
+        Route::put('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'updateSubCategory'])->name('invitation.sub-kategori.update');
+        Route::delete('invitation-kategori/{categoryId}/sub-kategori/{subCategoryId}', [InvitationController::class, 'destroySubCategory'])->name('invitation.sub-kategori.destroy');
 
         // Content Create (cashier access)
         Route::get('content/create', [ContentController::class, 'create'])->name('content.create');

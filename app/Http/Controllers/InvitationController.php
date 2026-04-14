@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\InvitationCategory;
 use App\Models\InvitationProduct;
+use App\Models\InvitationSubCategory;
 use App\Http\Requests\StoreInvitationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -274,5 +275,66 @@ class InvitationController extends Controller
         $product->delete();
 
         return redirect()->route('admin.invitation.index')->with('success', 'Produk undangan berhasil dihapus');
+    }
+
+    /**
+     * Store a newly created invitation sub-category.
+     */
+    public function storeSubCategory(Request $request, string $categoryId)
+    {
+        abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'order' => 'nullable|integer|min:0',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+        $validated['invitation_category_id'] = $categoryId;
+        $validated['is_active'] = true;
+
+        InvitationSubCategory::create($validated);
+
+        return redirect()->back()->with('success', 'Sub-kategori undangan berhasil ditambahkan');
+    }
+
+    /**
+     * Update an invitation sub-category.
+     */
+    public function updateSubCategory(Request $request, string $categoryId, string $subCategoryId)
+    {
+        abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
+        
+        $subCategory = InvitationSubCategory::where('invitation_category_id', $categoryId)
+            ->findOrFail($subCategoryId);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'order' => 'nullable|integer|min:0',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $validated['slug'] = Str::slug($validated['name']);
+
+        $subCategory->update($validated);
+
+        return redirect()->back()->with('success', 'Sub-kategori undangan berhasil diperbarui');
+    }
+
+    /**
+     * Remove an invitation sub-category.
+     */
+    public function destroySubCategory(string $categoryId, string $subCategoryId)
+    {
+        abort_if(!in_array(auth()->user()->role, ['admin', 'cashier']), 403);
+        
+        $subCategory = InvitationSubCategory::where('invitation_category_id', $categoryId)
+            ->findOrFail($subCategoryId);
+        
+        $subCategory->delete();
+
+        return redirect()->back()->with('success', 'Sub-kategori undangan berhasil dihapus');
     }
 }

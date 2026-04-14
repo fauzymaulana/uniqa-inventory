@@ -9,14 +9,16 @@
         in_array(strtolower($categorySlug), ['video', 'website', 'digital'])
     );
     $isSouvenir = $selectedCategory && (str_contains(strtolower($categoryName), 'souvenir') || str_contains(strtolower($categorySlug), 'souvenir'));
+    
+    // Get tabs from sub-categories if available
     $tabs = [];
-    if ($isCetak) {
-        $tabs = ['lipat 2', 'lipat 3', 'amplop'];
-    } elseif ($isDigital) {
-        $tabs = ['Spesial', 'Fauna', 'Adat', 'Video'];
-    } elseif ($isSouvenir) {
-        $tabs = ['Gift', 'Sablon', 'Gantungan Kunci'];
+    if ($selectedCategory && method_exists($selectedCategory, 'subCategories')) {
+        $subCats = $selectedCategory->subCategories;
+        if ($subCats && $subCats->count() > 0) {
+            $tabs = $subCats->pluck('name')->toArray();
+        }
     }
+    
     $activeTab = request()->query('tab', $tabs[0] ?? 'Semua');
     $hidePrice = $isCetak || $isSouvenir;
     $hideNameDescPrice = $isDigital;
@@ -37,12 +39,31 @@
     <style>
         .pm-media { display:flex; align-items:center; justify-content:center; min-height:360px; background:#000; }
         .pm-media img{ max-width:100%; max-height:70vh; transition:transform .15s ease; }
-        .pm-zoom-controls{ position:absolute; right:1rem; top:1rem; display:flex; gap:.5rem; }
-        .pm-zoom-controls button{ background:rgba(255,255,255,.9); border:0; padding:.35rem .5rem; border-radius:.35rem }
-        .product-image-trigger{ background:transparent; border:0; padding:0; display:block; width:100%; text-align:left }
-        .product-image-trigger img{ display:block; width:100%; height:auto }
-        .product-zoom-overlay{ position:absolute; right:10px; bottom:10px; background:rgba(0,0,0,.45); color:#fff; padding:.4rem .5rem; border-radius:.35rem }
-        .product-thumb{ position:relative; overflow:hidden }
+        .pm-zoom-controls{ position:absolute; right:1rem; top:1rem; display:flex; gap:.5rem; z-index:10; }
+        .pm-zoom-controls button{ background:rgba(255,255,255,.9); border:0; padding:.35rem .5rem; border-radius:.35rem; cursor:pointer; }
+        .pm-zoom-controls button:hover { background:rgba(255,255,255,1); }
+        .product-image-trigger{ background:transparent; border:0; padding:0; display:block; width:100%; text-align:left; cursor:pointer; }
+        .product-image-trigger img{ display:block; width:100%; height:auto; }
+        .product-zoom-overlay{ position:absolute; right:10px; bottom:10px; background:rgba(0,0,0,.45); color:#fff; padding:.4rem .5rem; border-radius:.35rem; font-size:0.875rem; }
+        .product-thumb{ position:relative; overflow:hidden; width:100%; display:flex; align-items:center; justify-content:center; }
+        .product-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+        .product-thumb-placeholder { width:100%; display:flex; align-items:center; justify-content:center; background:#f5f5f5; }
+        
+        /* Catalog cards - consistent sizing */
+        .catalog-card { display:flex; flex-direction:column; height:100%; }
+        .catalog-card .product-thumb { height:300px; }
+        .product-desc { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        
+        /* Digital category - portrait tall, hide name/desc, no bottom margin */
+        .catalog-card.digital { margin-bottom:0; }
+        .catalog-card.digital .product-thumb { height:450px; }
+        .catalog-card.digital .catalog-body { flex-grow:1; display:flex; flex-direction:column; justify-content:flex-end; padding-top:0; }
+        .catalog-card.digital .product-name { display:none; }
+        .catalog-card.digital .product-desc { display:none; }
+        .catalog-card.digital .product-price { display:none; }
+        
+        /* Cetak & Souvenir - square aspect ratio */
+        .catalog-card:not(.digital) .product-thumb { height:300px; }
     </style>
 </head>
 <body data-page-cetak="{{ $isCetak ? '1' : '0' }}">
@@ -71,28 +92,11 @@
     </div>
 
     {{-- Breadcrumb --}}
-    <div class="breadcrumb-custom">
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('company.index') }}" style="color: var(--teal);">Beranda</a></li>
-                    <li class="breadcrumb-item active">Katalog Produk</li>
-                    @if ($selectedCategory)
-                        <li class="breadcrumb-item active">{{ $selectedCategory->name }}</li>
-                    @endif
-                </ol>
-            </nav>
-        </div>
-    </div>
+    {{-- REMOVED: breadcrumb section --}}
 
     {{-- Main Content --}}
     <div class="container products-grid">
-        @if (count($tabs))
-            <div class="catalog-tab-summary">
-                <div>Tab aktif: <strong id="catalogTabTitle">{{ $activeTab }}</strong></div>
-                <div class="text-muted">Gunakan tab untuk melihat tema desain yang sesuai dengan kategori.</div>
-            </div>
-        @endif
+        {{-- Tab summary removed for cleaner layout --}}
 
         @if ($products->count())
             <div class="row g-4">
@@ -162,12 +166,11 @@
                             </div>
                             <div class="catalog-body">
                                 @if ($isDigital)
-                                    <div class="product-digital-note">Lihat preview produk digital di bawah ini.</div>
                                 @else
                                     <div>
                                         <div class="product-name">{{ $product->name }}</div>
                                         @if ($product->description)
-                                            <div class="product-desc">{{ Str::limit($product->description, 70) }}</div>
+                                            <div class="product-desc">{!! Str::limit($product->description, 70) !!}</div>
                                         @endif
                                     </div>
                                 @endif
@@ -336,48 +339,148 @@
 
             function createZoomControls(img){
                 let scale = 1;
-                function apply(){ img.style.transform = `scale(${scale})`; }
-                const controls = document.createElement('div'); controls.className = 'pm-zoom-controls';
-                const btnPlus = document.createElement('button'); btnPlus.type='button'; btnPlus.innerHTML = '+';
-                const btnMinus = document.createElement('button'); btnMinus.type='button'; btnMinus.innerHTML = '−';
-                const btnReset = document.createElement('button'); btnReset.type='button'; btnReset.innerHTML = '⤾';
-                btnPlus.addEventListener('click', (e)=>{ e.stopPropagation(); scale = Math.min(4, +(scale + 0.25).toFixed(2)); apply(); });
-                btnMinus.addEventListener('click', (e)=>{ e.stopPropagation(); scale = Math.max(0.5, +(scale - 0.25).toFixed(2)); apply(); });
-                btnReset.addEventListener('click', (e)=>{ e.stopPropagation(); scale = 1; apply(); });
-                controls.appendChild(btnPlus); controls.appendChild(btnMinus); controls.appendChild(btnReset);
-                img.addEventListener('wheel', function(ev){ ev.preventDefault(); const delta = Math.sign(ev.deltaY); if(delta>0) scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); else scale = Math.min(4, +(scale + 0.1).toFixed(2)); apply(); });
-                img.addEventListener('dblclick', function(ev){ ev.stopPropagation(); scale = 1; apply(); });
+                
+                function apply(){
+                    img.style.transform = `scale(${scale})`;
+                }
+                
+                const controls = document.createElement('div');
+                controls.className = 'pm-zoom-controls';
+                
+                const btnZoomIn = document.createElement('button');
+                btnZoomIn.type = 'button';
+                btnZoomIn.innerHTML = '<i class="fas fa-plus"></i>';
+                btnZoomIn.title = 'Zoom In (Ctrl+Scroll)';
+                btnZoomIn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scale = Math.min(4, +(scale + 0.25).toFixed(2));
+                    apply();
+                });
+                
+                const btnZoomOut = document.createElement('button');
+                btnZoomOut.type = 'button';
+                btnZoomOut.innerHTML = '<i class="fas fa-minus"></i>';
+                btnZoomOut.title = 'Zoom Out';
+                btnZoomOut.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scale = Math.max(0.5, +(scale - 0.25).toFixed(2));
+                    apply();
+                });
+                
+                const btnReset = document.createElement('button');
+                btnReset.type = 'button';
+                btnReset.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                btnReset.title = 'Reset Zoom (Double-click image)';
+                btnReset.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    scale = 1;
+                    apply();
+                });
+                
+                controls.appendChild(btnZoomIn);
+                controls.appendChild(btnZoomOut);
+                controls.appendChild(btnReset);
+                
+                img.addEventListener('wheel', function(ev) {
+                    ev.preventDefault();
+                    const delta = Math.sign(ev.deltaY);
+                    if (delta > 0) {
+                        scale = Math.max(0.5, +(scale - 0.1).toFixed(2));
+                    } else {
+                        scale = Math.min(4, +(scale + 0.1).toFixed(2));
+                    }
+                    apply();
+                }, { passive: false });
+                
+                img.addEventListener('dblclick', function(ev) {
+                    ev.stopPropagation();
+                    scale = 1;
+                    apply();
+                });
+                
                 return controls;
             }
 
             function openProductImageModal(src, name){
                 if(!productModal) return;
                 pmMedia.innerHTML = '';
-                const wrapper = document.createElement('div'); wrapper.style.position = 'relative'; wrapper.style.display='flex'; wrapper.style.alignItems='center'; wrapper.style.justifyContent='center';
-                const img = document.createElement('img'); img.src = src; img.alt = name || '';
-                img.id = 'pmImage'; img.style.maxWidth = '100%'; img.style.maxHeight = '70vh'; img.style.transition='transform .15s ease';
+                
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.style.justifyContent = 'center';
+                wrapper.style.width = '100%';
+                wrapper.style.height = '100%';
+                
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = name || '';
+                img.id = 'pmImage';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '70vh';
+                img.style.objectFit = 'contain';
+                img.style.transition = 'transform 0.15s ease';
+                
                 wrapper.appendChild(img);
+                
                 const controls = createZoomControls(img);
                 wrapper.appendChild(controls);
+                
                 pmMedia.appendChild(wrapper);
                 if(pmName) pmName.textContent = name || '';
                 productModal.show();
             }
 
-            // Use event delegation so dynamically rendered elements are handled.
-            document.addEventListener('click', function(e){
-                const el = e.target.closest('[data-image]');
-                if(!el) return;
-                const bodyIsCetak = document.body && document.body.dataset && document.body.dataset.pageCetak === '1';
-                if(!bodyIsCetak && !el.dataset.image) return;
+            // Image preview: Detect click on images with data-image attribute or product-image-trigger buttons
+            document.addEventListener('click', function(e) {
+                let target = e.target;
+                
+                // Handle button click (product-image-trigger)
+                const triggerBtn = target.closest('.product-image-trigger');
+                if (triggerBtn && triggerBtn.dataset.image) {
+                    e.stopPropagation();
+                    const src = triggerBtn.dataset.image;
+                    const name = triggerBtn.dataset.name || '';
+                    if (src) {
+                        openProductImageModal(src, name);
+                    }
+                    return;
+                }
+                
+                // Handle direct image click within product-thumb
+                const img = target.closest('img');
+                if (!img) return;
+                
+                const productThumb = img.closest('.product-thumb');
+                if (!productThumb) return;
+                
+                const productCard = img.closest('[data-is-cetak], [data-image]');
+                if (!productCard) return;
+                
+                const isCetak = productCard.dataset.isCetak === '1';
+                const bodyIsCetak = document.body.dataset.pageCetak === '1';
+                const hasDataImage = productCard.dataset.image;
+                
+                // Only trigger preview for Cetak/Souvenir categories or if explicitly has data-image
+                if (!isCetak && !bodyIsCetak && !hasDataImage) {
+                    return;
+                }
+                
                 e.stopPropagation();
-                const src = el.dataset.image;
-                const name = el.dataset.name || '';
-                if(src) openProductImageModal(src, name);
+                const src = productCard.dataset.image || img.src;
+                const name = productCard.dataset.name || '';
+                
+                if (src) {
+                    openProductImageModal(src, name);
+                }
             });
 
             if (productModalEl) {
-                productModalEl.addEventListener('hidden.bs.modal', function(){ pmMedia.innerHTML = ''; if(pmName) pmName.textContent = ''; });
+                productModalEl.addEventListener('hidden.bs.modal', function() {
+                    pmMedia.innerHTML = '';
+                    if(pmName) pmName.textContent = '';
+                });
             }
         });
     </script>
