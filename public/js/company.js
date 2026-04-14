@@ -2,7 +2,7 @@
    company.js – Wedding by Uniqa Landing Page Scripts
    =================================================== */
 
-document.addEventListener('DOMContentLoaded', function () {
+function companyInit() {
 
     /* ---- Page Loader ---- */
     var loader = document.getElementById('pageLoader');
@@ -23,14 +23,18 @@ document.addEventListener('DOMContentLoaded', function () {
     var stBtn = document.getElementById('scrollTop');
     var waBtn = document.getElementById('floatingWaBtn');
     window.addEventListener('scroll', function () {
-        stBtn.classList.toggle('show', window.scrollY > 400);
+        if (stBtn) {
+            stBtn.classList.toggle('show', window.scrollY > 400);
+        }
         if (waBtn) {
             waBtn.classList.toggle('scroll-active', window.scrollY > 400);
         }
     });
-    stBtn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    if (stBtn) {
+        stBtn.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 
     /* ---- Smooth Anchor Navigation ---- */
     document.querySelectorAll('a[href^="#"]').forEach(function (a) {
@@ -215,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.querySelectorAll('.product-card-clickable').forEach(function (card) {
+            var isCetakCard = card.dataset.isCekat === '1' || card.dataset.isCetak === '1';
+
             function openModal() {
                 var name    = card.dataset.name    || '';
                 var desc    = card.dataset.desc    || '';
@@ -258,68 +264,57 @@ document.addEventListener('DOMContentLoaded', function () {
                     vid.appendChild(src);
                     pmMedia.appendChild(vid);
                 } else if (image) {
-                    // Image swiper (single image; extend array for multi-image future support)
-                    var images = [image];
-                    var current = 0;
-
                     var wrap = document.createElement('div');
-                    wrap.className = 'pm-swiper';
+                    wrap.className = 'pm-image-preview-wrap';
 
-                    var track = document.createElement('div');
-                    track.className = 'pm-swiper-track';
+                    var imgEl = document.createElement('img');
+                    imgEl.src = image;
+                    imgEl.alt = name;
+                    imgEl.className = 'pm-image-preview';
+                    wrap.appendChild(imgEl);
 
-                    images.forEach(function (src) {
-                        var img = document.createElement('img');
-                        img.src = src;
-                        img.alt = name;
-                        track.appendChild(img);
+                    var zoomLevel = 1;
+                    function setZoom(value) {
+                        zoomLevel = Math.min(3, Math.max(1, value));
+                        imgEl.style.transform = 'scale(' + zoomLevel + ')';
+                    }
+
+                    var controls = document.createElement('div');
+                    controls.className = 'pm-image-controls';
+
+                    var btnZoomOut = document.createElement('button');
+                    btnZoomOut.type = 'button';
+                    btnZoomOut.className = 'pm-control-btn';
+                    btnZoomOut.textContent = '−';
+                    btnZoomOut.addEventListener('click', function () { setZoom(zoomLevel - 0.2); });
+
+                    var btnReset = document.createElement('button');
+                    btnReset.type = 'button';
+                    btnReset.className = 'pm-control-btn';
+                    btnReset.textContent = 'Reset';
+                    btnReset.addEventListener('click', function () { setZoom(1); });
+
+                    var btnZoomIn = document.createElement('button');
+                    btnZoomIn.type = 'button';
+                    btnZoomIn.className = 'pm-control-btn';
+                    btnZoomIn.textContent = '+';
+                    btnZoomIn.addEventListener('click', function () { setZoom(zoomLevel + 0.2); });
+
+                    controls.appendChild(btnZoomOut);
+                    controls.appendChild(btnReset);
+                    controls.appendChild(btnZoomIn);
+
+                    wrap.addEventListener('wheel', function (e) {
+                        e.preventDefault();
+                        setZoom(zoomLevel + (e.deltaY < 0 ? 0.15 : -0.15));
+                    }, { passive: false });
+
+                    imgEl.addEventListener('dblclick', function () {
+                        setZoom(1);
                     });
-                    wrap.appendChild(track);
-
-                    function goTo(idx) {
-                        current = (idx + images.length) % images.length;
-                        track.style.transform = 'translateX(-' + (current * 100) + '%)';
-                        wrap.querySelectorAll('.pm-swiper-dot').forEach(function (d, i) {
-                            d.classList.toggle('active', i === current);
-                        });
-                    }
-
-                    if (images.length > 1) {
-                        var btnPrev = document.createElement('button');
-                        btnPrev.className   = 'pm-swiper-btn pm-swiper-prev';
-                        btnPrev.innerHTML   = '<i class="fas fa-chevron-left"></i>';
-                        btnPrev.addEventListener('click', function () { goTo(current - 1); });
-
-                        var btnNext = document.createElement('button');
-                        btnNext.className   = 'pm-swiper-btn pm-swiper-next';
-                        btnNext.innerHTML   = '<i class="fas fa-chevron-right"></i>';
-                        btnNext.addEventListener('click', function () { goTo(current + 1); });
-
-                        var dots = document.createElement('div');
-                        dots.className = 'pm-swiper-dots';
-                        images.forEach(function (_, i) {
-                            var dot = document.createElement('div');
-                            dot.className = 'pm-swiper-dot' + (i === 0 ? ' active' : '');
-                            dot.addEventListener('click', function () { goTo(i); });
-                            dots.appendChild(dot);
-                        });
-
-                        wrap.appendChild(btnPrev);
-                        wrap.appendChild(btnNext);
-                        wrap.appendChild(dots);
-                    }
-
-                    // Touch/swipe support
-                    var touchStartX = 0;
-                    wrap.addEventListener('touchstart', function (e) {
-                        touchStartX = e.touches[0].clientX;
-                    }, { passive: true });
-                    wrap.addEventListener('touchend', function (e) {
-                        var diff = touchStartX - e.changedTouches[0].clientX;
-                        if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
-                    }, { passive: true });
 
                     pmMedia.appendChild(wrap);
+                    pmMedia.appendChild(controls);
                 } else {
                     pmMedia.innerHTML = '<div class="pm-media-placeholder"><i class="fas fa-image"></i></div>';
                 }
@@ -328,10 +323,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             card.addEventListener('click', openModal);
+            var thumb = card.querySelector('.product-thumb');
+            if (thumb) {
+                thumb.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    openModal();
+                });
+                var thumbImg = thumb.querySelector('img');
+                if (thumbImg) {
+                    thumbImg.style.cursor = 'pointer';
+                    thumbImg.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        openModal();
+                    });
+                }
+            }
             card.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openModal(); }
             });
         });
     })();
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', companyInit);
+} else {
+    companyInit();
+}
+

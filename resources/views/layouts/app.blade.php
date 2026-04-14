@@ -13,7 +13,7 @@
             --sidebar-grad: linear-gradient(160deg, #667eea 0%, #764ba2 100%);
             --topbar-h: 56px;
         }
-        body { background-color: #f0f2f5; font-size: 0.9rem; }
+        body { background-color: #f0f2f5; font-size: 0.9rem; overflow-x: hidden; }
 
         /* Topbar mobile */
         .topbar {
@@ -77,13 +77,26 @@
         }
 
         /* Layout wrapper */
-        .app-wrapper { display:flex; min-height:100vh; }
-        .app-sidebar-placeholder { width:var(--sidebar-w); flex-shrink:0; }
-        @media (max-width:991.98px) { .app-sidebar-placeholder { display:none !important; } }
+        .app-wrapper { display:flex; min-height:100vh; width:100%; }
+        .app-sidebar-placeholder { display:none !important; }
 
         /* Main Content */
-        .main-content { flex:1; min-width:0; padding:28px 24px; }
-        @media (max-width:991.98px) { .main-content { padding:72px 14px 24px; } }
+        .main-content { 
+            flex: 1; 
+            min-width: 0; 
+            padding: 28px 24px; 
+            position: relative;
+            z-index: 1;
+            margin-left: 0;
+            width: 100%;
+        }
+        @media (min-width:992px) { 
+            .main-content { 
+                margin-left: var(--sidebar-w); 
+                width: calc(100% - var(--sidebar-w));
+            } 
+        }
+        @media (max-width:991.98px) { .main-content { padding:72px 14px 24px; margin-left: 0; width: 100%; } }
         @media (max-width:575.98px)  { .main-content { padding:68px 10px 20px; } }
 
         /* Cards */

@@ -75,8 +75,8 @@
                     {{-- Deskripsi --}}
                     <div class="mb-3">
                         <label class="form-label fw-bold">Deskripsi</label>
-                        <textarea name="description" class="form-control @error('description') is-invalid @enderror"
-                                  rows="4" placeholder="Deskripsi produk undangan...">{{ old('description') }}</textarea>
+                        <textarea id="editor" name="description" class="form-control @error('description') is-invalid @enderror"
+                                  placeholder="Deskripsi produk undangan...">{{ old('description') }}</textarea>
                         @error('description')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -181,60 +181,52 @@
 @endsection
 
 @section('scripts')
+{{-- Tambahkan referrerpolicy="origin" --}}
+<script src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js" referrerpolicy="origin"></script>
+
 <script>
 (function () {
     'use strict';
 
-    /* ── Config ────────────────────────────────────────────── */
-    const MAX_IMAGE_BYTES = 5  * 1024 * 1024;   // 5 MB
-    const MAX_VIDEO_BYTES = 20 * 1024 * 1024;   // 20 MB
-    const MAX_VIDEO_DURATION = 60;               // detik
-    const RATIO_TOLERANCE   = 0.05;             // ±5%
+    /* ── Config ── */
+    const MAX_IMAGE_BYTES    = 5  * 1024 * 1024;
+    const MAX_VIDEO_BYTES    = 20 * 1024 * 1024;
+    const MAX_VIDEO_DURATION = 60;
+    const RATIO_TOLERANCE    = 0.05;
 
-    // Allowed aspect ratios [label, width/height]
     const IMAGE_RATIOS = [
         { label: 'Portrait 2:3 (800×1200 / 1080×1350)', ratio: 2/3 },
         { label: 'Square 1:1 (1080×1080)',               ratio: 1   },
         { label: 'Landscape 3:2 (1200×800)',             ratio: 3/2 },
     ];
-    const VIDEO_RATIOS = [
-        { label: 'Portrait 9:16 (1080×1920)', ratio: 9/16 },
-        { label: 'Landscape 16:9 (1920×1080)', ratio: 16/9 },
-        { label: 'Square 1:1 (1080×1080)',     ratio: 1   },
-    ];
 
-    /* ── Helpers ────────────────────────────────────────────── */
+    /* ── Helpers ── */
     function showFeedback(elId, type, html) {
-        const el = document.getElementById(elId);
-        el.innerHTML = `<div class="alert alert-${type} py-2 px-3 small mb-0">${html}</div>`;
+        document.getElementById(elId).innerHTML =
+            `<div class="alert alert-${type} py-2 px-3 small mb-0">${html}</div>`;
     }
-    function clearFeedback(elId) {
-        document.getElementById(elId).innerHTML = '';
-    }
-
+    function clearFeedback(elId) { document.getElementById(elId).innerHTML = ''; }
     function isRatioAllowed(w, h, allowedRatios) {
         const actual = w / h;
         return allowedRatios.find(r => Math.abs(actual - r.ratio) / r.ratio <= RATIO_TOLERANCE) || null;
     }
-
     function setInputError(inputEl, hasError) {
         inputEl.classList.toggle('is-invalid', hasError);
         inputEl.classList.toggle('is-valid',   !hasError);
     }
 
-    /* ── Image validation ───────────────────────────────────── */
+    /* ── Image validation ── */
     document.getElementById('thumbnailInput').addEventListener('change', function () {
-        const file = this.files[0];
-        const preview  = document.getElementById('thumbnailPreview');
-        const infoEl   = document.getElementById('thumbnailInfo');
-        const imgEl    = document.getElementById('previewImg');
+        const file    = this.files[0];
+        const preview = document.getElementById('thumbnailPreview');
+        const infoEl  = document.getElementById('thumbnailInfo');
+        const imgEl   = document.getElementById('previewImg');
 
         preview.style.display = 'none';
         clearFeedback('thumbnailFeedback');
 
         if (!file) { setInputError(this, false); return; }
 
-        // Size check
         if (file.size > MAX_IMAGE_BYTES) {
             showFeedback('thumbnailFeedback', 'danger',
                 `<i class="fas fa-times-circle"></i> Ukuran file terlalu besar (${(file.size/1024/1024).toFixed(2)} MB). Maksimal 5 MB.`);
@@ -247,10 +239,8 @@
         reader.onload = (ev) => {
             const img = new Image();
             img.onload = () => {
-                const w = img.naturalWidth;
-                const h = img.naturalHeight;
+                const w = img.naturalWidth, h = img.naturalHeight;
                 const matched = isRatioAllowed(w, h, IMAGE_RATIOS);
-
                 imgEl.src = ev.target.result;
                 preview.style.display = 'block';
                 infoEl.textContent = `Dimensi: ${w} × ${h} px | Rasio: ${(w/h).toFixed(3)}`;
@@ -258,8 +248,7 @@
                 if (!matched) {
                     showFeedback('thumbnailFeedback', 'danger',
                         `<i class="fas fa-times-circle"></i> Dimensi <strong>${w}×${h} px</strong> tidak sesuai.<br>
-                         Rasio yang diterima:<br>
-                         ${IMAGE_RATIOS.map(r => '• ' + r.label).join('<br>')}`);
+                         Rasio yang diterima:<br>${IMAGE_RATIOS.map(r => '• ' + r.label).join('<br>')}`);
                     setInputError(document.getElementById('thumbnailInput'), true);
                 } else {
                     showFeedback('thumbnailFeedback', 'success',
@@ -272,9 +261,9 @@
         reader.readAsDataURL(file);
     });
 
-    /* ── Video validation ───────────────────────────────────── */
+    /* ── Video validation ── */
     document.getElementById('videoInput').addEventListener('change', function () {
-        const file   = this.files[0];
+        const file    = this.files[0];
         const preview = document.getElementById('videoPreview');
         const infoEl  = document.getElementById('videoInfo');
         const videoEl = document.getElementById('previewVideo');
@@ -284,7 +273,6 @@
 
         if (!file) { setInputError(this, false); return; }
 
-        // Size check
         if (file.size > MAX_VIDEO_BYTES) {
             showFeedback('videoFeedback', 'danger',
                 `<i class="fas fa-times-circle"></i> Ukuran file terlalu besar (${(file.size/1024/1024).toFixed(2)} MB). Maksimal 20 MB.`);
@@ -293,40 +281,33 @@
             return;
         }
 
-        showFeedback('videoFeedback', 'info',
-            `<i class="fas fa-spinner fa-spin"></i> Loading video metadata...`);
+        showFeedback('videoFeedback', 'info', `<i class="fas fa-spinner fa-spin"></i> Loading video metadata...`);
 
         const url = URL.createObjectURL(file);
         videoEl.src = url;
         preview.style.display = 'block';
 
-        // Set timeout for metadata loading
         const metadataTimeout = setTimeout(() => {
             if (!videoEl.videoWidth) {
                 showFeedback('videoFeedback', 'warning',
-                    `<i class="fas fa-exclamation-circle"></i> Tidak bisa membaca metadata video. File mungkin corrupt atau format tidak mendukung.`);
+                    `<i class="fas fa-exclamation-circle"></i> Tidak bisa membaca metadata video.`);
                 setInputError(this, false);
             }
         }, 5000);
 
         videoEl.onloadedmetadata = () => {
             clearTimeout(metadataTimeout);
-            
-            const w  = videoEl.videoWidth;
-            const h  = videoEl.videoHeight;
-            const dur = videoEl.duration;
+            const w = videoEl.videoWidth, h = videoEl.videoHeight, dur = videoEl.duration;
             const errors = [];
 
-            // Duration check only
             if (dur > MAX_VIDEO_DURATION) {
                 errors.push(`Durasi video <strong>${dur.toFixed(1)} detik</strong> melebihi batas 60 detik.`);
             }
 
-            infoEl.textContent = `Dimensi: ${w} × ${h} px | Durasi: ${dur.toFixed(1)} dtk | Size: ${(file.size/1024/1024).toFixed(2)} MB | Format: ${file.type || 'unknown'}`;
+            infoEl.textContent = `Dimensi: ${w} × ${h} px | Durasi: ${dur.toFixed(1)} dtk | Size: ${(file.size/1024/1024).toFixed(2)} MB`;
 
             if (errors.length) {
-                showFeedback('videoFeedback', 'danger',
-                    `<i class="fas fa-times-circle"></i> ${errors.join('<br>')}`);
+                showFeedback('videoFeedback', 'danger', `<i class="fas fa-times-circle"></i> ${errors.join('<br>')}`);
                 setInputError(document.getElementById('videoInput'), true);
             } else {
                 showFeedback('videoFeedback', 'success',
@@ -337,13 +318,12 @@
 
         videoEl.onerror = () => {
             clearTimeout(metadataTimeout);
-            showFeedback('videoFeedback', 'danger',
-                `<i class="fas fa-times-circle"></i> Gagal membaca file video. File mungkin corrupt atau format tidak didukung.`);
+            showFeedback('videoFeedback', 'danger', `<i class="fas fa-times-circle"></i> Gagal membaca file video.`);
             setInputError(this, true);
         };
     });
 
-    /* ── Form submit validation ─────────────────────────────── */
+    /* ── Form submit ── */
     document.getElementById('invitationForm').addEventListener('submit', function (e) {
         const errList = document.getElementById('clientErrorList');
         const errBox  = document.getElementById('clientErrors');
@@ -352,17 +332,11 @@
         errList.innerHTML = '';
         errBox.classList.add('d-none');
 
-        // Debug: Log form data
-        const videoInput = document.getElementById('videoInput');
-        const videoFile = videoInput.files[0];
-        console.log('=== Form Submit Debug ===');
-        console.log('Video file selected:', videoFile ? videoFile.name : 'NONE');
-        console.log('Video file size:', videoFile ? videoFile.size : 'N/A');
-        console.log('Form enctype:', this.getAttribute('enctype'));
-        console.log('Video input value:', videoInput.value);
-        console.log('Video input files:', videoInput.files.length);
+        // ✅ Paksa TinyMCE simpan konten ke textarea sebelum validasi
+        if (typeof tinymce !== 'undefined') {
+            tinymce.triggerSave();
+        }
 
-        // Required fields
         if (!document.getElementById('categorySelect').value) {
             errors.push('Kategori wajib dipilih.');
         }
@@ -370,13 +344,14 @@
             errors.push('Nama Produk wajib diisi.');
         }
 
-        // Check any invalid file inputs
         const thumbInput = document.getElementById('thumbnailInput');
+        const videoInput = document.getElementById('videoInput');
+
         if (thumbInput.classList.contains('is-invalid')) {
-            errors.push('Perbaiki file Thumbnail terlebih dahulu (dimensi atau ukuran tidak sesuai).');
+            errors.push('Perbaiki file Thumbnail terlebih dahulu.');
         }
         if (videoInput.classList.contains('is-invalid')) {
-            errors.push('Perbaiki file Video Demo terlebih dahulu (dimensi, durasi, atau ukuran tidak sesuai).');
+            errors.push('Perbaiki file Video Demo terlebih dahulu.');
         }
 
         if (errors.length) {
@@ -391,27 +366,39 @@
             return;
         }
 
-        // Show loading state
         const btn = document.getElementById('submitBtn');
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
-        
-        console.log('Form validated, submitting...');
     });
 
 })();
 </script>
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+{{-- ✅ TinyMCE Init — pisah dari script di atas agar urutan load jelas --}}
 <script>
     tinymce.init({
-        selector: 'textarea[name=description]',
+        selector: '#editor',
+        promotion: false,
+        license_key: 'gpl',
+        plugins: ['advlist', 'autolink', 'lists', 'link', 'charmap', 'searchreplace', 'help'],
+        toolbar: 'undo redo | styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link charmap | removeformat help',
+        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; line-height: 1.6; } p { margin: 0.5em 0; }',
+        height: 350,
+        resize: true,
         menubar: false,
-        plugins: 'lists link paste autoresize',
-        toolbar: 'undo redo | bold italic underline | bullist numlist | alignleft aligncenter alignright | removeformat',
+        statusbar: true,
         branding: false,
-        height: 250,
-        statusbar: false,
-        content_style: 'body { font-family: Lato, sans-serif; font-size: 14px; color: #333; }'
+        paste_as_text: true,
+        link_target_list: [
+            { title: 'Same window', value: '' },
+            { title: 'New tab', value: '_blank' }
+        ],
+        link_context_toolbar: true,
+        setup: function(editor) {
+            editor.on('init', function() {
+                console.log('TinyMCE initialized successfully');
+            });
+        }
     });
 </script>
 @endsection

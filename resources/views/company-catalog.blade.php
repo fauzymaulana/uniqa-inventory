@@ -9,217 +9,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/company3.css') }}" rel="stylesheet">
     <link href="{{ asset('css/company.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/company-catalog.css') }}" rel="stylesheet">
     <style>
-        .catalog-hero {
-            display: grid;
-            grid-template-columns: 1.3fr 1fr;
-            gap: 2rem;
-            align-items: stretch;
-            background: #fff;
-            padding: 2rem;
-            border-radius: 28px;
-            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            margin: 3rem 0 1.5rem;
-        }
-        .catalog-hero .hero-image {
-            min-height: 320px;
-            border-radius: 24px;
-            background-image: url('{{ asset('images/hero.jpg') }}');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .catalog-hero .hero-image::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.18));
-        }
-        .catalog-meta {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 320px;
-            padding: 1rem 0;
-        }
-        .catalog-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: .35rem;
-            background: rgba(91,164,164,.14);
-            color: var(--teal);
-            padding: .7rem 1rem;
-            border-radius: 999px;
-            font-weight: 700;
-            letter-spacing: .02em;
-            text-transform: uppercase;
-            font-size: .8rem;
-            margin-bottom: 1rem;
-            width: fit-content;
-        }
-        .catalog-headline {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 4vw, 3.4rem);
-            font-weight: 800;
-            line-height: 1.02;
-            margin-bottom: 1rem;
-            max-width: 560px;
-        }
-        .catalog-summary {
-            font-size: 1rem;
-            color: #4b4b4b;
-            line-height: 1.75;
-            max-width: 620px;
-            margin-bottom: 1.8rem;
-        }
-        .catalog-metrics {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        .catalog-metric {
-            background: #f6fdff;
-            border: 1px solid rgba(91,164,164,.14);
-            border-radius: 16px;
-            padding: 1rem 1.2rem;
-            min-width: 140px;
-            color: #33434b;
-            font-weight: 700;
-            box-shadow: 0 12px 30px rgba(102,128,130,.06);
-        }
-        .catalog-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 1rem;
-        }
-        .catalog-tab {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 11px 18px;
-            background: #fff;
-            border: 1px solid rgba(91,164,164,.25);
-            color: #345c5c;
-            border-radius: 999px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all .25s ease;
-            text-decoration: none;
-        }
-        .catalog-tab.active,
-        .catalog-tab:hover {
-            background: var(--teal);
-            color: #fff;
-            border-color: transparent;
-        }
-        .catalog-tab-summary {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 1rem;
-            margin: 1.5rem 0 1rem;
-            color: #5a5a5a;
-        }
-        .catalog-tab-summary strong {
-            color: #2d2d2d;
-            font-weight: 700;
-        }
-        .catalog-card {
-            background: #fff;
-            border-radius: 22px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(30, 50, 60, .08);
-            transition: transform .35s ease, box-shadow .35s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .catalog-card:hover { transform: translateY(-5px); }
-        .catalog-card .product-thumb {
-            position: relative;
-            overflow: hidden;
-            aspect-ratio: 16 / 10;
-            background: #f5f7fa;
-        }
-        .catalog-card .product-thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform .35s ease;
-        }
-        .catalog-card:hover .product-thumb img { transform: scale(1.04); }
-        .catalog-card.digital {
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-        }
-        .catalog-card.digital .product-thumb {
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
-        }
-        .catalog-card.digital .product-body {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 1.5rem;
-            gap: 1rem;
-        }
-        .catalog-card.digital .product-actions {
-            margin-top: 0;
-        }
-        .catalog-card.digital .btn-preview {
-            width: 100%;
-            border-radius: 0 0 20px 20px;
-        }
-        .catalog-body {
-            padding: 1.45rem 1.45rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            flex: 1;
-        }
-        .product-name {
-            font-weight: 700;
-            font-size: 1rem;
-            color: #1f3c3c;
-            margin-bottom: .4rem;
-        }
-        .product-desc {
-            font-size: .9rem;
-            color: #6f7d7d;
-            line-height: 1.7;
-            min-height: 3.4rem;
-        }
-        .product-price {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--teal);
-        }
-        .product-actions {
-            display: grid;
-            gap: .75rem;
-            margin-top: 1rem;
-        }
-        .catalog-empty .btn {
-            min-width: 220px;
-        }
-        @media (max-width: 991px) {
-            .catalog-hero { grid-template-columns: 1fr; }
-            .catalog-meta { min-height: auto; }
-        }
+        .pm-media { display:flex; align-items:center; justify-content:center; min-height:360px; background:#000; }
+        .pm-media img{ max-width:100%; max-height:70vh; transition:transform .15s ease; }
+        .pm-zoom-controls{ position:absolute; right:1rem; top:1rem; display:flex; gap:.5rem; }
+        .pm-zoom-controls button{ background:rgba(255,255,255,.9); border:0; padding:.35rem .5rem; border-radius:.35rem }
+        .product-image-trigger{ background:transparent; border:0; padding:0; display:block; width:100%; text-align:left }
+        .product-image-trigger img{ display:block; width:100%; height:auto }
+        .product-zoom-overlay{ position:absolute; right:10px; bottom:10px; background:rgba(0,0,0,.45); color:#fff; padding:.4rem .5rem; border-radius:.35rem }
+        .product-thumb{ position:relative; overflow:hidden }
     </style>
 </head>
-<body>
+<body data-page-cetak="{{ $isCetak ? '1' : '0' }}">
 
     @php
         $pageTitle = $selectedCategory ? $selectedCategory->name : 'Katalog Produk';
         $categoryName = $selectedCategory ? $selectedCategory->name : '';
         $categorySlug = $selectedCategory ? $selectedCategory->slug : '';
+        $heroImageUrl = $selectedCategory ? asset('images/categories/' . $categorySlug . '.jpg') : asset('images/hero.jpg');
         $isCetak = $selectedCategory && (str_contains(strtolower($categoryName), 'cetak') || str_contains(strtolower($categorySlug), 'cetak'));
         $isDigital = $selectedCategory && (
             str_contains(strtolower($categoryName), 'digital') ||
@@ -241,29 +49,17 @@
 
     {{-- Header Section --}}
     <div class="container catalog-header-row">
-        <div class="catalog-hero">
-            <div class="hero-image"></div>
-            <div class="catalog-meta">
-                <div>
-                    <span class="catalog-badge">{{ $selectedCategory ? 'Kategori ' . $selectedCategory->name : 'Katalog Produk' }}</span>
-                    <h1 class="catalog-headline">{{ $pageTitle }}</h1>
-                    <p class="catalog-summary">
+        <div class="catalog-hero" style="grid-template-columns: 1fr; text-align: center;">
+            <div class="catalog-hero-preview" data-aos="fade-up" style="max-width: 700px; margin: 0 auto;">
+                <div class="hero-image" style="min-height: 400px; background-image: url('{{ $heroImageUrl }}');"></div>
+                <div class="catalog-image-caption" style="gap: 1.2rem;">
+                    <span class="catalog-badge" style="justify-content: center; margin: 0 auto;">{{ $selectedCategory ? 'Kategori ' . $selectedCategory->name : 'Katalog Produk' }}</span>
+                    <h1 class="catalog-category-title">{{ $pageTitle }}</h1>
+                    <p class="catalog-summary" style="text-align: center; margin: 0.5rem 0 1rem;">
                         {!! $selectedCategory && $selectedCategory->description ? $selectedCategory->description : 'Nikmati pengalaman menelusuri katalog premium Uniqa yang dirancang khusus untuk membuat setiap produk tampak mewah, terstruktur, dan mudah dipilih.' !!}
                     </p>
-                </div>
-                <div>
-                    <div class="catalog-metrics">
-                        <div class="catalog-metric">
-                            <div>{{ $products->count() }} desain</div>
-                            <small class="text-muted">Dipilih untuk kategori ini</small>
-                        </div>
-                        <div class="catalog-metric">
-                            <div>{{ $invitationCategories->count() }} kategori</div>
-                            <small class="text-muted">Semua koleksi undangan</small>
-                        </div>
-                    </div>
                     @if(count($tabs))
-                        <div class="catalog-tabs">
+                        <div class="catalog-subtabs" style="justify-content: center;">
                             @foreach($tabs as $tab)
                                 <a href="#" class="catalog-tab {{ $activeTab === $tab ? 'active' : '' }}" data-tab="{{ $tab }}">{{ ucfirst($tab) }}</a>
                             @endforeach
@@ -301,6 +97,15 @@
         @if ($products->count())
             <div class="row g-4">
                 @foreach ($products as $product)
+                    @php
+                        $productCategoryName = $product->category->name ?? ($product->category_name ?? '');
+                        $productCategorySlug = $product->category->slug ?? ($product->category_slug ?? '');
+                        $clickableImage = (
+                            $productCategoryName && (str_contains(strtolower($productCategoryName), 'souvenir') || str_contains(strtolower($productCategoryName), 'undangan') || str_contains(strtolower($productCategoryName), 'cetak'))
+                        ) || (
+                            $productCategorySlug && (str_contains(strtolower($productCategorySlug), 'souvenir') || str_contains(strtolower($productCategorySlug), 'undangan') || str_contains(strtolower($productCategorySlug), 'cetak'))
+                        );
+                    @endphp
                     <div class="col-12 col-md-6 col-lg-4" data-aos="fade-up">
                         <div class="catalog-card product-card-clickable {{ $isDigital ? 'digital' : '' }}"
                             data-name="{{ $product->name }}"
@@ -309,7 +114,8 @@
                             data-video="{{ $product->video_demo ? asset('storage/undangan/videos/' . $product->video_demo) : '' }}"
                             data-image="{{ $product->thumbnail ? asset('storage/undangan/' . $product->thumbnail) : '' }}"
                             data-link="{{ $product->link ?? '' }}"
-                            data-wa="{{ urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}"
+                            data-is-cetak="{{ $isCetak ? '1' : '0' }}"
+                            data-wa="{{ $isCetak ? '' : urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}"
                             role="button"
                             tabindex="0"
                         >
@@ -327,14 +133,27 @@
                                         <i class="fas fa-play-circle"></i>
                                     </div>
                                 @elseif ($product->thumbnail)
-                                    <img
-                                        src="{{ asset('storage/undangan/' . $product->thumbnail) }}"
-                                        alt="{{ $product->name }}"
-                                        loading="lazy"
-                                    >
-                                    <div class="product-zoom-overlay">
-                                        <i class="fas fa-search-plus"></i>
-                                    </div>
+                                    @if($clickableImage)
+                                        <button type="button" class="product-image-trigger" data-image="{{ asset('storage/undangan/' . $product->thumbnail) }}" data-name="{{ $product->name }}">
+                                            <img
+                                                src="{{ asset('storage/undangan/' . $product->thumbnail) }}"
+                                                alt="{{ $product->name }}"
+                                                loading="lazy"
+                                            >
+                                            <div class="product-zoom-overlay">
+                                                <i class="fas fa-search-plus"></i>
+                                            </div>
+                                        </button>
+                                    @else
+                                        <img
+                                            src="{{ asset('storage/undangan/' . $product->thumbnail) }}"
+                                            alt="{{ $product->name }}"
+                                            loading="lazy"
+                                        >
+                                        <div class="product-zoom-overlay">
+                                            <i class="fas fa-search-plus"></i>
+                                        </div>
+                                    @endif
                                 @else
                                     <div class="product-thumb-placeholder">
                                         <i class="fas fa-image fa-2x" style="color:var(--gold);opacity:.3"></i>
@@ -342,44 +161,46 @@
                                 @endif
                             </div>
                             <div class="catalog-body">
-                                @unless($hideNameDescPrice)
+                                @if ($isDigital)
+                                    <div class="product-digital-note">Lihat preview produk digital di bawah ini.</div>
+                                @else
                                     <div>
                                         <div class="product-name">{{ $product->name }}</div>
                                         @if ($product->description)
                                             <div class="product-desc">{{ Str::limit($product->description, 70) }}</div>
                                         @endif
                                     </div>
-                                @endunless
+                                @endif
 
-                                @unless($hidePrice || $hideNameDescPrice)
+                                @if (!$isDigital && !$hidePrice)
                                     <div class="product-price">
                                         Rp {{ number_format($product->price, 0, ',', '.') }}
                                     </div>
-                                @endunless
+                                @endif
 
                                 <div class="product-actions">
                                     @if ($isDigital)
-                                        @if ($product->link)
-                                            <a
-                                                href="{{ $product->link }}"
-                                                class="btn-preview"
-                                                target="_blank"
-                                                rel="noopener"
-                                                onclick="event.stopPropagation()"
-                                            >
-                                                <i class="fas fa-eye"></i> Preview
-                                            </a>
-                                        @endif
-                                    @else
                                         <a
-                                            href="https://wa.me/6285362533619?text={{ urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}"
-                                            class="btn-wa"
+                                            href="{{ $product->link ?? '#' }}"
+                                            class="btn-preview"
                                             target="_blank"
                                             rel="noopener"
                                             onclick="event.stopPropagation()"
                                         >
-                                            <i class="fab fa-whatsapp"></i> Pesan
+                                            <i class="fas fa-eye"></i> Preview
                                         </a>
+                                    @else
+                                        @if (!$isCetak)
+                                            <a
+                                                href="https://wa.me/6285362533619?text={{ urlencode('Halo Uniqa, saya tertarik dengan undangan "' . $product->name . '" seharga Rp ' . number_format($product->price, 0, ',', '.') . '. Bisa info lebih lanjut?') }}"
+                                                class="btn-wa"
+                                                target="_blank"
+                                                rel="noopener"
+                                                onclick="event.stopPropagation()"
+                                            >
+                                                <i class="fab fa-whatsapp"></i> Pesan
+                                            </a>
+                                        @endif
                                         @if ($product->link)
                                             <a
                                                 href="{{ $product->link }}"
@@ -409,6 +230,60 @@
             </div>
         @endif
     </div>
+
+    @if($isDigital || $isCetak)
+        <section class="catalog-pricelist" data-aos="fade-up">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Pricelist Undangan Digital</h2>
+                    <p>Berikan pengalaman undangan digital yang elegan dengan paket harga transparan dan fitur lengkap untuk setiap kebutuhan acara.</p>
+                </div>
+                <div class="pricelist-grid">
+                    <div class="price-card">
+                        <h4>Paket Basic</h4>
+                        <div class="price-value">Rp 450.000</div>
+                        <ul>
+                            <li>Desain responsif</li>
+                            <li>Template undangan digital</li>
+                            <li>Link langsung</li>
+                        </ul>
+                    </div>
+                    <div class="price-card">
+                        <h4>Paket Premium</h4>
+                        <div class="price-value">Rp 850.000</div>
+                        <ul>
+                            <li>Video undangan</li>
+                            <li>Animasi transisi</li>
+                            <li>Custom domain ready</li>
+                        </ul>
+                    </div>
+                    <div class="price-card">
+                        <h4>Paket Eksklusif</h4>
+                        <div class="price-value">Rp 1.250.000</div>
+                        <ul>
+                            <li>Undangan digital + video</li>
+                            <li>Form RSVP dan galeri</li>
+                            <li>Support premium</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="benefit-list">
+                    <div class="benefit-card">
+                        <h5>Fitur yang Hebat</h5>
+                        <p>Undangan digital memungkinkan pengiriman instan, laporan klik, dan integrasi WhatsApp yang mudah.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h5>Pengalaman Modern</h5>
+                        <p>Tampilan interaktif dan desain responsif membuat undangan Anda tampil memukau di layar apa pun.</p>
+                    </div>
+                    <div class="benefit-card">
+                        <h5>Hemat & Efisien</h5>
+                        <p>Tanpa biaya cetak, tanpa biaya pengiriman, dan lebih cepat terkirim ke semua tamu Anda.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
 
     <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -449,6 +324,61 @@
                     }
                 });
             });
+
+            // Image preview modal + zoom (delegated; active on pages with cetak flag or per-product data-image)
+            const pmMedia = document.getElementById('pmMedia');
+            const pmName = document.getElementById('pmName');
+            const productModalEl = document.getElementById('productModal');
+            let productModal = null;
+            if (productModalEl && typeof bootstrap !== 'undefined') {
+                productModal = new bootstrap.Modal(productModalEl);
+            }
+
+            function createZoomControls(img){
+                let scale = 1;
+                function apply(){ img.style.transform = `scale(${scale})`; }
+                const controls = document.createElement('div'); controls.className = 'pm-zoom-controls';
+                const btnPlus = document.createElement('button'); btnPlus.type='button'; btnPlus.innerHTML = '+';
+                const btnMinus = document.createElement('button'); btnMinus.type='button'; btnMinus.innerHTML = '−';
+                const btnReset = document.createElement('button'); btnReset.type='button'; btnReset.innerHTML = '⤾';
+                btnPlus.addEventListener('click', (e)=>{ e.stopPropagation(); scale = Math.min(4, +(scale + 0.25).toFixed(2)); apply(); });
+                btnMinus.addEventListener('click', (e)=>{ e.stopPropagation(); scale = Math.max(0.5, +(scale - 0.25).toFixed(2)); apply(); });
+                btnReset.addEventListener('click', (e)=>{ e.stopPropagation(); scale = 1; apply(); });
+                controls.appendChild(btnPlus); controls.appendChild(btnMinus); controls.appendChild(btnReset);
+                img.addEventListener('wheel', function(ev){ ev.preventDefault(); const delta = Math.sign(ev.deltaY); if(delta>0) scale = Math.max(0.5, +(scale - 0.1).toFixed(2)); else scale = Math.min(4, +(scale + 0.1).toFixed(2)); apply(); });
+                img.addEventListener('dblclick', function(ev){ ev.stopPropagation(); scale = 1; apply(); });
+                return controls;
+            }
+
+            function openProductImageModal(src, name){
+                if(!productModal) return;
+                pmMedia.innerHTML = '';
+                const wrapper = document.createElement('div'); wrapper.style.position = 'relative'; wrapper.style.display='flex'; wrapper.style.alignItems='center'; wrapper.style.justifyContent='center';
+                const img = document.createElement('img'); img.src = src; img.alt = name || '';
+                img.id = 'pmImage'; img.style.maxWidth = '100%'; img.style.maxHeight = '70vh'; img.style.transition='transform .15s ease';
+                wrapper.appendChild(img);
+                const controls = createZoomControls(img);
+                wrapper.appendChild(controls);
+                pmMedia.appendChild(wrapper);
+                if(pmName) pmName.textContent = name || '';
+                productModal.show();
+            }
+
+            // Use event delegation so dynamically rendered elements are handled.
+            document.addEventListener('click', function(e){
+                const el = e.target.closest('[data-image]');
+                if(!el) return;
+                const bodyIsCetak = document.body && document.body.dataset && document.body.dataset.pageCetak === '1';
+                if(!bodyIsCetak && !el.dataset.image) return;
+                e.stopPropagation();
+                const src = el.dataset.image;
+                const name = el.dataset.name || '';
+                if(src) openProductImageModal(src, name);
+            });
+
+            if (productModalEl) {
+                productModalEl.addEventListener('hidden.bs.modal', function(){ pmMedia.innerHTML = ''; if(pmName) pmName.textContent = ''; });
+            }
         });
     </script>
 
