@@ -1,3 +1,27 @@
+@php
+    $pageTitle = $selectedCategory ? $selectedCategory->name : 'Katalog Produk';
+    $categoryName = $selectedCategory ? $selectedCategory->name : '';
+    $categorySlug = $selectedCategory ? $selectedCategory->slug : '';
+    $heroImageUrl = $selectedCategory ? asset('images/categories/' . $categorySlug . '.jpg') : asset('images/hero.jpg');
+    $isCetak = $selectedCategory && (str_contains(strtolower($categoryName), 'cetak') || str_contains(strtolower($categorySlug), 'cetak'));
+    $isDigital = $selectedCategory && (
+        str_contains(strtolower($categoryName), 'digital') ||
+        in_array(strtolower($categorySlug), ['video', 'website', 'digital'])
+    );
+    $isSouvenir = $selectedCategory && (str_contains(strtolower($categoryName), 'souvenir') || str_contains(strtolower($categorySlug), 'souvenir'));
+    $tabs = [];
+    if ($isCetak) {
+        $tabs = ['lipat 2', 'lipat 3', 'amplop'];
+    } elseif ($isDigital) {
+        $tabs = ['Spesial', 'Fauna', 'Adat', 'Video'];
+    } elseif ($isSouvenir) {
+        $tabs = ['Gift', 'Sablon', 'Gantungan Kunci'];
+    }
+    $activeTab = request()->query('tab', $tabs[0] ?? 'Semua');
+    $hidePrice = $isCetak || $isSouvenir;
+    $hideNameDescPrice = $isDigital;
+@endphp
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -22,30 +46,6 @@
     </style>
 </head>
 <body data-page-cetak="{{ $isCetak ? '1' : '0' }}">
-
-    @php
-        $pageTitle = $selectedCategory ? $selectedCategory->name : 'Katalog Produk';
-        $categoryName = $selectedCategory ? $selectedCategory->name : '';
-        $categorySlug = $selectedCategory ? $selectedCategory->slug : '';
-        $heroImageUrl = $selectedCategory ? asset('images/categories/' . $categorySlug . '.jpg') : asset('images/hero.jpg');
-        $isCetak = $selectedCategory && (str_contains(strtolower($categoryName), 'cetak') || str_contains(strtolower($categorySlug), 'cetak'));
-        $isDigital = $selectedCategory && (
-            str_contains(strtolower($categoryName), 'digital') ||
-            in_array(strtolower($categorySlug), ['video', 'website', 'digital'])
-        );
-        $isSouvenir = $selectedCategory && (str_contains(strtolower($categoryName), 'souvenir') || str_contains(strtolower($categorySlug), 'souvenir'));
-        $tabs = [];
-        if ($isCetak) {
-            $tabs = ['lipat 2', 'lipat 3', 'amplop'];
-        } elseif ($isDigital) {
-            $tabs = ['Spesial', 'Fauna', 'Adat', 'Video'];
-        } elseif ($isSouvenir) {
-            $tabs = ['Gift', 'Sablon', 'Gantungan Kunci'];
-        }
-        $activeTab = request()->query('tab', $tabs[0] ?? 'Semua');
-        $hidePrice = $isCetak || $isSouvenir;
-        $hideNameDescPrice = $isDigital;
-    @endphp
 
     {{-- Header Section --}}
     <div class="container catalog-header-row">
